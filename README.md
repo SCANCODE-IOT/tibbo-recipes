@@ -20,6 +20,7 @@
 ## Принципы
 
 - **Самое доступное, что решает задачу.** По умолчанию - плата TPP2(G2) и источник #09 от 12 В; более дорогие блоки - только там, где без них нельзя, и с объяснением в README рецепта.
+- **Раскладка, которую одобряет AppBlocks.** Разъёмы выбраны так, чтобы редактор AppBlocks не отмечал сокеты жёлтыми треугольниками: источнику питания #09/#10 - #18, датчику #29 - #00-3. Если документация Tibbo допускает вариант дешевле, но редактор его не принимает, он описан в README рецепта как нишевый.
 - **Все настройки объекта в одном файле** `tide/config.tbh`: сеть, MQTT, адреса приборов, пороги.
 - **Проверка.** Каждый проект собирается в TIDE (библиотеки 2_01_05) без ошибок и предупреждений; варианты AppBlocks открываются в редакторе без ошибок и собираются облачным компилятором. На реальном оборудовании рецепты не проверялись - перед установкой на объект проверьте комплект на стенде.
 
@@ -50,7 +51,13 @@ Ten typical automation tasks solved end to end on Tibbo hardware: a TIDE project
 | 09 | [4-20 mA data logger with web chart](09-4-20ma-logger/) | TPP2(G2) | yes |
 | 10 | [Network watchdog with power-cycle reboot](10-watchdog/) | TPP2(G2) | yes |
 
-Every project builds in TIDE (libraries 2_01_05) with no errors or warnings, and AppBlocks variants open without errors and build in the cloud. **Not tested on real hardware** - verify on a bench before deployment.
+Every project builds in TIDE (libraries 2_01_05) with no errors or warnings, and AppBlocks variants open without errors and build in the cloud. Connectors are chosen so that the AppBlocks editor does not flag any socket (power Tibbits #09/#10 use #18, the #29 sensor sits next to #00-3). **Not tested on real hardware** - verify on a bench before deployment.
+
+## Versions
+
+- **1.1.0** (2026-10-26): recipes 02-05 - inputs of #54 on #21 in S10 and the #09 supply on #18 in S12 instead of one #20 (the AppBlocks editor accepts only #18 for power Tibbits); recipe 07 - #00-3 in S11 powers the #29 sensor; recipe 09 - #12 moved to S9; exact terminal numbers in the READMEs.
+- **1.0.1**: UART divider without overflow on 16-bit DS1100 (recipe 06), library timer period in recipe 03.
+- **1.0**: first release.
 
 ## License
 

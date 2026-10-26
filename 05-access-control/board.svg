@@ -167,13 +167,14 @@ RL2: S5.B → PL_IO_NUM_12_RX2
 <text x="89.5" y="31.5" fill="#fff" font-size="8.5" text-anchor="end">-IN4</text>
 </g>
 </g>
-<g><title>#20 Nine terminal blocks (C2)
-Сокеты: S10, S12</title>
-<rect x="473" y="86" width="272" height="124" fill="#EE6A2C"/>
-<rect x="473" y="86" width="272" height="12" fill="#B8461A"/>
-<rect x="483" y="108" width="252" height="78" rx="3" fill="#141414"/>
-<text x="727" y="138" fill="#fff" font-size="24" font-weight="800" text-anchor="end">#20</text>
-<text x="491" y="158" fill="#fff" font-size="10.5" font-weight="600">NINE TERMINAL BLOCKS</text>
+<g><title>#21 Four terminal blocks (C1)
+Сокеты: S10</title>
+<rect x="611" y="86" width="134" height="124" fill="#EE6A2C"/>
+<rect x="611" y="86" width="134" height="12" fill="#B8461A"/>
+<rect x="621" y="108" width="114" height="78" rx="3" fill="#141414"/>
+<text x="727" y="138" fill="#fff" font-size="24" font-weight="800" text-anchor="end">#21</text>
+<text x="629" y="158" fill="#fff" font-size="10.5" font-weight="600">FOUR TERMINAL</text>
+<text x="629" y="171" fill="#fff" font-size="10.5" font-weight="600">BLOCKS</text>
 </g>
 <g><title>#09 Low-power 5V supply, 12V input (M1S)
 Сокеты: S11
@@ -200,6 +201,14 @@ SDWN: S11.A → PL_IO_NUM_34
 <rect x="93.5" y="-39.0" width="10" height="10" fill="none" stroke="#fff" stroke-width="1.3"/>
 <text x="89.5" y="-30.0" fill="#fff" font-size="8.5" text-anchor="end">SDWN</text>
 </g>
+</g>
+<g><title>#18 Power input (C1)
+Сокеты: S12</title>
+<rect x="473" y="86" width="134" height="124" fill="#EE6A2C"/>
+<rect x="473" y="86" width="134" height="12" fill="#B8461A"/>
+<rect x="483" y="108" width="114" height="78" rx="3" fill="#141414"/>
+<text x="589" y="138" fill="#fff" font-size="24" font-weight="800" text-anchor="end">#18</text>
+<text x="491" y="158" fill="#fff" font-size="10.5" font-weight="600">POWER INPUT</text>
 </g>
 <text x="75" y="934" font-size="18" font-weight="800" fill="#222">Подключение к CPU</text>
 <text x="75" y="960" font-size="12" font-weight="700" fill="#666">Сокет</text>

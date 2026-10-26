@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 80 777 1356" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
-<rect width="837" height="1505" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 80 777 1367" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<rect width="837" height="1543" fill="#FFFFFF"/>
 <rect x="75" y="128" width="742" height="736" fill="#17B884"/>
 <text transform="translate(797,496.0) rotate(-90)" fill="#fff" font-size="26" font-weight="800" text-anchor="middle">TPP2W(G2)</text>
 <rect x="205" y="92" width="122" height="162" fill="#1E9AD6"/><rect x="216" y="108" width="100" height="132" fill="#14324D"/>
@@ -35,26 +35,6 @@
 <text x="678.0" y="658.5" fill="#fff" font-size="12.5" font-weight="700" text-anchor="middle">FULL</text>
 <text x="678.0" y="676.5" fill="#fff" font-size="12.5" font-weight="700" text-anchor="middle">SER4(3) INT4(3)</text>
 <text x="678.0" y="539" fill="#fff" font-size="11.5" font-weight="700" text-anchor="middle" word-spacing="6">15 14 3 19</text>
-<rect x="472" y="212" width="136" height="283" fill="none" stroke="#5FD8AE" stroke-width="2"/>
-<circle cx="493.0" cy="232" r="2.6" fill="#0B3D2E"/>
-<circle cx="508.5" cy="232" r="2.6" fill="#0B3D2E"/>
-<circle cx="524.0" cy="232" r="2.6" fill="#0B3D2E"/>
-<circle cx="539.5" cy="232" r="2.6" fill="#0B3D2E"/>
-<circle cx="555.0" cy="232" r="2.6" fill="#0B3D2E"/>
-<circle cx="570.5" cy="232" r="2.6" fill="#0B3D2E"/>
-<circle cx="586.0" cy="232" r="2.6" fill="#0B3D2E"/>
-<circle cx="493.0" cy="475" r="2.6" fill="#0B3D2E"/>
-<circle cx="508.5" cy="475" r="2.6" fill="#0B3D2E"/>
-<circle cx="524.0" cy="475" r="2.6" fill="#0B3D2E"/>
-<circle cx="539.5" cy="475" r="2.6" fill="#0B3D2E"/>
-<circle cx="555.0" cy="475" r="2.6" fill="#0B3D2E"/>
-<circle cx="570.5" cy="475" r="2.6" fill="#0B3D2E"/>
-<circle cx="586.0" cy="475" r="2.6" fill="#0B3D2E"/>
-<circle cx="540.0" cy="335.5" r="16" fill="none" stroke="#fff" stroke-width="2"/>
-<text x="540.0" y="340.0" fill="#fff" font-size="12.5" font-weight="700" text-anchor="middle">S11</text>
-<text x="540.0" y="373.5" fill="#fff" font-size="12.5" font-weight="700" text-anchor="middle">FULL</text>
-<text x="540.0" y="391.5" fill="#fff" font-size="12.5" font-weight="700" text-anchor="middle">INT6(5) PoE</text>
-<text x="540.0" y="453" fill="#fff" font-size="11.5" font-weight="700" text-anchor="middle" word-spacing="6">21 5 35 34</text>
 <rect x="334" y="128" width="136" height="82" fill="none" stroke="#5FD8AE" stroke-width="2"/>
 <circle cx="402.0" cy="153" r="16" fill="none" stroke="#fff" stroke-width="2"/>
 <text x="402.0" y="157.5" fill="#fff" font-size="12.5" font-weight="700" text-anchor="middle">S13</text>
@@ -197,6 +177,34 @@ SDWN: S9.A → PL_IO_NUM_32
 <text x="727" y="138" fill="#fff" font-size="24" font-weight="800" text-anchor="end">#18</text>
 <text x="629" y="158" fill="#fff" font-size="10.5" font-weight="600">POWER INPUT</text>
 </g>
+<g><title>#00_3 Two direct I/O lines, +5V power, ground (M1S)
+Сокеты: S11
+LN1: S11.A → PL_IO_NUM_34
+LN2: S11.B → PL_IO_NUM_35
+Потребление: +5V 20 мА</title>
+<rect x="476" y="217" width="128" height="273" rx="3" fill="#C3C6C8"/>
+<rect x="491.2" y="224" width="8" height="11" fill="#8E9295" opacity=".75"/>
+<rect x="491.2" y="472" width="8" height="11" fill="#8E9295" opacity=".75"/>
+<rect x="513.6" y="224" width="8" height="11" fill="#8E9295" opacity=".75"/>
+<rect x="513.6" y="472" width="8" height="11" fill="#8E9295" opacity=".75"/>
+<rect x="536.0" y="224" width="8" height="11" fill="#8E9295" opacity=".75"/>
+<rect x="536.0" y="472" width="8" height="11" fill="#8E9295" opacity=".75"/>
+<rect x="558.4" y="224" width="8" height="11" fill="#8E9295" opacity=".75"/>
+<rect x="558.4" y="472" width="8" height="11" fill="#8E9295" opacity=".75"/>
+<rect x="580.8" y="224" width="8" height="11" fill="#8E9295" opacity=".75"/>
+<rect x="580.8" y="472" width="8" height="11" fill="#8E9295" opacity=".75"/>
+<path d="M503,242 H591 V465 H489 V256 Z" fill="#141414"/>
+<path d="M489,256 L503,242 V256 Z" fill="#C3C6C8"/>
+<g transform="translate(540.0,353.5) rotate(90)">
+<text x="-103.5" y="41.0" fill="#fff" font-size="30" font-weight="800">#00_3</text>
+<text x="-103.5" y="-4.0" fill="#fff" font-size="10.5" font-weight="600">TWO DIRECT I/O LINES,</text>
+<text x="-103.5" y="9.0" fill="#fff" font-size="10.5" font-weight="600">+5V POWER, GROUND</text>
+<rect x="93.5" y="-39.0" width="10" height="10" fill="none" stroke="#fff" stroke-width="1.3"/>
+<text x="89.5" y="-30.0" fill="#fff" font-size="8.5" text-anchor="end">LN1</text>
+<rect x="93.5" y="-11.0" width="10" height="10" fill="none" stroke="#fff" stroke-width="1.3"/>
+<text x="89.5" y="-2.0" fill="#fff" font-size="8.5" text-anchor="end">LN2</text>
+</g>
+</g>
 <g><title>#29 Ambient temperature meter (C1)
 Сокеты: S12
 Потребление: +5V 2 мА</title>
@@ -207,8 +215,6 @@ SDWN: S9.A → PL_IO_NUM_32
 <text x="491" y="158" fill="#fff" font-size="10.5" font-weight="600">AMBIENT</text>
 <text x="491" y="171" fill="#fff" font-size="10.5" font-weight="600">TEMPERATURE</text>
 </g>
-<circle cx="485" cy="98" r="12" fill="#E8A100" stroke="#fff" stroke-width="2"/>
-<text x="485" y="102.5" fill="#fff" font-size="12.5" font-weight="800" text-anchor="middle">1</text>
 <text x="75" y="934" font-size="18" font-weight="800" fill="#222">Подключение к CPU</text>
 <text x="75" y="960" font-size="12" font-weight="700" fill="#666">Сокет</text>
 <text x="175" y="960" font-size="12" font-weight="700" fill="#666">Tibbit</text>
@@ -243,28 +249,35 @@ SDWN: S9.A → PL_IO_NUM_32
 <text x="260" y="1166" font-size="12" fill="#333">Medium-power 5V supply, 12V in…</text>
 <text x="470" y="1166" font-size="11.5" fill="#333" font-family="Menlo,Consolas,monospace">SDWN→32</text>
 <text x="627" y="1166" font-size="12" fill="#333">даёт +5V 1100 мА</text>
-<text x="75" y="1214" font-size="18" font-weight="800" fill="#1B8A5A">Питание +5 В: потребление 732 мА из 1100 мА — загрузка 67%</text>
-<rect x="75" y="1226" width="742" height="34" fill="#F1F3F4"/>
-<rect x="75" y="1226" width="742.0" height="34" fill="#E3F5EC" stroke="#1B8A5A" stroke-width="1.5"/>
-<rect x="75.0" y="1230" width="93.4" height="26" fill="#5B6770"><title>плата TPP2 Gen2: 140 мА</title></rect>
-<text x="80.0" y="1247" fill="#fff" font-size="11" font-weight="600">плата TPP2 Gen</text>
-<rect x="169.4" y="1230" width="32.7" height="26" fill="#2F8FE3"><title>зуммер: 50 мА</title></rect>
-<rect x="203.2" y="1230" width="336.3" height="26" fill="#8CC63F"><title>#45_2 S1: 500 мА</title></rect>
-<text x="208.2" y="1247" fill="#fff" font-size="11" font-weight="600">#45_2 S1</text>
-<rect x="540.4" y="1230" width="26.0" height="26" fill="#E2463F"><title>#54 S5: 40 мА</title></rect>
-<rect x="567.4" y="1230" width="0.5" height="26" fill="#F2C230"><title>#29 S12: 2 мА</title></rect>
-<rect x="75.0" y="1272" width="12" height="12" fill="#5B6770"/>
-<text x="93.0" y="1282" font-size="12.5" fill="#333">плата TPP2 Gen2 — 140 мА</text>
-<rect x="446.0" y="1272" width="12" height="12" fill="#2F8FE3"/>
-<text x="464.0" y="1282" font-size="12.5" fill="#333">зуммер — 50 мА</text>
-<rect x="75.0" y="1292" width="12" height="12" fill="#8CC63F"/>
-<text x="93.0" y="1302" font-size="12.5" fill="#333">#45_2 S1 — 500 мА</text>
-<rect x="446.0" y="1292" width="12" height="12" fill="#E2463F"/>
-<text x="464.0" y="1302" font-size="12.5" fill="#333">#54 S5 — 40 мА</text>
-<rect x="75.0" y="1312" width="12" height="12" fill="#F2C230"/>
-<text x="93.0" y="1322" font-size="12.5" fill="#333">#29 S12 — 2 мА</text>
-<text x="75" y="1348" font-size="13" fill="#333"><tspan font-weight="700">Источники:</tspan> #10 S9 (12 В) — 1100 мА</text>
-<circle cx="87" cy="1401" r="12" fill="#E8A100" stroke="#fff" stroke-width="2"/>
-<text x="87" y="1405.5" fill="#fff" font-size="12.5" font-weight="800" text-anchor="middle">1</text>
-<text x="107" y="1406" font-size="13" fill="#222"><tspan font-weight="700">S12:</tspan> разъём #29 обслуживает модуль в S11 (он пуст); совместим с #00_3</text>
+<rect x="175" y="1181" width="10" height="10" fill="#C3C6C8"/>
+<text x="75" y="1191" font-size="12.5" font-weight="700" fill="#222">S11</text>
+<text x="191" y="1191" font-size="12.5" font-weight="700" fill="#222">#00_3</text>
+<text x="260" y="1191" font-size="12" fill="#333">Two direct I/O lines, +5V powe…</text>
+<text x="470" y="1191" font-size="11.5" fill="#333" font-family="Menlo,Consolas,monospace">LN1→34 · LN2→35</text>
+<text x="627" y="1191" font-size="12" fill="#333">20 мА</text>
+<text x="75" y="1239" font-size="18" font-weight="800" fill="#1B8A5A">Питание +5 В: потребление 752 мА из 1100 мА — загрузка 68%</text>
+<rect x="75" y="1251" width="742" height="34" fill="#F1F3F4"/>
+<rect x="75" y="1251" width="742.0" height="34" fill="#E3F5EC" stroke="#1B8A5A" stroke-width="1.5"/>
+<rect x="75.0" y="1255" width="93.4" height="26" fill="#5B6770"><title>плата TPP2 Gen2: 140 мА</title></rect>
+<text x="80.0" y="1272" fill="#fff" font-size="11" font-weight="600">плата TPP2 Gen</text>
+<rect x="169.4" y="1255" width="32.7" height="26" fill="#2F8FE3"><title>зуммер: 50 мА</title></rect>
+<rect x="203.2" y="1255" width="336.3" height="26" fill="#8CC63F"><title>#45_2 S1: 500 мА</title></rect>
+<text x="208.2" y="1272" fill="#fff" font-size="11" font-weight="600">#45_2 S1</text>
+<rect x="540.4" y="1255" width="26.0" height="26" fill="#E2463F"><title>#54 S5: 40 мА</title></rect>
+<rect x="567.4" y="1255" width="12.5" height="26" fill="#F2C230"><title>#00_3 S11: 20 мА</title></rect>
+<rect x="580.9" y="1255" width="0.5" height="26" fill="#9B59B6"><title>#29 S12: 2 мА</title></rect>
+<rect x="75.0" y="1297" width="12" height="12" fill="#5B6770"/>
+<text x="93.0" y="1307" font-size="12.5" fill="#333">плата TPP2 Gen2 — 140 мА</text>
+<rect x="446.0" y="1297" width="12" height="12" fill="#2F8FE3"/>
+<text x="464.0" y="1307" font-size="12.5" fill="#333">зуммер — 50 мА</text>
+<rect x="75.0" y="1317" width="12" height="12" fill="#8CC63F"/>
+<text x="93.0" y="1327" font-size="12.5" fill="#333">#45_2 S1 — 500 мА</text>
+<rect x="446.0" y="1317" width="12" height="12" fill="#E2463F"/>
+<text x="464.0" y="1327" font-size="12.5" fill="#333">#54 S5 — 40 мА</text>
+<rect x="75.0" y="1337" width="12" height="12" fill="#F2C230"/>
+<text x="93.0" y="1347" font-size="12.5" fill="#333">#00_3 S11 — 20 мА</text>
+<rect x="446.0" y="1337" width="12" height="12" fill="#9B59B6"/>
+<text x="464.0" y="1347" font-size="12.5" fill="#333">#29 S12 — 2 мА</text>
+<text x="75" y="1373" font-size="13" fill="#333"><tspan font-weight="700">Источники:</tspan> #10 S9 (12 В) — 1100 мА</text>
+<text x="75" y="1427" font-size="14" font-weight="700" fill="#1B8A5A">Ошибок и предупреждений нет</text>
 </svg>
