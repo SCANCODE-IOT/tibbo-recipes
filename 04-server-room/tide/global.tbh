@@ -1,0 +1,87 @@
+'=====================================================================
+' Рецепт «Мониторинг серверной» · общий заголовок
+' Плата TPP2(G2): #05 (RS-485) в S1, #06 (реле) в S5+S7, #54 (входы) в S9,
+' #09 (питание 12 В) в S11. Библиотеки Tibbo 2_01_05
+'=====================================================================
+include "config.tbh"
+
+#define MQTT_DEBUG_PRINT 0
+#define MQTT_RX_BUFF 2
+#define MQTT_TX_BUFF 4
+#define DHCP_DEBUG_PRINT 0
+#define DNS_DEBUG_PRINT 0
+#define DNS_DEFAULT_SERVER CFG_DNS_SERVER
+
+include "sock\trunk\sock.tbh"
+include "dns\trunk\dns.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "mqtt\trunk\mqtt.tbh"
+
+declare function wln_check_association() as pl_wln_association_states
+
+enum pt_types
+	PT_U16,
+	PT_S16,
+	PT_U32,
+	PT_S32,
+	PT_F32
+end enum
+
+'--- тревоги (биты) ---
+#define AL_T_HIGH 1
+#define AL_T_LOW 2
+#define AL_H_HIGH 4
+#define AL_H_LOW 8
+#define AL_LEAK 16
+#define AL_DOOR 32
+#define AL_IN3 64
+#define AL_IN4 128
+#define AL_SENSOR 256
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+declare function dev_id() as string
+declare sub app_point_value(idx as byte, byref value as string)
+declare sub app_point_error(idx as byte, code as byte)
+declare sub app_cycle_done(ok_count as byte, err_count as byte)
+declare mqtt_online as no_yes
+
+'--- modbus_rtu.tbs ---
+declare sub mb_init()
+declare sub point_add(slave as byte, func as byte, addr as word, ptype as pt_types, divider as word, byref pname as string, writable as no_yes)
+declare sub mb_start_cycle()
+declare sub mb_proc_timer()
+declare sub mb_proc_data()
+declare function mb_find_point(byref pname as string) as byte
+declare function mb_write_point(idx as byte, byref value as string) as ok_ng
+declare function mb_point_name(idx as byte) as string
+declare function mb_point_value(idx as byte) as string
+declare pt_count as byte
+
+'--- monitor.tbs ---
+declare sub mon_init()
+declare sub mon_proc_tick()
+declare sub mon_proc_second()
+declare sub mon_set_temp(byref v as string)
+declare sub mon_set_hum(byref v as string)
+declare sub mon_sensor_error()
+declare sub mon_ack()
+declare sub mon_set_limits(th as integer, tl as integer, hh as integer, hl as integer)
+declare sub mon_set_relay2(st as no_yes)
+declare function mon_alarm_text(mask as word) as string
+declare function mon_input(n as byte) as no_yes
+declare mon_temp as string(8)
+declare mon_hum as string(8)
+declare mon_alarms as word
+declare mon_acked as no_yes
+declare mon_t_high as integer
+declare mon_t_low as integer
+declare mon_h_high as integer
+declare mon_h_low as integer
+declare mon_relay2 as no_yes
+
+'--- web.tbs ---
+declare function web_arg(byref rq as string, byref argname as string) as string
+declare sub web_send(byref s as string)
+declare sub web_handle_set(byref rq as string)
+declare function web_tenth(v as integer) as string

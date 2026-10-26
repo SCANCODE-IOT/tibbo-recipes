@@ -1,0 +1,229 @@
+'=====================================================================
+' Рецепт «Шлюз Modbus RTU -> MQTT» · события и логика
+' Устройство опрашивает приборы по RS-485 (Modbus RTU) и публикует значения
+' в MQTT: <CFG_TOPIC_ROOT>/<id>/<имя точки>. Запись: .../<имя точки>/set
+' Состояние: <root>/<id>/status (online, ошибки цикла), LED: зелёный мигает -
+' нет брокера, горит - на связи; красная вспышка - прибор не ответил.
+'=====================================================================
+include "global.tbh"
+
+dim mqtt_online as no_yes = NO
+dim net_ready as no_yes = NO
+dim tick as byte = 0
+dim poll_ms as dword = 0
+dim topic_base as string(48)
+dim app_mqtt_host as string(64) = CFG_MQTT_HOST
+dim app_mqtt_user as string(32) = CFG_MQTT_USER
+dim app_mqtt_pass as string(32) = CFG_MQTT_PASSWORD
+dim app_mqtt_cid as string(32)
+
+sub on_sys_init()
+	'сторожевой таймер: сбрасываем сами из on_sys_timer, зависание приложения -> перезагрузка
+	sys.wdperiod = 1000
+	sys.wdautoreset = DISABLED
+	sys.wdenabled = YES
+
+	sys.onsystimerperiod = 10            'событие таймера каждые 100 мс
+	pat.play("G-G-------", PL_PAT_CANINT)
+
+	topic_base = CFG_TOPIC_ROOT + "/" + dev_id() + "/"
+	app_mqtt_cid = "tibbo-" + dev_id()
+	dbg("Modbus RTU -> MQTT gateway, id " + dev_id())
+
+	mb_init()
+	config_points()
+	dbg("Points: " + str(pt_count))
+
+	dns_start(sock_get("DNS"))
+#if CFG_USE_DHCP
+	dhcp_start(PL_SOCK_INTERFACE_NET, "", "")
+#else
+	net.ip = CFG_IP
+	net.netmask = CFG_NETMASK
+	net.gatewayip = CFG_GATEWAY
+	net_start_mqtt()
+#endif
+	poll_ms = sys.timercountms
+end sub
+
+sub net_start_mqtt()
+	if net_ready = YES then exit sub
+	net_ready = YES
+	dbg("IP " + net.ip + ", broker " + app_mqtt_host)
+	mqtt_start(PL_SOCK_INTERFACE_NET, app_mqtt_host, CFG_MQTT_PORT, app_mqtt_user, app_mqtt_pass, app_mqtt_cid, false)
+end sub
+
+sub on_sys_timer()
+	sys.wdreset()
+	mb_proc_timer()
+
+	'запуск цикла опроса
+	if sys.timercountms - poll_ms >= CFG_POLL_PERIOD_MS then
+		poll_ms = sys.timercountms
+		mb_start_cycle()
+	end if
+
+	'библиотеки ждут вызова раз в 0,5 с
+	tick = tick + 1
+	if tick >= 5 then
+		tick = 0
+		dhcp_proc_timer()
+		dns_proc_timer()
+		mqtt_proc_timer()
+	end if
+end sub
+
+sub on_ser_data_arrival()
+	if ser.num = CFG_RS485_PORT then mb_proc_data()
+end sub
+
+sub on_sock_data_arrival()
+	dhcp_proc_data()
+	dns_proc_data()
+	mqtt_proc_data()
+end sub
+
+sub on_sock_event(newstate as enum pl_sock_state, newstatesimple as enum pl_sock_state_simple)
+	mqtt_sock_event(newstate, newstatesimple)
+end sub
+
+sub on_net_link_change()
+	if net.linkstate = PL_NET_LINKSTAT_NOLINK then
+		dbg("Ethernet link lost")
+	end if
+end sub
+
+'--- значения от Modbus -> MQTT ---
+sub app_point_value(idx as byte, byref value as string)
+	dim t as string(96)
+	if mqtt_online = NO then exit sub
+	t = topic_base + mb_point_name(idx)
+	mqtt_publish(t, value, QOS_AT_MOST_ONCE)
+end sub
+
+sub app_point_error(idx as byte, code as byte)
+	dbg("Point " + mb_point_name(idx) + ": error " + str(code))
+	pat.play("R-", PL_PAT_CANINT)
+end sub
+
+sub app_cycle_done(ok_count as byte, err_count as byte)
+	dim t as string(64)
+	if mqtt_online = NO then exit sub
+	t = topic_base + "status"
+	mqtt_publish(t, "online ok=" + str(ok_count) + " err=" + str(err_count), QOS_AT_MOST_ONCE)
+end sub
+
+'--- MQTT ---
+sub callback_mqtt_connect_ok()
+	dim t as string(96)
+	mqtt_online = YES
+	pat.play("~G", PL_PAT_CANINT)
+	dbg("MQTT: connected")
+	t = topic_base + "+/set"
+	mqtt_sub(t, QOS_AT_MOST_ONCE)
+	t = topic_base + "+/+/set"
+	mqtt_sub(t, QOS_AT_MOST_ONCE)
+end sub
+
+sub callback_mqtt_connect_lost()
+	mqtt_online = NO
+	pat.play("G-G-------", PL_PAT_CANINT)
+	dbg("MQTT: connection lost, library will reconnect")
+end sub
+
+sub callback_mqtt_sub_ok()
+end sub
+
+'запись: <root>/<id>/<имя точки>/set  значение в единицах публикации (23.5)
+sub callback_mqtt_notif(byref topic as string, byref data as string, remaining_bytes as dword)
+	dim pname as string(48)
+	dim idx as byte
+	dim l as byte = len(topic_base)
+	if left(topic, l) <> topic_base then exit sub
+	if right(topic, 4) <> "/set" then exit sub
+	pname = mid(topic, l + 1, len(topic) - l - 4)
+	idx = mb_find_point(pname)
+	if idx = 255 then
+		dbg("Write: no such point " + pname)
+		exit sub
+	end if
+	if mb_write_point(idx, data) = NG then
+		dbg("Write refused or bad value: " + pname)
+	end if
+end sub
+
+'--- сеть ---
+sub callback_dhcp_ok(renew as no_yes, interface as pl_sock_interfaces, byref ip as string, byref gateway_ip as string, byref netmask as string, lease_time as dword)
+	if renew = YES and net.ip = ip then exit sub
+	net.ip = ip
+	net.gatewayip = gateway_ip
+	net.netmask = netmask
+	net_start_mqtt()
+end sub
+
+sub callback_dhcp_failure(interface as pl_sock_interfaces, failure_code as en_dhcp_status_codes)
+	dbg("DHCP failed, library will retry")
+end sub
+
+sub callback_dhcp_pre_clear_ip(interface as pl_sock_interfaces)
+end sub
+
+sub callback_dhcp_pre_buffrq(required_buff_pages as byte)
+end sub
+
+sub callback_dhcp_buff_released()
+end sub
+
+sub callback_dns_failure(status as en_dns_status_codes)
+	dbg("DNS error " + str(status))
+end sub
+
+sub callback_dns_answer_acquired(return_type as en_dns_return_type, byref return_string as string)
+	mqtt_dns_answer_acquired(return_type, return_string)
+end sub
+
+sub callback_dns_ok()
+end sub
+
+sub callback_dns_pre_buffrq(num_of_pages_required as byte)
+end sub
+
+sub callback_dns_buff_released()
+end sub
+
+'--- заглушка Wi-Fi (см. global.tbh) ---
+function wln_check_association() as pl_wln_association_states
+	wln_check_association = PL_WLN_NOT_ASSOCIATED
+end function
+
+'--- служебное ---
+'id устройства из MAC: 0.36.119.81.127.23 -> 002477517F17
+function dev_id() as string
+	dim m as string(24) = net.mac
+	dim part as string(4) = ""
+	dim i as byte
+	dim c as string(1)
+	dev_id = ""
+	for i = 1 to len(m) + 1
+		if i <= len(m) then
+			c = mid(m, i, 1)
+		else
+			c = "."
+		end if
+		if c = "." then
+			dim h as string(8) = hex(val(part))
+			h = right(h, len(h) - 2)
+			if len(h) < 2 then h = "0" + h
+			dev_id = dev_id + h
+			part = ""
+		else
+			part = part + c
+		end if
+	next i
+end function
+
+sub dbg(byref s as string)
+#if CFG_DEBUG
+	sys.debugprint(s + chr(13) + chr(10))
+#endif
+end sub

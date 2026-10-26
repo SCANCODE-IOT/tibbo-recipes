@@ -1,0 +1,180 @@
+'=====================================================================
+' Регулирование: нагреватель (реле, гистерезис), клапан нагрева 0-10 В
+' и вентилятор 0-10 В (пропорционально), влажность, аварийный режим.
+'=====================================================================
+include "global.tbh"
+
+'#06 в S5+S7: реле 1 (A S5) - нагреватель, реле 2 (B S5) - пуск вентилятора; LOW - включено
+#define IO_HEATER PL_IO_NUM_13_TX2
+#define IO_FAN PL_IO_NUM_12_RX2
+'#14 в S3: CLK - A, DATA - B, LOAD - C, BUSY - D. Выход 1 - вентилятор, 2 - клапан
+#define T14_CLK PL_IO_NUM_11_TX1
+#define T14_DATA PL_IO_NUM_10_RX1
+#define T14_LOAD PL_IO_NUM_1
+#define T14_BUSY PL_IO_NUM_17_INT1
+#define EE_BASE 1
+
+dim th_mode as th_modes = TM_AUTO
+dim th_setpoint as integer
+dim th_hyst as integer
+dim th_pband as integer
+dim th_rh_max as integer
+dim th_manual_fan as byte = 50
+dim th_temp as integer = 0
+dim th_hum as integer = 0
+dim th_have_data as no_yes = NO
+dim th_heater as no_yes = NO
+dim th_valve as byte = 0
+dim th_fan as byte = 0
+dim lost_s as word = 0
+dim dac_ch as byte
+dim dac_ok as no_yes = NO
+
+declare sub th_outputs()
+declare sub th_load()
+declare function to_tenth(byref v as string) as integer
+declare function clamp_pct(v as integer) as byte
+declare function i2s(v as integer) as string
+declare function s2i(byref s as string, pos as byte) as integer
+
+sub th_init()
+	io.num = IO_HEATER
+	io.enabled = YES
+	io.state = HIGH
+	io.num = IO_FAN
+	io.enabled = YES
+	io.state = HIGH
+	if tbt14_init("DAC", T14_DATA, T14_CLK, T14_LOAD, T14_BUSY, dac_ch, NO) = OK then
+		dac_ok = YES
+	else
+		dbg("Tibbit #14: init failed")
+	end if
+	th_load()
+	th_outputs()
+end sub
+
+sub th_set_temp(byref v as string)
+	th_temp = to_tenth(v)
+	th_have_data = YES
+	lost_s = 0
+end sub
+
+sub th_set_hum(byref v as string)
+	th_hum = to_tenth(v)
+end sub
+
+sub th_proc_second()
+	dim d as integer
+	if lost_s < 65000 then lost_s = lost_s + 1
+	if lost_s > CFG_SENSOR_LOST_S then th_have_data = NO
+
+	select case th_mode
+	case TM_OFF
+		th_heater = NO
+		th_valve = 0
+		th_fan = 0
+	case TM_VENT
+		th_heater = NO
+		th_valve = 0
+		th_fan = th_manual_fan
+	case else
+		if th_have_data = NO then
+			th_heater = NO
+			th_valve = 0
+			th_fan = CFG_FAIL_FAN_PCT
+		else
+			'нагреватель: гистерезис вокруг уставки
+			if th_temp < th_setpoint - th_hyst / 2 then th_heater = YES
+			if th_temp > th_setpoint + th_hyst / 2 then th_heater = NO
+			'клапан: 0 % на уставке, 100 % при отклонении вниз на зону пропорциональности
+			d = th_setpoint - th_temp
+			if d > th_pband then d = th_pband
+			if d < 0 then d = 0
+			th_valve = clamp_pct(d * 100 / th_pband)
+			'вентилятор: охлаждение наружным воздухом выше уставки + зона нагревателя
+			d = th_temp - (th_setpoint + th_hyst / 2)
+			if d > th_pband then d = th_pband
+			if d < 0 then d = 0
+			dim f as byte = clamp_pct(d * 100 / th_pband)
+			if th_hum > th_rh_max and f < CFG_RH_FAN_PCT then f = CFG_RH_FAN_PCT
+			if f > 0 and f < CFG_FAN_MIN_PCT then f = CFG_FAN_MIN_PCT
+			th_fan = f
+		end if
+	end select
+	th_outputs()
+end sub
+
+sub th_outputs()
+	io.num = IO_HEATER
+	if th_heater = YES then
+		io.state = LOW
+	else
+		io.state = HIGH
+	end if
+	io.num = IO_FAN
+	if th_fan > 0 then
+		io.state = LOW
+	else
+		io.state = HIGH
+	end if
+	if dac_ok = YES then
+		tbt14_set_mv(DAC_1, th_fan * 100, T14_LOAD, T14_BUSY, dac_ch)
+		tbt14_set_mv(DAC_2, th_valve * 100, T14_LOAD, T14_BUSY, dac_ch)
+	end if
+end sub
+
+function clamp_pct(v as integer) as byte
+	if v < 0 then
+		clamp_pct = 0
+	else if v > 100 then
+		clamp_pct = 100
+	else
+		clamp_pct = v
+	end if
+end function
+
+function to_tenth(byref v as string) as integer
+	dim r as real = strtof(v) * 10
+	if r >= 0 then
+		to_tenth = r + 0.5
+	else
+		to_tenth = r - 0.5
+	end if
+end function
+
+sub th_load()
+	dim r as string(13) = stor.getdata(EE_BASE, 13)
+	if left(r, 2) <> "T1" then
+		th_mode = TM_AUTO
+		th_setpoint = CFG_DEF_SETPOINT
+		th_hyst = CFG_DEF_HYST
+		th_pband = CFG_DEF_PBAND
+		th_rh_max = CFG_DEF_RH_MAX
+		th_manual_fan = 50
+		th_save()
+		exit sub
+	end if
+	th_mode = asc(mid(r, 3, 1))
+	if th_mode > TM_VENT then th_mode = TM_AUTO
+	th_setpoint = s2i(r, 4)
+	th_hyst = s2i(r, 6)
+	th_pband = s2i(r, 8)
+	th_rh_max = s2i(r, 10)
+	th_manual_fan = asc(mid(r, 12, 1))
+	if th_pband < 1 then th_pband = CFG_DEF_PBAND
+	if th_manual_fan > 100 then th_manual_fan = 50
+end sub
+
+sub th_save()
+	stor.setdata("T1" + chr(th_mode) + i2s(th_setpoint) + i2s(th_hyst) + i2s(th_pband) + i2s(th_rh_max) + chr(th_manual_fan) + "|", EE_BASE)
+end sub
+
+function i2s(v as integer) as string
+	dim w as word = v
+	i2s = chr(w / 256) + chr(w mod 256)
+end function
+
+function s2i(byref s as string, pos as byte) as integer
+	dim w as word = asc(mid(s, pos, 1)) * 256 + asc(mid(s, pos + 1, 1))
+	s2i = w
+end function

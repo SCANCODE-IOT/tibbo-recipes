@@ -1,0 +1,48 @@
+'=====================================================================
+' Рецепт «Термостат и вентиляция (0-10 В)» · настройки
+' Датчик температуры и влажности RS-485 (Modbus), нагреватель на реле,
+' клапан нагрева и вентилятор EC с управлением 0-10 В, веб-страница, MQTT.
+' Уставки меняются на веб-странице и хранятся в памяти контроллера.
+'=====================================================================
+
+'--- Сеть ---------------------------------------------------------------
+#define CFG_USE_DHCP 1
+const CFG_IP = "192.168.1.208"
+const CFG_NETMASK = "255.255.255.0"
+const CFG_GATEWAY = "192.168.1.1"
+const CFG_DNS_SERVER = "8.8.8.8"
+
+'--- MQTT ---------------------------------------------------------------
+#define CFG_USE_MQTT 1
+const CFG_MQTT_HOST = "192.168.1.10"
+#define CFG_MQTT_PORT 1883
+const CFG_MQTT_USER = ""
+const CFG_MQTT_PASSWORD = ""
+const CFG_TOPIC_ROOT = "tibbo"
+
+'--- Датчик RS-485 (Tibbit #05 в S1): как в рецепте «Мониторинг серверной» --
+#define CFG_RS485_PORT 0
+#define CFG_RS485_BAUD 9600
+#define CFG_RS485_PARITY PL_SER_PR_NONE
+#define CFG_SENSOR_ADDR 1
+#define CFG_SENSOR_FUNC 4
+#define CFG_REG_TEMP 1
+#define CFG_REG_HUM 2
+#define CFG_POLL_PERIOD_MS 2000
+#define CFG_REPLY_TIMEOUT_MS 500
+#define CFG_MAX_POINTS 4
+#define CFG_PUBLISH_ON_CHANGE_ONLY 0
+#define CFG_REPUBLISH_EVERY 15
+#define CFG_SENSOR_LOST_S 30                'нет данных дольше - аварийный режим
+
+'--- Регулирование по умолчанию (дальше - с веб-страницы), десятые доли --
+#define CFG_DEF_SETPOINT 220                'уставка 22.0 °C
+#define CFG_DEF_HYST 10                     'гистерезис нагревателя 1.0 °C
+#define CFG_DEF_PBAND 30                    'зона пропорциональности 3.0 °C (клапан и вентилятор)
+#define CFG_DEF_RH_MAX 600                  'влажность выше 60 % - вентиляция не меньше CFG_RH_FAN_PCT
+#define CFG_RH_FAN_PCT 50
+#define CFG_FAN_MIN_PCT 20                  'минимальная скорость, когда вентилятор работает
+#define CFG_FAIL_FAN_PCT 30                 'скорость при отказе датчика (нагрев выключается)
+
+'--- Отладка ------------------------------------------------------------
+#define CFG_DEBUG 1

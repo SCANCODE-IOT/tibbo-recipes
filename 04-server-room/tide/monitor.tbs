@@ -1,0 +1,258 @@
+'=====================================================================
+' Логика мониторинга: пороги с задержкой, входы, тревога (реле 1 + зуммер),
+' квитирование, реле 2 вручную с веб-страницы, хранение порогов в EEPROM.
+'=====================================================================
+include "global.tbh"
+
+#define EE_BASE 1
+
+dim mon_temp as string(8) = ""
+dim mon_hum as string(8) = ""
+dim mon_alarms as word = 0
+dim mon_acked as no_yes = NO
+dim mon_t_high as integer
+dim mon_t_low as integer
+dim mon_h_high as integer
+dim mon_h_low as integer
+dim mon_relay2 as no_yes = NO
+
+dim t10 as integer = 0
+dim h10 as integer = 0
+dim have_data as no_yes = NO
+dim lost_s as word = 0
+dim dly(4) as word
+dim in_line(4) as pl_io_num
+dim in_cnt(4) as byte
+dim in_st(4) as no_yes
+dim relay1 as pl_io_num
+dim relay2 as pl_io_num
+dim last_alarms as word = 0
+dim out_state as byte = 0
+
+declare sub mon_load()
+declare sub mon_save()
+declare sub mon_outputs()
+declare function to_tenth(byref v as string) as integer
+declare function i2s(v as integer) as string
+declare function s2i(byref s as string, pos as byte) as integer
+
+sub mon_init()
+	dim i as byte
+	'#06 в S5+S7: реле 1 - линия A S5, реле 2 - линия B S5; LOW - включено
+	relay1 = PL_IO_NUM_13_TX2
+	relay2 = PL_IO_NUM_12_RX2
+	io.num = relay1
+	io.enabled = YES
+	io.state = HIGH
+	io.num = relay2
+	io.enabled = YES
+	io.state = HIGH
+	'#54 в S9: замкнут - LOW
+	in_line(0) = PL_IO_NUM_32
+	in_line(1) = PL_IO_NUM_33
+	in_line(2) = PL_IO_NUM_4
+	in_line(3) = PL_IO_NUM_20_INT4
+	for i = 0 to 3
+		io.num = in_line(i)
+		io.enabled = NO
+		in_cnt(i) = 0
+		in_st(i) = NO
+		dly(i) = 0
+	next i
+	beep.divider = 120000000 / (4 * 2700)     'около 2,7 кГц, как в коде AppBlocks
+	mon_load()
+end sub
+
+'каждые 100 мс: входы с антидребезгом 0,3 с
+sub mon_proc_tick()
+	dim i as byte
+	dim closed as no_yes
+	for i = 0 to 3
+		io.num = in_line(i)
+		if io.state = LOW then
+			closed = YES
+		else
+			closed = NO
+		end if
+		if closed <> in_st(i) then
+			in_cnt(i) = in_cnt(i) + 1
+			if in_cnt(i) >= 3 then
+				in_st(i) = closed
+				in_cnt(i) = 0
+			end if
+		else
+			in_cnt(i) = 0
+		end if
+	next i
+end sub
+
+function mon_input(n as byte) as no_yes
+	mon_input = in_st(n)
+end function
+
+sub mon_set_temp(byref v as string)
+	t10 = to_tenth(v)
+	mon_temp = v
+	have_data = YES
+	lost_s = 0
+end sub
+
+sub mon_set_hum(byref v as string)
+	h10 = to_tenth(v)
+	mon_hum = v
+end sub
+
+sub mon_sensor_error()
+end sub
+
+'раз в секунду: пересчёт тревог
+sub mon_proc_second()
+	dim a as word = 0
+	dim i as byte
+	dim cond(4) as no_yes
+	if lost_s < 65000 then lost_s = lost_s + 1
+	if have_data = YES and lost_s > CFG_SENSOR_LOST_S then
+		have_data = NO
+		mon_temp = ""
+		mon_hum = ""
+	end if
+	if have_data = NO and lost_s > CFG_SENSOR_LOST_S then a = a or AL_SENSOR
+	for i = 0 to 3
+		cond(i) = NO
+	next i
+	if have_data = YES then
+		if t10 > mon_t_high then cond(0) = YES
+		if t10 < mon_t_low then cond(1) = YES
+		if h10 > mon_h_high then cond(2) = YES
+		if h10 < mon_h_low then cond(3) = YES
+	end if
+	for i = 0 to 3
+		if cond(i) = YES then
+			if dly(i) < CFG_ALARM_DELAY_S then dly(i) = dly(i) + 1
+		else
+			dly(i) = 0
+		end if
+	next i
+	if dly(0) >= CFG_ALARM_DELAY_S then a = a or AL_T_HIGH
+	if dly(1) >= CFG_ALARM_DELAY_S then a = a or AL_T_LOW
+	if dly(2) >= CFG_ALARM_DELAY_S then a = a or AL_H_HIGH
+	if dly(3) >= CFG_ALARM_DELAY_S then a = a or AL_H_LOW
+	if in_st(0) = YES then a = a or AL_LEAK
+#if CFG_DOOR_NC
+	if in_st(1) = NO then a = a or AL_DOOR
+#else
+	if in_st(1) = YES then a = a or AL_DOOR
+#endif
+	if in_st(2) = YES then a = a or AL_IN3
+	if in_st(3) = YES then a = a or AL_IN4
+	'новая тревога снимает квитирование
+	if (a and (not last_alarms)) <> 0 then mon_acked = NO
+	last_alarms = a
+	mon_alarms = a
+	mon_outputs()
+end sub
+
+sub mon_outputs()
+	dim want as byte = 0
+	if mon_alarms <> 0 then want = 1
+	if mon_alarms <> 0 and mon_acked = NO then want = 2
+	io.num = relay1
+	if want = 2 then
+		io.state = LOW
+	else
+		io.state = HIGH
+	end if
+	if want <> out_state then
+		out_state = want
+		select case want
+		case 2
+			beep.play("BB-BB-------*", PL_BEEP_CANINT)
+			pat.play("R-R-*", PL_PAT_CANINT)
+		case 1
+			beep.play("-", PL_BEEP_CANINT)
+			pat.play("R-------*", PL_PAT_CANINT)
+		case else
+			beep.play("-", PL_BEEP_CANINT)
+			pat.play("~G", PL_PAT_CANINT)
+		end select
+	end if
+	io.num = relay2
+	if mon_relay2 = YES then
+		io.state = LOW
+	else
+		io.state = HIGH
+	end if
+end sub
+
+sub mon_ack()
+	mon_acked = YES
+	mon_outputs()
+end sub
+
+sub mon_set_relay2(st as no_yes)
+	mon_relay2 = st
+	mon_outputs()
+end sub
+
+sub mon_set_limits(th as integer, tl as integer, hh as integer, hl as integer)
+	if th <= tl or hh <= hl then exit sub
+	mon_t_high = th
+	mon_t_low = tl
+	mon_h_high = hh
+	mon_h_low = hl
+	mon_save()
+end sub
+
+function mon_alarm_text(mask as word) as string
+	dim s as string(160) = ""
+	if (mask and AL_T_HIGH) <> 0 then s = s + "перегрев; "
+	if (mask and AL_T_LOW) <> 0 then s = s + "низкая температура; "
+	if (mask and AL_H_HIGH) <> 0 then s = s + "высокая влажность; "
+	if (mask and AL_H_LOW) <> 0 then s = s + "низкая влажность; "
+	if (mask and AL_LEAK) <> 0 then s = s + "протечка; "
+	if (mask and AL_DOOR) <> 0 then s = s + "дверь открыта; "
+	if (mask and AL_IN3) <> 0 then s = s + CFG_IN3_NAME + "; "
+	if (mask and AL_IN4) <> 0 then s = s + CFG_IN4_NAME + "; "
+	if (mask and AL_SENSOR) <> 0 then s = s + "нет связи с датчиком; "
+	mon_alarm_text = s
+end function
+
+'"23.5" -> 235, "-5.2" -> -52
+function to_tenth(byref v as string) as integer
+	dim r as real = strtof(v) * 10
+	if r >= 0 then
+		to_tenth = r + 0.5
+	else
+		to_tenth = r - 0.5
+	end if
+end function
+
+sub mon_load()
+	dim r as string(10) = stor.getdata(EE_BASE, 10)
+	if left(r, 2) <> "M1" then
+		mon_t_high = CFG_DEF_T_HIGH
+		mon_t_low = CFG_DEF_T_LOW
+		mon_h_high = CFG_DEF_H_HIGH
+		mon_h_low = CFG_DEF_H_LOW
+		mon_save()
+		exit sub
+	end if
+	mon_t_high = s2i(r, 3)
+	mon_t_low = s2i(r, 5)
+	mon_h_high = s2i(r, 7)
+	mon_h_low = s2i(r, 9)
+end sub
+
+sub mon_save()
+	stor.setdata("M1" + i2s(mon_t_high) + i2s(mon_t_low) + i2s(mon_h_high) + i2s(mon_h_low), EE_BASE)
+end sub
+
+function i2s(v as integer) as string
+	dim w as word = v
+	i2s = chr(w / 256) + chr(w mod 256)
+end function
+
+function s2i(byref s as string, pos as byte) as integer
+	dim w as word = asc(mid(s, pos, 1)) * 256 + asc(mid(s, pos + 1, 1))
+	s2i = w
+end function

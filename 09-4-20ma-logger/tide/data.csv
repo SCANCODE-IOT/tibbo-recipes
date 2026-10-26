@@ -1,0 +1,16 @@
+<?
+include "global.tbh"
+dim rq as string
+dim s as string
+dim ch as byte
+dim n as word
+rq = sock.httprqstring
+ch = val(web_arg(rq, "c"))
+if ch >= CH_COUNT then ch = 0
+s = "minutes_ago;" + daq_name(ch) + chr(10)
+web_send(s)
+for n = 0 to daq_count - 1
+	s = str(daq_count - n) + ";" + daq_hist(ch, n) + chr(10)
+	web_send(s)
+next n
+?>

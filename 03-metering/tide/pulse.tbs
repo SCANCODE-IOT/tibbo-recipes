@@ -1,0 +1,166 @@
+'=====================================================================
+' Счётчики воды: импульсы с герконов на входах Tibbit #54, литры,
+' хранение в EEPROM с распределением записи по 8 ячейкам (меньше износ).
+'=====================================================================
+include "global.tbh"
+
+#define EE_SLOTS 8
+#define EE_SLOT 24
+#define EE_BASE 1
+
+dim w_line(W_COUNT) as pl_io_num
+dim w_liters(W_COUNT) as dword
+dim w_step(W_COUNT) as word
+dim w_prev(W_COUNT) as low_high
+dim w_cnt(W_COUNT) as byte
+dim w_dirty as no_yes = NO
+dim w_seq as dword = 0
+dim w_slot as byte = 0
+dim w_minutes as word = 0
+
+declare function d2s(d as dword) as string
+declare function s2d(byref s as string, pos as byte) as dword
+declare function ee_sum(byref s as string) as byte
+declare sub pulse_save()
+
+sub pulse_init()
+	dim i as byte
+	'#54 в S9: линии A, B, C, D сокета; вход замкнут - LOW
+	w_line(0) = PL_IO_NUM_32
+	w_line(1) = PL_IO_NUM_33
+	w_line(2) = PL_IO_NUM_4
+	w_line(3) = PL_IO_NUM_20_INT4
+	w_step(0) = CFG_PULSE_L1
+	w_step(1) = CFG_PULSE_L2
+	w_step(2) = CFG_PULSE_L3
+	w_step(3) = CFG_PULSE_L4
+	for i = 0 to W_COUNT - 1
+		io.num = w_line(i)
+		io.enabled = NO
+		w_prev(i) = HIGH
+		w_cnt(i) = 0
+		w_liters(i) = 0
+	next i
+	'найти самую свежую целую запись
+	dim s as byte
+	dim r as string(EE_SLOT)
+	dim best as dword = 0
+	dim found as no_yes = NO
+	for s = 0 to EE_SLOTS - 1
+		r = stor.getdata(EE_BASE + s * EE_SLOT, EE_SLOT)
+		if len(r) = EE_SLOT and mid(r, 1, 2) = "W1" and asc(mid(r, EE_SLOT, 1)) = ee_sum(r) then
+			dim q as dword = s2d(r, 3)
+			if found = NO or q > best then
+				best = q
+				found = YES
+				w_slot = s
+				for i = 0 to W_COUNT - 1
+					w_liters(i) = s2d(r, 7 + i * 4)
+				next i
+			end if
+		end if
+	next s
+	if found = YES then
+		w_seq = best
+		dbg("Water counters restored from slot " + str(w_slot))
+	else
+		dbg("Water counters: no saved data, starting from 0")
+	end if
+end sub
+
+'каждые 10 мс: импульс = 3 отсчёта подряд LOW после HIGH
+sub pulse_proc_tick()
+	dim i as byte
+	for i = 0 to W_COUNT - 1
+		io.num = w_line(i)
+		if io.state = LOW then
+			if w_cnt(i) < 3 then
+				w_cnt(i) = w_cnt(i) + 1
+				if w_cnt(i) = 3 and w_prev(i) = HIGH then
+					w_prev(i) = LOW
+					w_liters(i) = w_liters(i) + w_step(i)
+					w_dirty = YES
+				end if
+			end if
+		else
+			w_cnt(i) = 0
+			w_prev(i) = HIGH
+		end if
+	next i
+end sub
+
+sub pulse_proc_minute()
+	w_minutes = w_minutes + 1
+	if w_minutes >= CFG_SAVE_MINUTES then
+		w_minutes = 0
+		if w_dirty = YES then pulse_save()
+	end if
+end sub
+
+sub pulse_save()
+	dim r as string(EE_SLOT)
+	dim i as byte
+	w_seq = w_seq + 1
+	w_slot = w_slot + 1
+	if w_slot >= EE_SLOTS then w_slot = 0
+	r = "W1" + d2s(w_seq)
+	for i = 0 to W_COUNT - 1
+		r = r + d2s(w_liters(i))
+	next i
+	r = r + chr(0)
+	r = left(r, EE_SLOT - 1) + chr(ee_sum(r))
+	stor.setdata(r, EE_BASE + w_slot * EE_SLOT)
+	w_dirty = NO
+end sub
+
+'показание с веб-страницы, м3: "123.456"
+sub pulse_set_m3(ch as byte, byref m3 as string)
+	if ch >= W_COUNT then exit sub
+	dim v as real = strtof(m3)
+	if v < 0 or v > 4000000 then exit sub
+	w_liters(ch) = v * 1000 + 0.5
+	pulse_save()
+end sub
+
+function pulse_m3(ch as byte) as string
+	dim m as dword = w_liters(ch) / 1000
+	dim l as string(4) = str(w_liters(ch) mod 1000)
+	while len(l) < 3
+		l = "0" + l
+	wend
+	pulse_m3 = lstr(m) + "." + l
+end function
+
+function pulse_name(ch as byte) as string
+	select case ch
+	case 0
+		pulse_name = CFG_WNAME1
+	case 1
+		pulse_name = CFG_WNAME2
+	case 2
+		pulse_name = CFG_WNAME3
+	case else
+		pulse_name = CFG_WNAME4
+	end select
+end function
+
+function d2s(d as dword) as string
+	d2s = chr(d shr 24) + chr((d shr 16) and &hFF) + chr((d shr 8) and &hFF) + chr(d and &hFF)
+end function
+
+function s2d(byref s as string, pos as byte) as dword
+	s2d = asc(mid(s, pos, 1))
+	s2d = (s2d shl 8) + asc(mid(s, pos + 1, 1))
+	s2d = (s2d shl 8) + asc(mid(s, pos + 2, 1))
+	s2d = (s2d shl 8) + asc(mid(s, pos + 3, 1))
+end function
+
+'контрольная сумма всех байтов, кроме последнего
+function ee_sum(byref s as string) as byte
+	dim i as byte
+	dim t as word = 0
+	for i = 1 to len(s) - 1
+		t = (t + asc(mid(s, i, 1))) and &hFF
+	next i
+	ee_sum = t
+end function

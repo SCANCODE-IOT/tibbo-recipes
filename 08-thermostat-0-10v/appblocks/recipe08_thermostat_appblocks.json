@@ -1,0 +1,4430 @@
+{
+ "id": "6a7027cef9549288e8b5f72b",
+ "name": "Tibbo-recipe-08-Thermostat-0-10V",
+ "device": "TPP2W(G2)",
+ "description": "Recipe 08 from tibbo.ru: thermostat and ventilation on TPP2(G2): RS-485 Modbus T/RH sensor, heater relay, 0-10 V EC fan and heating valve on Tibbit #14, web console, MQTT.",
+ "shortDescription": "",
+ "version": "0.1.19",
+ "runtime": "tios",
+ "featureFlags": [],
+ "featureFlagMap": {},
+ "features": [
+  {
+   "id": "boardsetting",
+   "settings": {
+    "ID": "mquecbkte5plbdjo9sl",
+    "POE": "0",
+    "5VDIRECT": "0",
+    "WIFIANTENNA": "0",
+    "GPRSANTENNA": "0",
+    "TPB": "true",
+    "VPK": "1",
+    "DIN": "1",
+    "POWERADAPTER": "0",
+    "ASM": "asm+rp",
+    "NOTES": ""
+   }
+  },
+  {
+   "id": "general",
+   "settings": {
+    "ID": "mquecbkttwt2hgq703",
+    "DEVICE_NAME": "Device_Name_1",
+    "FIRMWAREVERSION": "1.0.0",
+    "TIMEZONE": "17",
+    "LATITUDE": "0",
+    "LONGITUDE": "0",
+    "LOGGING": "sys.debugprint"
+   }
+  },
+  {
+   "id": "global_vars",
+   "settings": {
+    "ID": "mquecbktwgvfvpgurtd",
+    "INTERVAL": "1",
+    "DEBUG_PRINT": "0",
+    "VARS": [
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htpeypcbrs1",
+       "VARNAME": "temperature",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htpry99thhr",
+       "VARNAME": "humidity",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htq431ao933",
+       "VARNAME": "sensor_ok",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     }
+    ],
+    "AUTOVARS": [
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrluhv919cwahy9",
+       "VARNAME": "T05_S1",
+       "DATATYPE": "byte",
+       "NAME": "",
+       "FEATURE": "mrubrlt15u4ollyy4vs",
+       "FEATURE_SETTING": "NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 255,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrss3tv3pyxdbuoq",
+       "VARNAME": "T05BAUD",
+       "DATATYPE": "string",
+       "NAME": "Tibbit 05 Baud Rate",
+       "FEATURE": "mrubrsjqjgez7pq729s",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 0,
+       "MAXIMUM": 8,
+       "DEFAULT": "9600",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrvhcqmaloecg96j",
+       "VARNAME": "PARITY",
+       "DATATYPE": "string",
+       "NAME": "Tibbit 05 Parity",
+       "FEATURE": "mrubrvavla7vxt2vpsf",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 1,
+       "MAXIMUM": 1,
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrw8wbcce7x2uu0u",
+       "VARNAME": "BITS",
+       "DATATYPE": "string",
+       "NAME": "Tibbit 05 Data Bits",
+       "FEATURE": "mrubrw3wxg4yqjdwoei",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 1,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubsh32a2embdnuvai",
+       "VARNAME": "NETNM",
+       "DATATYPE": "string",
+       "NAME": "Ethernet Netmask",
+       "FEATURE": "mrubsgsn5fle7jbssdo",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 16,
+       "DEFAULT": "255.255.255.0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubshgzsjb4gm63ssr",
+       "VARNAME": "NETGW",
+       "DATATYPE": "string",
+       "NAME": "Ethernet Gateway",
+       "FEATURE": "mrubsh4bc8qcqndpcht",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 16,
+       "DEFAULT": "1.0.0.1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrymiqlhcd1d1rwzu0e",
+       "VARNAME": "TZONE",
+       "DATATYPE": "string",
+       "NAME": "Setting",
+       "FEATURE": "mrymiqezmq36y4mkkkj",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 0,
+       "MAXIMUM": 3,
+       "DEFAULT": "27",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7eljwo0gmyh1e4",
+       "VARNAME": "MQTTI",
+       "DATATYPE": "string",
+       "NAME": "MQTT Client ID",
+       "FEATURE": "mrzo7ea9feve0sv4ygj",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "Client_ID_1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7ezlq467aw7zzak",
+       "VARNAME": "MQTTU",
+       "DATATYPE": "string",
+       "NAME": "MQTT Username",
+       "FEATURE": "mrzo7epx3kygk7rmrs1",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "MQTT_Name_1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7fravh2jgpzc4w",
+       "VARNAME": "MQTPW",
+       "DATATYPE": "string",
+       "NAME": "MQTT Password",
+       "FEATURE": "mrzo7fitpbnham9mxhk",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "Password",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7g6kap2iaa90fkd",
+       "VARNAME": "MQTTH",
+       "DATATYPE": "string",
+       "NAME": "MQTT Server Host Address/IP",
+       "FEATURE": "mrzo7g3tyb6fojffkcn",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "1.0.0.1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7i2o3w3dg4vj2ln",
+       "VARNAME": "MQTSP",
+       "DATATYPE": "string",
+       "NAME": "MQTT Server Port",
+       "FEATURE": "mrzo7ho6f5pcfvevwfa",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 5,
+       "DEFAULT": "1883",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo9b9xeuua0ggpl8d",
+       "VARNAME": "PUBLISH_TOPIC",
+       "DATATYPE": "string",
+       "NAME": "Setting",
+       "FEATURE": "mrzo9b5wfhv28kp5e6a",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "240",
+       "DEFAULT": "",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzt1s0uv1b1k1bagu",
+       "VARNAME": "NETCP",
+       "DATATYPE": "float",
+       "NAME": "Ethernet DHCP",
+       "FEATURE": "mrzt1rujl4lgn820yvi",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzt1sslhhf9lkweny7",
+       "VARNAME": "NETIP",
+       "DATATYPE": "string",
+       "NAME": "Ethernet IP",
+       "FEATURE": "mrzt1sdhn1vc0rp5zup",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 16,
+       "DEFAULT": "192.168.1.40",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrztvqcktdwhdlgoryd",
+       "VARNAME": "WBPWD",
+       "DATATYPE": "string",
+       "NAME": "Web Admin Password",
+       "FEATURE": "mrztvq72hd8zzwdfusm",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 32,
+       "DEFAULT": "",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htbolq578ln",
+       "VARNAME": "fan_v",
+       "DATATYPE": "float",
+       "NAME": "Tibbit 14",
+       "FEATURE": "mvl0ht9vilv4mhf",
+       "FEATURE_SETTING": "CH1",
+       "MINIMUM": "0",
+       "MAXIMUM": "10",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htc12kx9zgk",
+       "VARNAME": "valve_v",
+       "DATATYPE": "float",
+       "NAME": "Tibbit 14",
+       "FEATURE": "mvl0ht9vilv4mhf",
+       "FEATURE_SETTING": "CH2",
+       "MINIMUM": "0",
+       "MAXIMUM": "10",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htcetjfk5kc",
+       "VARNAME": "aout3",
+       "DATATYPE": "float",
+       "NAME": "Tibbit 14",
+       "FEATURE": "mvl0ht9vilv4mhf",
+       "FEATURE_SETTING": "CH3",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htcrom728qz",
+       "VARNAME": "aout4",
+       "DATATYPE": "float",
+       "NAME": "Tibbit 14",
+       "FEATURE": "mvl0ht9vilv4mhf",
+       "FEATURE_SETTING": "CH4",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htd45g5bb9q",
+       "VARNAME": "heater",
+       "DATATYPE": "boolean",
+       "NAME": "Tibbit 06",
+       "FEATURE": "mvl0hta8y4sv7dk",
+       "FEATURE_SETTING": "L1NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htdhfd6ld1p",
+       "VARNAME": "fan_run",
+       "DATATYPE": "boolean",
+       "NAME": "Tibbit 06",
+       "FEATURE": "mvl0hta8y4sv7dk",
+       "FEATURE_SETTING": "L2NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0hte7l6ry9ts",
+       "VARNAME": "MODE",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0htdu1xxyg06",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "2",
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0hth31kciu51",
+       "VARNAME": "SETPOINT",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0htgqjv5vhdv",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "5",
+       "MAXIMUM": "35",
+       "DEFAULT": "22",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htij2cslc1v",
+       "VARNAME": "HYST",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0hti6udzc03k",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0.2",
+       "MAXIMUM": "5",
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htjz9wnudcu",
+       "VARNAME": "PBAND",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0htjm3k0vsh0",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0.5",
+       "MAXIMUM": "20",
+       "DEFAULT": "3",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htlf72j1sdl",
+       "VARNAME": "RH_MAX",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0htl2mfoo60p",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "20",
+       "MAXIMUM": "95",
+       "DEFAULT": "60",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htmvqueg42b",
+       "VARNAME": "FAN_MANUAL",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0htmi2gxx8lw",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "100",
+       "DEFAULT": "50",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0htob4y8tipt",
+       "VARNAME": "SENSOR_ADDR",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0htnynkhr147",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "1",
+       "MAXIMUM": "247",
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "net",
+   "settings": {
+    "ID": "mquecbkt7eahgszzc6g",
+    "ENABLED": "1",
+    "DHCP": "1",
+    "IP": "192.168.1.200",
+    "NM": "255.255.255.0",
+    "GI": "192.168.1.1"
+   }
+  },
+  {
+   "id": "flash_devices",
+   "settings": {
+    "ID": "mqueccssuznhrlmb4ap",
+    "FLASH_DEVICES": [
+     {
+      "id": "flash_device",
+      "settings": {
+       "ID": "mrubri0k6lw5x4pzr9b",
+       "NAME": "flash0",
+       "BUILTIN": "1",
+       "BUILTINID": "flash0",
+       "LINKED_FEATURE": "",
+       "FLASH_DEVICE_NAME": "flash0",
+       "PARTITIONS": [
+        {
+         "id": "flash_partition",
+         "settings": {
+          "ID": "mrubri0kwbwn28dswk",
+          "NAME": "boot_partition",
+          "ADDRESS": "8200",
+          "SIZE": "457728",
+          "LABEL": "boot_partition",
+          "MOUNT_POINT": ""
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "flash_device",
+      "settings": {
+       "ID": "mrubri0klfywzjonti",
+       "NAME": "at45db081e",
+       "BUILTIN": "1",
+       "BUILTINID": "at45db081e",
+       "LINKED_FEATURE": "",
+       "FLASH_DEVICE_NAME": "at45db081e",
+       "PARTITIONS": [
+        {
+         "id": "flash_partition",
+         "settings": {
+          "ID": "mrubri0kias1w5xffb",
+          "NAME": "storage_partition",
+          "ADDRESS": "0",
+          "SIZE": "1048576",
+          "LABEL": "storage_partition",
+          "MOUNT_POINT": "/lfs"
+         }
+        }
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "peripheral_wiring",
+   "settings": {
+    "ID": "mquecdkhubfazo3zmsk",
+    "ENABLED": "1",
+    "LAYOUT_DATA": "[]",
+    "CUSTOM_SHAPES": "[]",
+    "CUSTOM_GROUPS": "[]"
+   }
+  },
+  {
+   "id": "datetime",
+   "settings": {
+    "ID": "mquece9nfn3kvdkizho"
+   }
+  },
+  {
+   "id": "dhcp",
+   "settings": {
+    "ID": "mquece9n9swb69v12g"
+   }
+  },
+  {
+   "id": "time",
+   "settings": {
+    "ID": "mquecebjj4h4tkoi25d"
+   }
+  },
+  {
+   "id": "sock",
+   "settings": {
+    "ID": "mquecebjkw6smsjwht"
+   }
+  },
+  {
+   "id": "tibbit_05",
+   "settings": {
+    "ID": "mrubrlt15u4ollyy4vs",
+    "SOCKET": "1",
+    "TIBBIT": "05",
+    "PLATFORM": "",
+    "NAME": "T05_S1",
+    "MODE": "RS485",
+    "BAUD": "9600",
+    "FLOWCONTROL": "0",
+    "PARITY": "0",
+    "BITS": "1",
+    "TXBUF": "1",
+    "RXBUF": "1"
+   }
+  },
+  {
+   "id": "timers",
+   "settings": {
+    "ID": "mrubrq7hry0t2aiqgr",
+    "DEBUG_PRINT": "0",
+    "TIMERS": []
+   }
+  },
+  {
+   "id": "cron",
+   "settings": {
+    "ID": "mrubrq7j6psp7kuo3s6",
+    "SCHEDULES": []
+   }
+  },
+  {
+   "id": "commands",
+   "settings": {
+    "ID": "mrubrq7km9e93bdx0sf",
+    "COMMANDS": []
+   }
+  },
+  {
+   "id": "log",
+   "settings": {
+    "ID": "mrubrq7leok0mwos33i",
+    "ENABLED": "0"
+   }
+  },
+  {
+   "id": "stg",
+   "settings": {
+    "ID": "mrubrq7mnv87nufrvr9",
+    "ENABLED": "1",
+    "STG_DEBUG_PRINT": "0",
+    "STORAGE": "FLASH",
+    "STG_TIMESTAMP": "0",
+    "REDUNDANCY": "0",
+    "STG_MAX_NUM_SETTINGS": "0",
+    "STG_RAM_ARRAY_SIZE": "0",
+    "STG_MAX_SETTING_NAME_LEN": "0",
+    "STG_MAX_SETTING_VALUE_LEN": "0",
+    "SETTINGS": [
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubrsjqjgez7pq729s",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "T05BAUD",
+       "NAME": "Tibbit 05 Baud Rate",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 0,
+       "MAX": 8,
+       "INITIALIZE": "A",
+       "DEFAULT": "9600"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubrvavla7vxt2vpsf",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "PARITY",
+       "NAME": "Tibbit 05 Parity",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 1,
+       "MAX": 1,
+       "INITIALIZE": "A",
+       "DEFAULT": "0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubrw3wxg4yqjdwoei",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "BITS",
+       "NAME": "Tibbit 05 Data Bits",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 1,
+       "MAX": 1,
+       "INITIALIZE": "A",
+       "DEFAULT": "1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubsgsn5fle7jbssdo",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETNM",
+       "NAME": "Ethernet Netmask",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 16,
+       "INITIALIZE": "A",
+       "DEFAULT": "255.255.255.0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubsh4bc8qcqndpcht",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETGW",
+       "NAME": "Ethernet Gateway",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 16,
+       "INITIALIZE": "A",
+       "DEFAULT": "192.168.1.1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrymiqezmq36y4mkkkj",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "TZONE",
+       "NAME": "Device Time Zone",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 0,
+       "MAX": 3,
+       "INITIALIZE": "A",
+       "DEFAULT": "17"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7ea9feve0sv4ygj",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTTI",
+       "NAME": "MQTT Client ID",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": "Client_ID_1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7epx3kygk7rmrs1",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTTU",
+       "NAME": "MQTT Username",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": "MQTT_Name_1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7fitpbnham9mxhk",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTPW",
+       "NAME": "MQTT Password",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": ""
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7g3tyb6fojffkcn",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTTH",
+       "NAME": "MQTT Server Host Address/IP",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": "1.0.0.1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7ho6f5pcfvevwfa",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTSP",
+       "NAME": "MQTT Server Port",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 5,
+       "INITIALIZE": "A",
+       "DEFAULT": "1883"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo9b5wfhv28kp5e6a",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "PUBLISH_TOPIC",
+       "NAME": "MQTT Publish Topic Prefix",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": "240",
+       "INITIALIZE": "A",
+       "DEFAULT": ""
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzt1rujl4lgn820yvi",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETCP",
+       "NAME": "Ethernet DHCP",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": 0,
+       "MAX": 1,
+       "INITIALIZE": "A",
+       "DEFAULT": "1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzt1sdhn1vc0rp5zup",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETIP",
+       "NAME": "Ethernet IP",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 16,
+       "INITIALIZE": "A",
+       "DEFAULT": "192.168.1.40"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrztvq72hd8zzwdfusm",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "WBPWD",
+       "NAME": "Web Admin Password",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 32,
+       "INITIALIZE": "A",
+       "DEFAULT": ""
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0htdu1xxyg06",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MODE",
+       "NAME": "Mode",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "2",
+       "INITIALIZE": "I",
+       "DEFAULT": "1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0htgqjv5vhdv",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "SETPOINT",
+       "NAME": "Setpoint, C",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "5",
+       "MAX": "35",
+       "INITIALIZE": "I",
+       "DEFAULT": "22"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0hti6udzc03k",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "HYST",
+       "NAME": "Heater hysteresis, C",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0.2",
+       "MAX": "5",
+       "INITIALIZE": "I",
+       "DEFAULT": "1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0htjm3k0vsh0",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "PBAND",
+       "NAME": "Proportional band, C",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0.5",
+       "MAX": "20",
+       "INITIALIZE": "I",
+       "DEFAULT": "3"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0htl2mfoo60p",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "RH_MAX",
+       "NAME": "Humidity limit, %",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "20",
+       "MAX": "95",
+       "INITIALIZE": "I",
+       "DEFAULT": "60"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0htmi2gxx8lw",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "FAN_MANUAL",
+       "NAME": "Fan speed in ventilation mode, %",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "100",
+       "INITIALIZE": "I",
+       "DEFAULT": "50"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0htnynkhr147",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "SENSOR_ADDR",
+       "NAME": "Sensor Modbus address",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "1",
+       "MAX": "247",
+       "INITIALIZE": "I",
+       "DEFAULT": "1"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tbl",
+   "settings": {
+    "ID": "mrubrq7n41jcwl4pn2p",
+    "ENABLED": "0",
+    "TBL_DEBUG_PRINT": "0",
+    "WEBENABLED": "1",
+    "TABLES": [],
+    "STORAGE_PATH": "/lfs"
+   }
+  },
+  {
+   "id": "cell",
+   "settings": {
+    "ID": "mrubrq7om0lm1x7reyj",
+    "ENABLED": "0",
+    "CELL_MODE": "CELL__PPP_MODE_ISENABLED",
+    "CELL_APN": "",
+    "CELL_UN": "myusername@realm",
+    "CELL_PW": "",
+    "CELL_PIN": "?",
+    "CELL_BAND_TYPE": "1",
+    "CELL__DEBUG_PRINT": "1",
+    "CELL_LOG_LEVEL": "2"
+   }
+  },
+  {
+   "id": "bt",
+   "settings": {
+    "ID": "mrubrq7oy4s2mz0bcrt",
+    "ENABLED": "0",
+    "DEVICENAME": "MyBTDevice",
+    "EMULATION": "PL_WLN_BT_EMULATION_MODE_MICROCHIP",
+    "TXBUF": "1",
+    "RXBUF": "1"
+   }
+  },
+  {
+   "id": "mqtt",
+   "settings": {
+    "ID": "mrubrq7paiw1hmfo1bm",
+    "GENERAL": "",
+    "CERTIFICATE": "",
+    "ENABLED": "1",
+    "MQTT_APP_CLIENT_ID": "Client_ID_1",
+    "MQTT_NAME": "MQTT_Name_1",
+    "MQTT_PASSWORD": "",
+    "MQTT_SERVER_HOST": "1.0.0.1",
+    "MQTT_DESTINATION_PORT": "1883",
+    "MQTT_TLS": "0",
+    "MQTT_KEEPALIVE_INTERVAL": "30",
+    "MQTT_DEBUG_PRINT": "1",
+    "CERTIFICATEFILE": "",
+    "CERTIFICATE_PATH": "",
+    "CLIENT_CERTIFICATE_PATH": "",
+    "TOPICS": []
+   }
+  },
+  {
+   "id": "cgg",
+   "settings": {
+    "ID": "mrubrq7pal0qeoxr0u8",
+    "GENERAL": "",
+    "SETTINGS": "",
+    "CONSOLE": "",
+    "ADVANCED": "",
+    "ENABLED": "0",
+    "SERVER": "192.168.1.201",
+    "SERVER_PORT": "1883",
+    "USERNAME": "",
+    "PASSWORD": "",
+    "DEBUG_PRINT": "0",
+    "WIDGETS": [],
+    "WIDGET_GROUPS": [
+     {
+      "id": "widget_group",
+      "settings": {
+       "ID": "mrubrq7pxwbce02prvo",
+       "GROUPID": "group1",
+       "NAME": "Group",
+       "WIDGETS": []
+      }
+     }
+    ],
+    "INTERVAL": "1",
+    "TLS": "0",
+    "GROUPS": [
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrubrq7pau0c4r6v916",
+       "GROUPID": "group1",
+       "NAME": "General",
+       "SETTINGS": []
+      }
+     }
+    ],
+    "CONSOLE_PREVIEW": "cloud",
+    "TABLES": []
+   }
+  },
+  {
+   "id": "httpserver",
+   "settings": {
+    "ID": "mrubrq7qm4xcnjyt9s8",
+    "GENERAL": "",
+    "ADVANCED": "",
+    "ENABLED": "1",
+    "PORT": "80",
+    "SOCKETS": "2",
+    "TXBUF": "10",
+    "RXBUF": "10",
+    "VARBUF": "1",
+    "ENDPOINTS": [],
+    "DEBUG_PRINT": "0",
+    "TLS_ENABLED": "0"
+   }
+  },
+  {
+   "id": "http",
+   "settings": {
+    "ID": "mrubrq7qgx4eh0mu6el",
+    "ENABLED": "0",
+    "MAX_REQUESTS": "5",
+    "DEBUG_PRINT": "0"
+   }
+  },
+  {
+   "id": "socket",
+   "settings": {
+    "ID": "mrubrq7r5r28mns1ko8",
+    "SOCKETS": []
+   }
+  },
+  {
+   "id": "dns",
+   "settings": {
+    "ID": "mrubrq7r3ge8ga8smn3",
+    "ENABLED": "1",
+    "SERVER1": "8.8.8.8",
+    "SERVER2": "",
+    "DNS_TIMEOUT": "5000",
+    "DNS_DEBUG_PRINT": "0"
+   }
+  },
+  {
+   "id": "sntp",
+   "settings": {
+    "ID": "mrubrq7shyohrudx4gn",
+    "ENABLED": "1",
+    "DEBUGPRINT": "0",
+    "SNTP_SERVER": "216.239.35.0"
+   }
+  },
+  {
+   "id": "mbedtls",
+   "settings": {
+    "ID": "mrubrq7spks63m3sm2",
+    "ENABLED": "0",
+    "CONFIGS": "\nCONFIG_MBEDTLS_HEAP_SIZE=30000\nCONFIG_MBEDTLS_SSL_MAX_CONTENT_LEN=4096                \n"
+   }
+  },
+  {
+   "id": "snmp_agent",
+   "settings": {
+    "ID": "mrubrq7sd9emcmt1ad",
+    "GENERAL": "",
+    "SYSTEM": "",
+    "V3": "",
+    "ADVANCED": "",
+    "ENABLED": "0",
+    "PORT": "161",
+    "READ_COMMUNITY": "public",
+    "WRITE_COMMUNITY": "private",
+    "OBJECTS": [],
+    "SYSDESCR": "Tibbo Device",
+    "SYSOBJECTID": "1.3.6.1.4.1.20738",
+    "SYSCONTACT": "",
+    "SYSNAME": "",
+    "SYSLOCATION": "",
+    "V3_ENABLED": "0",
+    "USERS": [],
+    "OBJECT_CAPACITY": "16",
+    "LOG_LEVEL": "4"
+   }
+  },
+  {
+   "id": "smtp_client",
+   "settings": {
+    "ID": "mrubrq7thy56poqyyzm",
+    "GENERAL": "",
+    "AUTH": "",
+    "ADVANCED": "",
+    "ENABLED": "0",
+    "SERVER": "",
+    "PORT": "465",
+    "SECURITY": "tls",
+    "FROM_ADDRESS": "",
+    "AUTH_METHOD": "login",
+    "USERNAME": "",
+    "PASSWORD": "",
+    "TIMEOUT": "10000",
+    "LOG_LEVEL": "3"
+   }
+  },
+  {
+   "id": "modbus_master",
+   "settings": {
+    "ID": "mrubrq7t0jv8nqk7bvd",
+    "DEBUG_PRINT": "0",
+    "TIMEOUT": "1000",
+    "POLL_INTERVAL": "1000",
+    "FRAME_DELAY": "2",
+    "MAX_REQUESTS": "10",
+    "MODBUSDEVICES": []
+   }
+  },
+  {
+   "id": "modbus_slave",
+   "settings": {
+    "ID": "mrubrq7uvezopfuci",
+    "DEBUG_PRINT": "0",
+    "SLAVEPROTOCOL": "modbus_RTU",
+    "DEVICEID": "1",
+    "SLAVE_SERIAL_PORT": "",
+    "SLAVE_TCP_PORT": "502",
+    "MODBUSTABLEITEMS": []
+   }
+  },
+  {
+   "id": "lcd",
+   "settings": {
+    "ID": "mrubrq7uqk6oqszelbr",
+    "GENERAL": "",
+    "IMAGES_GROUP": "",
+    "SETTINGS": "",
+    "ENABLED": "0",
+    "BACKCOLOR": "#000000",
+    "FORECOLOR": "#ffffff",
+    "LOGFONT": "LCD_SMALL_FONT",
+    "WIDGETS": [],
+    "SCREENS": [],
+    "IMAGES": [],
+    "LCD_SCREEN_WIDGET_COLUMNS": 320,
+    "LCD_SCREEN_WIDGET_ROWS": 240,
+    "GROUPS": [
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrubrq7u7p7g8mggced",
+       "GROUPID": "group2",
+       "NAME": "General",
+       "SETTINGS": []
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "lcd_graph",
+   "settings": {
+    "ID": "mrubrq7vlwp02vzb4n",
+    "ENABLED": "0",
+    "MINY": "-100",
+    "MAXY": "100",
+    "STARTX": "0",
+    "STARTY": 0,
+    "WIDTH": 320,
+    "HEIGHT": 240,
+    "FILL": "#00ff00"
+   }
+  },
+  {
+   "id": "web_dashboard",
+   "settings": {
+    "ID": "mrubrq7w5smh555khek",
+    "GENERAL": "",
+    "SETTINGS": "",
+    "ADVANCED": "",
+    "CUSTOM_PAGES": "",
+    "ENABLED": "1",
+    "TABLESENABLED": "1",
+    "SETTINGSENABLED": "1",
+    "WIDGETENABLED": "1",
+    "INTERVAL": "1",
+    "DASHBOARD_TITLE": "Modbus MQTT Gateway",
+    "GROUPS": [
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mvl0htekhy4xoso",
+       "GROUPID": "gmvl0ht",
+       "NAME": "Thermostat",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0htgdnqcktoz",
+          "SETTINGID": "mvl0htdu1xxyg06",
+          "NAME": "Mode",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0htfad4zjr7q",
+             "LABEL": "Off",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0htfn4dkof8b",
+             "LABEL": "Auto",
+             "VALUE": "1"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0htg06p6sbhs",
+             "LABEL": "Ventilation only",
+             "VALUE": "2"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0htht7rasem8",
+          "SETTINGID": "mvl0htgqjv5vhdv",
+          "NAME": "Setpoint, C",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0hthgb30il88",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0htj9ce0kj7h",
+          "SETTINGID": "mvl0hti6udzc03k",
+          "NAME": "Heater hysteresis, C",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0htiwe8ue3da",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0htkp7m2a5o2",
+          "SETTINGID": "mvl0htjm3k0vsh0",
+          "NAME": "Proportional band, C",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0htkcgh4rccx",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0htm5kttg71z",
+          "SETTINGID": "mvl0htl2mfoo60p",
+          "NAME": "Humidity limit, %",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0htlsvlbzlk9",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0htnl3gkj1iu",
+          "SETTINGID": "mvl0htmi2gxx8lw",
+          "NAME": "Fan speed in ventilation mode, %",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0htn8o4ozwdw",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0htp1mm0qsyf",
+          "SETTINGID": "mvl0htnynkhr147",
+          "NAME": "Sensor Modbus address",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0htoodyd9pna",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrzocamz6onj42hdm",
+       "GROUPID": "webgroup2",
+       "NAME": "General",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrztvxo8z2skfzmlmy",
+          "SETTINGID": "mrztvq72hd8zzwdfusm",
+          "NAME": "Web Admin Password",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrztvxo84a76ch5xj2j",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzocqzl563lrptxbnt",
+          "SETTINGID": "mrymiqezmq36y4mkkkj",
+          "NAME": "Device Time Zone",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8ffw1qcwv64v",
+             "LABEL": "UTC-12:00",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8bgmr8r2yuzw",
+             "LABEL": "UTC-11:00",
+             "VALUE": "1"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8a1mpviy2pde",
+             "LABEL": "UTC-10:00",
+             "VALUE": "2"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz80ryj36l8ou9",
+             "LABEL": "UTC-09:00",
+             "VALUE": "3"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8grvqj16u8o9",
+             "LABEL": "UTC-08:00",
+             "VALUE": "4"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8j4q0fy7gk1",
+             "LABEL": "UTC-07:00",
+             "VALUE": "5"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8z56gyc919v",
+             "LABEL": "UTC-06:00",
+             "VALUE": "6"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8wi8wk73ky9f",
+             "LABEL": "UTC-05:00",
+             "VALUE": "7"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8wopv411gu6k",
+             "LABEL": "UTC-04:30",
+             "VALUE": "8"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8497gvkqwgbn",
+             "LABEL": "UTC-04:00",
+             "VALUE": "9"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8v9iip32fyz",
+             "LABEL": "UTC-03:30",
+             "VALUE": "10"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8c1ltlh1bqa5",
+             "LABEL": "UTC-03:00",
+             "VALUE": "11"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8ypq95t4pl18",
+             "LABEL": "UTC-02:00",
+             "VALUE": "12"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8nz6dyc66iho",
+             "LABEL": "UTC-01:00",
+             "VALUE": "13"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8pqm6y3f2oc",
+             "LABEL": "UTC",
+             "VALUE": "14"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8x3al1g6delm",
+             "LABEL": "UTC+01:00",
+             "VALUE": "15"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz81ht612g4x3n",
+             "LABEL": "UTC+02:00",
+             "VALUE": "16"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8qk1p8lakoc",
+             "LABEL": "UTC+03:00",
+             "VALUE": "17"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8bc6lf1l3317",
+             "LABEL": "UTC+03:30",
+             "VALUE": "18"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8x9d7ievtjpn",
+             "LABEL": "UTC+04:00",
+             "VALUE": "19"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8okoiz8zxcdh",
+             "LABEL": "UTC+04:30",
+             "VALUE": "20"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz87a8u90y3ocb",
+             "LABEL": "UTC+05:00",
+             "VALUE": "21"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8wq62jbrznup",
+             "LABEL": "UTC+05:30",
+             "VALUE": "22"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8aflt8js6x9h",
+             "LABEL": "UTC+05:45",
+             "VALUE": "23"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8ibrll63vzbd",
+             "LABEL": "UTC+06:00",
+             "VALUE": "24"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz88h6ut205i4i",
+             "LABEL": "UTC+06:30",
+             "VALUE": "25"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8s7ixt8z634r",
+             "LABEL": "UTC+07:00",
+             "VALUE": "26"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz80w0jom599cd",
+             "LABEL": "UTC+08:00",
+             "VALUE": "27"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8amqd6jv4baf",
+             "LABEL": "UTC+09:00",
+             "VALUE": "28"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz87q5u5q0083b",
+             "LABEL": "UTC+9:30",
+             "VALUE": "29"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9bi6otz31cfu",
+             "LABEL": "UTC+10:00",
+             "VALUE": "30"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9tadf9gy9ivo",
+             "LABEL": "UTC+11:00",
+             "VALUE": "31"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9hnjkuwnfxoa",
+             "LABEL": "UTC+12:00",
+             "VALUE": "32"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9e8pssio44me",
+             "LABEL": "UTC+13:00",
+             "VALUE": "33"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrucyal20jhh1pzu096n",
+       "GROUPID": "webgroup1",
+       "NAME": "Network",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucyfckj12hj6kxjyk",
+          "SETTINGID": "mrzt1rujl4lgn820yvi",
+          "NAME": "Ethernet DHCP",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyh2yi7uhrx617lt",
+             "LABEL": "Disabled",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyh2ypl43rs4efea",
+             "LABEL": "Enabled",
+             "VALUE": "1"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucyjswtij74ddqhrd",
+          "SETTINGID": "mrzt1sdhn1vc0rp5zup",
+          "NAME": "Ethernet IP",
+          "CONTROL": "IPCTRL",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyjswxhwtnbxkhzj",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucynijjca18967m6",
+          "SETTINGID": "mrubsgsn5fle7jbssdo",
+          "NAME": "Ethernet Netmask",
+          "CONTROL": "IPCTRL",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucynijxabrbbisclr",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucyr06v2woip59x4",
+          "SETTINGID": "mrubsh4bc8qcqndpcht",
+          "NAME": "Ethernet Gateway",
+          "CONTROL": "IPCTRL",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyr06c9xuqg6ctcs",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrubrq7wq74v0983l1",
+       "GROUPID": "group3",
+       "NAME": "Modbus",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucxvahkdeipxow6p",
+          "SETTINGID": "mrubrsjqjgez7pq729s",
+          "NAME": "Tibbit 05 Baud Rate",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdycxomvlqv3",
+             "LABEL": "1200",
+             "VALUE": "1200"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdxu4h6okqc5r",
+             "LABEL": "2400",
+             "VALUE": "2400"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsd9qna3creu29",
+             "LABEL": "4800",
+             "VALUE": "4800"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsd05l7xgbjmkw",
+             "LABEL": "9600",
+             "VALUE": "9600"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdrnlgonp7xg",
+             "LABEL": "19200",
+             "VALUE": "19200"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdkclc3z43ke",
+             "LABEL": "38400",
+             "VALUE": "38400"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdiozr36z2t6",
+             "LABEL": "57600",
+             "VALUE": "57600"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsd53yqo3ocypa",
+             "LABEL": "115200",
+             "VALUE": "115200"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdej9kx01vmgw",
+             "LABEL": "230400",
+             "VALUE": "230400"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdc8xdasfw35s",
+             "LABEL": "460800",
+             "VALUE": "460800"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdd07e0nd1m28",
+             "LABEL": "921600",
+             "VALUE": "921600"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucxzlo3bt860fssz",
+          "SETTINGID": "mrubrvavla7vxt2vpsf",
+          "NAME": "Tibbit 05 Parity",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19gubfymwhwwk",
+             "LABEL": "None",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19g3z05wnh14dq",
+             "LABEL": "Even",
+             "VALUE": "1"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19g1ccumxsnwnu",
+             "LABEL": "Odd",
+             "VALUE": "2"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19gw2cty4zfdh",
+             "LABEL": "Mark(Always 1)",
+             "VALUE": "3"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19g9o15l7expop",
+             "LABEL": "Space(Always 0)",
+             "VALUE": "4"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucy2cfnfz42z6k9d",
+          "SETTINGID": "mrubrw3wxg4yqjdwoei",
+          "NAME": "Tibbit 05 Data Bits",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy3yrv3owj2lnxkl",
+             "LABEL": "7 Bits",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy3yrj9hlwqgy3y",
+             "LABEL": "8 Bits",
+             "VALUE": "1"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrzode0sag5675gjwve",
+       "GROUPID": "webgroup3",
+       "NAME": "MQTT",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzodh80zwtmef5uu7k",
+          "SETTINGID": "mrzo7g3tyb6fojffkcn",
+          "NAME": "MQTT Server Host Address/IP",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzodh80dz1enxil1h8",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzodpwnvu3l4xk63yi",
+          "SETTINGID": "mrzo7ho6f5pcfvevwfa",
+          "NAME": "MQTT Server Port",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzodpwnm1sp9pva68g",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzoeno42afa7plccw",
+          "SETTINGID": "mrzo9b5wfhv28kp5e6a",
+          "NAME": "MQTT Publish Topic Prefix",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzoeno41d9164nayym",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzodvcf6zbhex5v9t5",
+          "SETTINGID": "mrzo7ea9feve0sv4ygj",
+          "NAME": "MQTT Client ID",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzodvcfiz5psa9jjib",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzoefpv4xinht2knh",
+          "SETTINGID": "mrzo7epx3kygk7rmrs1",
+          "NAME": "MQTT Username",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzoefpvngsb8bg3ibs",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzoejtquqx1pdw82lk",
+          "SETTINGID": "mrzo7fitpbnham9mxhk",
+          "NAME": "MQTT Password",
+          "CONTROL": "PASSWORD",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzoejtq8p1xigkbjvf",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     }
+    ],
+    "WIDGETS": [
+     {
+      "id": "card_widget",
+      "settings": {
+       "COLOR": "#1976d2",
+       "DECIMAL_PLACES": "1",
+       "FONT_SIZE": "60",
+       "H": "3",
+       "LABEL": "Temperature, C",
+       "LABEL_FONT_SIZE": "16",
+       "TEXT_COLOR": "#000000",
+       "VARIABLE": "mvl0htpeypcbrs1",
+       "VISIBLE": "1",
+       "W": "3",
+       "ID": "mvl0hv6h0j7emtt",
+       "X": 0,
+       "Y": 0
+      }
+     },
+     {
+      "id": "card_widget",
+      "settings": {
+       "COLOR": "#1976d2",
+       "DECIMAL_PLACES": "1",
+       "FONT_SIZE": "60",
+       "H": "3",
+       "LABEL": "Humidity, %",
+       "LABEL_FONT_SIZE": "16",
+       "TEXT_COLOR": "#000000",
+       "VARIABLE": "mvl0htpry99thhr",
+       "VISIBLE": "1",
+       "W": "3",
+       "ID": "mvl0hv6upfq87o2",
+       "X": 3,
+       "Y": 0
+      }
+     },
+     {
+      "id": "gauge_widget",
+      "settings": {
+       "COLOR": "#1976d2",
+       "DECIMAL_PLACES": "1",
+       "FONT_SIZE": "16",
+       "H": "3",
+       "LABEL": "Fan, V",
+       "LABEL_FONT_SIZE": "16",
+       "MAX": "10",
+       "MIN": "0",
+       "TEXT_COLOR": "#000000",
+       "VARIABLE": "mvl0htbolq578ln",
+       "VISIBLE": "1",
+       "W": "3",
+       "ID": "mvl0hv77shho06d",
+       "X": 6,
+       "Y": 0
+      }
+     },
+     {
+      "id": "gauge_widget",
+      "settings": {
+       "COLOR": "#1976d2",
+       "DECIMAL_PLACES": "1",
+       "FONT_SIZE": "16",
+       "H": "3",
+       "LABEL": "Valve, V",
+       "LABEL_FONT_SIZE": "16",
+       "MAX": "10",
+       "MIN": "0",
+       "TEXT_COLOR": "#000000",
+       "VARIABLE": "mvl0htc12kx9zgk",
+       "VISIBLE": "1",
+       "W": "3",
+       "ID": "mvl0hv7k6p8dwtp",
+       "X": 9,
+       "Y": 0
+      }
+     }
+    ],
+    "WIDGET_GROUPS": [
+     {
+      "id": "widget_group",
+      "settings": {
+       "ID": "mrubrq7wekb7o2fbbqa",
+       "GROUPID": "group2",
+       "NAME": "Group",
+       "WIDGETS": []
+      }
+     }
+    ],
+    "USER": "admin",
+    "PASSWORD": "",
+    "USER_REGULAR": "user",
+    "USER_PASSWORD": "",
+    "WEB_ADMIN_WIDGET_COLUMNS": "10",
+    "WEB_ADMIN_WIDGET_ROWS": "15",
+    "CONSOLE_PREVIEW": "device",
+    "TABLES": [],
+    "CUSTOM_PAGES_REFRESH_INTERVAL": "2",
+    "CUSTOM_PAGES_JSON": "[]",
+    "CUSTOM_PAGES_EDITOR": ""
+   }
+  },
+  {
+   "id": "luis",
+   "settings": {
+    "ID": "mrubrq7wbczxfpnpxe9",
+    "ENABLED": "0",
+    "BTENABLED": "1",
+    "WEBENABLED": "0",
+    "START_ENABLED": "1",
+    "PASSWORD": "",
+    "GROUPS": []
+   }
+  },
+  {
+   "id": "ds_man",
+   "settings": {
+    "ID": "mrubrq7xu2hhyy4utwf",
+    "ENABLED": "0",
+    "GROUPS": []
+   }
+  },
+  {
+   "id": "custom_features",
+   "settings": {
+    "ID": "mrubrq7xnn81nz3otvq",
+    "FEATURES": []
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubrskaax2o6rk7gxj",
+    "SETTINGID": "BAUD",
+    "LINKEDSETTING": "mrubrsjqjgez7pq729s",
+    "FEATURE": "mrubrlt15u4ollyy4vs"
+   }
+  },
+  {
+   "id": "fd",
+   "settings": {
+    "ID": "mrubrt5tezlln38nbsv",
+    "ENABLED": "1",
+    "FILES": "32",
+    "SECTORS": "100"
+   }
+  },
+  {
+   "id": "filenum",
+   "settings": {
+    "ID": "mrubrtjqr98nsxe2lsb"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubrvbf9d9awq6dmgt",
+    "SETTINGID": "PARITY",
+    "LINKEDSETTING": "mrubrvavla7vxt2vpsf",
+    "FEATURE": "mrubrlt15u4ollyy4vs"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubrw4a1kc2qlt2zg4",
+    "SETTINGID": "BITS",
+    "LINKEDSETTING": "mrubrw3wxg4yqjdwoei",
+    "FEATURE": "mrubrlt15u4ollyy4vs"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubsgsx1s23jr8akod",
+    "SETTINGID": "NM",
+    "LINKEDSETTING": "mrubsgsn5fle7jbssdo",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubsh4icuhl4xcfnpo",
+    "SETTINGID": "GI",
+    "LINKEDSETTING": "mrubsh4bc8qcqndpcht",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "stgcmd_lib",
+   "settings": {
+    "ID": "mrubwb787ck2o5caqji"
+   }
+  },
+  {
+   "id": "node_system",
+   "settings": {
+    "ID": "mruc1kwub9esrimd9d",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 0,
+    "INPUTS": [
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwup7tk263gp98",
+       "NAME": "Halt",
+       "PORTID": "sys.halt",
+       "PARAMS": []
+      }
+     },
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwuampa3o961jw",
+       "NAME": "Reboot",
+       "PORTID": "sys.reboot",
+       "PARAMS": []
+      }
+     }
+    ],
+    "OUTPUTS": [
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwu2i1tshrpyxx",
+       "NAME": "Boot Complete",
+       "PORTID": "boot",
+       "PARAMS": []
+      }
+     },
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwu1r2ew19mmtxh",
+       "NAME": "System tick",
+       "PORTID": "on_sys_timer",
+       "PARAMS": []
+      }
+     }
+    ],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "modbus",
+   "settings": {
+    "ID": "mruc8kyow8g1vgjgacj"
+   }
+  },
+  {
+   "id": "tibbit_18",
+   "settings": {
+    "ID": "mrugtw45o0mlklquzjo",
+    "SOCKET": "12",
+    "TIBBIT": "18",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrymiqfm057j0qm71hef",
+    "SETTINGID": "TIMEZONE",
+    "LINKEDSETTING": "mrymiqezmq36y4mkkkj",
+    "FEATURE": "mquecbkttwt2hgq703"
+   }
+  },
+  {
+   "id": "mqtt_lib",
+   "settings": {
+    "ID": "mrzo79kt29gl5doepyt"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7easqrldtonej4h",
+    "SETTINGID": "MQTT_APP_CLIENT_ID",
+    "LINKEDSETTING": "mrzo7ea9feve0sv4ygj",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7eqchru21c9tx5h",
+    "SETTINGID": "MQTT_NAME",
+    "LINKEDSETTING": "mrzo7epx3kygk7rmrs1",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7fj7f2qppm2qyks",
+    "SETTINGID": "MQTT_PASSWORD",
+    "LINKEDSETTING": "mrzo7fitpbnham9mxhk",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7g49mpujzxx21ll",
+    "SETTINGID": "MQTT_SERVER_HOST",
+    "LINKEDSETTING": "mrzo7g3tyb6fojffkcn",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7hov4l6dcr22pzd",
+    "SETTINGID": "MQTT_DESTINATION_PORT",
+    "LINKEDSETTING": "mrzo7ho6f5pcfvevwfa",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzt1rvlr599ubh8qw",
+    "SETTINGID": "DHCP",
+    "LINKEDSETTING": "mrzt1rujl4lgn820yvi",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzt1sdy89idnrj9jlc",
+    "SETTINGID": "IP",
+    "LINKEDSETTING": "mrzt1sdhn1vc0rp5zup",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrztvq7nv86zswmlg0l",
+    "SETTINGID": "PASSWORD",
+    "LINKEDSETTING": "mrztvq72hd8zzwdfusm",
+    "FEATURE": "mrubrq7w5smh555khek"
+   }
+  },
+  {
+   "id": "tibbit_20",
+   "settings": {
+    "ID": "mvl0ht9i7azr8zt",
+    "SOCKET": "2",
+    "TIBBIT": "20",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "tibbit_14",
+   "settings": {
+    "ID": "mvl0ht9vilv4mhf",
+    "SOCKET": "3",
+    "TIBBIT": "14",
+    "PLATFORM": "",
+    "NAME": "T14_S3",
+    "CH1": "fan_v",
+    "CH2": "valve_v",
+    "CH3": "aout3",
+    "CH4": "aout4",
+    "USESSI": "NO"
+   }
+  },
+  {
+   "id": "tibbit_06",
+   "settings": {
+    "ID": "mvl0hta8y4sv7dk",
+    "SOCKET": "5",
+    "TIBBIT": "06",
+    "PLATFORM": "",
+    "NAME": "T06_S5",
+    "L1NAME": "heater",
+    "L2NAME": "fan_run"
+   }
+  },
+  {
+   "id": "tibbit_20",
+   "settings": {
+    "ID": "mvl0htalwy3b8z0",
+    "SOCKET": "6",
+    "TIBBIT": "20",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "tibbit_12",
+   "settings": {
+    "ID": "mvl0htaygsc5olr",
+    "SOCKET": "9",
+    "TIBBIT": "12",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "tibbit_10",
+   "settings": {
+    "ID": "mvl0htbbvpua4c6",
+    "SOCKET": "11",
+    "TIBBIT": "10",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mvl0htqhg8qd17u",
+    "DISPLAY_NAME": "sensor",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_time_interval",
+   "settings": {
+    "ID": "mvl0htqu8tzxr0v",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [],
+    "INTERVAL": "2"
+   }
+  },
+  {
+   "id": "node_modbus_write",
+   "settings": {
+    "ID": "mvl0htr75pehmxs",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [],
+    "DEVICE": "",
+    "PROTOCOL": "modbus_RTU",
+    "SERIAL_PORT": "mrubrlt15u4ollyy4vs",
+    "DEVICEIP": "1.0.0.1",
+    "DEVICEPORT": "502",
+    "FUNCTIONCODE": "ReadInputRegisters",
+    "DEVICEID": "{{$mvl0htob4y8tipt}}",
+    "REGISTER_ADDRESS": "1",
+    "LENGTH": "1",
+    "VARTYPE": "SIGNED_INTEGER",
+    "ENDIAN": "BIG",
+    "DATA": ""
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0htrkvkxabnf",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0htrx5ic1y49",
+       "ARGVALUE": "{{$response_data}}/10",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htpeypcbrs1"
+   }
+  },
+  {
+   "id": "node_modbus_write",
+   "settings": {
+    "ID": "mvl0htsawlpth6o",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [],
+    "DEVICE": "",
+    "PROTOCOL": "modbus_RTU",
+    "SERIAL_PORT": "mrubrlt15u4ollyy4vs",
+    "DEVICEIP": "1.0.0.1",
+    "DEVICEPORT": "502",
+    "FUNCTIONCODE": "ReadInputRegisters",
+    "DEVICEID": "{{$mvl0htob4y8tipt}}",
+    "REGISTER_ADDRESS": "2",
+    "LENGTH": "1",
+    "VARTYPE": "INTEGER",
+    "ENDIAN": "BIG",
+    "DATA": ""
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0htsnic8lr7o",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0htt0d6qnvpv",
+       "ARGVALUE": "{{$response_data}}/10",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htpry99thhr"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0httdpnjixe7",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0httqp39czen",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htq431ao933"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0htu366pqw3n",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0htugnwczxzr",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htq431ao933"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0htutgq79hsr",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0htv6alzqdtf",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htq431ao933"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0htvjjkjpkng",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0htqu8tzxr0v",
+    "SOURCE_PORT": "timer_tick",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0htr75pehmxs",
+    "TARGET_PORT": "modbus_poll",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0htvwr9kf7p9",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0htr75pehmxs",
+    "SOURCE_PORT": "modbus_response",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0htrkvkxabnf",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0htw95q6g54c",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0htrkvkxabnf",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0htsawlpth6o",
+    "TARGET_PORT": "modbus_poll",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0htwmtugcgqa",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0htsawlpth6o",
+    "SOURCE_PORT": "modbus_response",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0htsnic8lr7o",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0htwz2w3ugy0",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0htsnic8lr7o",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0httdpnjixe7",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0htxcuhsz7b3",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0htr75pehmxs",
+    "SOURCE_PORT": "modbus_timeout",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0htu366pqw3n",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0htxpovmwra4",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0htsawlpth6o",
+    "SOURCE_PORT": "modbus_timeout",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0htutgq79hsr",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mvl0hty2mnm34jd",
+    "DISPLAY_NAME": "control",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 700,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_time_interval",
+   "settings": {
+    "ID": "mvl0htyf6yzhuvs",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [],
+    "INTERVAL": "1"
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0htyse1psa51",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0htz5kgo8a23",
+       "ARGVALUE": "{{$mvl0hte7l6ry9ts}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0htzit15cr92",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0htzv0qak4c1",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hu08ydutkk5",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0htyf6yzhuvs",
+    "SOURCE_PORT": "timer_tick",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0htyse1psa51",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0hu0l6adkh9k",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu0ygosdjhn",
+       "ARGVALUE": "{{$mvl0htq431ao933}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu1bo2q220h",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu1ohklt65v",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hu21324uysu",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0htyse1psa51",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hu0l6adkh9k",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0hu2e9q7qji2",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu2rvcq0hml",
+       "ARGVALUE": "{{$mvl0htpeypcbrs1}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu341yq7c29",
+       "ARGVALUE": "<",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu3hy67tamq",
+       "ARGVALUE": "{{$mvl0hth31kciu51}}-{{$mvl0htij2cslc1v}}/2",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0hu3ubdpfvdx",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 760,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu47mcj3wd6",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htd45g5bb9q"
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0hu4kooyrv46",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 880,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu4xmo2v2h4",
+       "ARGVALUE": "{{$mvl0htpeypcbrs1}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu5a0e0vhgb",
+       "ARGVALUE": ">",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu5nm5ql3ya",
+       "ARGVALUE": "{{$mvl0hth31kciu51}}+{{$mvl0htij2cslc1v}}/2",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0hu60bkrq76a",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 880,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu6dpo58vvg",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htd45g5bb9q"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hu6qw2bxfoc",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hu0l6adkh9k",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hu2e9q7qji2",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hu731fkatk8",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hu2e9q7qji2",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hu3ubdpfvdx",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hu7gof460nb",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hu2e9q7qji2",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hu4kooyrv46",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hu7t2kl3l7p",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hu4kooyrv46",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hu60bkrq76a",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0hu86eh01adx",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 1000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu8jkdd9n04",
+       "ARGVALUE": "({{$mvl0hth31kciu51}}-{{$mvl0htpeypcbrs1}})*10/{{$mvl0htjz9wnudcu}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htc12kx9zgk"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0hu8wbxwkd5u",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 1000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hu991j81jch",
+       "ARGVALUE": "({{$mvl0htpeypcbrs1}}-{{$mvl0hth31kciu51}}-{{$mvl0htij2cslc1v}}/2)*10/{{$mvl0htjz9wnudcu}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htbolq578ln"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hu9meuveqft",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hu0l6adkh9k",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hu86eh01adx",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hu9zobsrt31",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hu86eh01adx",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hu8wbxwkd5u",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0huacb30u6ta",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 1000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huap6hoic1h",
+       "ARGVALUE": "{{$mvl0htpry99thhr}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hub2uz73wnu",
+       "ARGVALUE": ">",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hubfu4wh195",
+       "ARGVALUE": "{{$mvl0htlf72j1sdl}}",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0hubsnknvefd",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1800,
+    "Y": 1000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huc5fi35727",
+       "ARGVALUE": "{{$mvl0htbolq578ln}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hucim4fcmwq",
+       "ARGVALUE": "<",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hucvlegg3nw",
+       "ARGVALUE": "5",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0hud8xnc5iem",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2100,
+    "Y": 1000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hudlfk42j0t",
+       "ARGVALUE": "5",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htbolq578ln"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hudy52716qm",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hu8wbxwkd5u",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huacb30u6ta",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0huebn82ybjq",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huacb30u6ta",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hubsnknvefd",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hueoeqlxvxd",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hubsnknvefd",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hud8xnc5iem",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0huf11vwlwxw",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 1150,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hufe57n5in7",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htd45g5bb9q"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0hufr6ph2jgc",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 1150,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hug4mk7nfe0",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htc12kx9zgk"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0hugh9urps91",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 1150,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hugug3v98me",
+       "ARGVALUE": "3",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htbolq578ln"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0huh7uaz4tz9",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hu0l6adkh9k",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huf11vwlwxw",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0huhkfyxkho6",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huf11vwlwxw",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hufr6ph2jgc",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0huhxzowc4ov",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hufr6ph2jgc",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hugh9urps91",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0huia655gqwf",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 1300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huin3f71m72",
+       "ARGVALUE": "{{$mvl0hte7l6ry9ts}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huj0ysqdszv",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hujdrnpcv8i",
+       "ARGVALUE": "2",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hujq3klcjgr",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0htyse1psa51",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huia655gqwf",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0huk388vrtl3",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 1300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hukgwqfohxn",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htd45g5bb9q"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0huktw0dplxa",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 1300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hul6d9yc2v3",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htc12kx9zgk"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0hulj9wuqaxx",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 1300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hulw2btir9r",
+       "ARGVALUE": "{{$mvl0htmvqueg42b}}/10",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htbolq578ln"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hum919dz3e9",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huia655gqwf",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huk388vrtl3",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0humm1ce8iv7",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huk388vrtl3",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huktw0dplxa",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0humz5cguzuy",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huktw0dplxa",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hulj9wuqaxx",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0huncsge0ug8",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 1450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hunpmwdtmvc",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htd45g5bb9q"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0huo2d4lx814",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 1450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huofnpebdox",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htc12kx9zgk"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0huos7h021me",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 1450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hup5b3vh0c2",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htbolq578ln"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hupi6f227tf",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huia655gqwf",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huncsge0ug8",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hupv7yumbby",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huncsge0ug8",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huo2d4lx814",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0huq8rdb7eyb",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huo2d4lx814",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huos7h021me",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_changed",
+   "settings": {
+    "ID": "mvl0huqlxxdqqfq",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 1650,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [],
+    "VARIABLE": "mvl0htbolq578ln"
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0huqycg1ewdz",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 1650,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hurbqf65jlq",
+       "ARGVALUE": "{{$mvl0htbolq578ln}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huroyid8tsa",
+       "ARGVALUE": ">",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hus1a4mqqml",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0husedjl21uv",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 1600,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0husr1oomtss",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htdhfd6ld1p"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0hut4x04py5m",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 1720,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0hty2mnm34jd",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huthimnkxnp",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0htdhfd6ld1p"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hutuldtgqvc",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huqlxxdqqfq",
+    "SOURCE_PORT": "variable_changed",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huqycg1ewdz",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0huu7tjkv0wd",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huqycg1ewdz",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0husedjl21uv",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0huukje5xive",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huqycg1ewdz",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hut4x04py5m",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mvl0huuxr1epy7c",
+    "DISPLAY_NAME": "mqtt",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 1900,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_time_interval",
+   "settings": {
+    "ID": "mvl0huvabu8asba",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 2000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0huuxr1epy7c",
+    "ARGUMENTS": [],
+    "INTERVAL": "10"
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mvl0huvnc5wwynl",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 2000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0huuxr1epy7c",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huw0jicyo52",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/temperature",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huwdlkixxyc",
+       "ARGVALUE": "{{$mvl0htpeypcbrs1}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huwqzddrdfu",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hux31o7uov3",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0huxg3fdtadx",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huvabu8asba",
+    "SOURCE_PORT": "timer_tick",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huvnc5wwynl",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mvl0huxtbijssaj",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 2000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0huuxr1epy7c",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huy6dcm0v84",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/humidity",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huyjt34o6rr",
+       "ARGVALUE": "{{$mvl0htpry99thhr}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huyw3v7z6tc",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0huz9b2569n8",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0huzmc9d9azc",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huvnc5wwynl",
+    "SOURCE_PORT": "done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huxtbijssaj",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mvl0huzz3yh4vkd",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 2000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0huuxr1epy7c",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv0cdoswkwc",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/fan_v",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv0powu8di4",
+       "ARGVALUE": "{{$mvl0htbolq578ln}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv12jnot0rh",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv1fmys4fir",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hv1s7geq8nw",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huxtbijssaj",
+    "SOURCE_PORT": "done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0huzz3yh4vkd",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mvl0hv25q5ua1ab",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 2000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0huuxr1epy7c",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv2iu44rgsg",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/valve_v",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv2vhtmp93p",
+       "ARGVALUE": "{{$mvl0htc12kx9zgk}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv38mg0vtvv",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv3lvc8n551",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hv3y1h1luca",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0huzz3yh4vkd",
+    "SOURCE_PORT": "done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hv25q5ua1ab",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mvl0hv4bot7kqwj",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 2000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0huuxr1epy7c",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv4o6w1ds9n",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/heater",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv51nw9i7en",
+       "ARGVALUE": "{{$mvl0htd45g5bb9q}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv5e5jqsscl",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0hv5rjeitqrz",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0hv64l756dth",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0hv25q5ua1ab",
+    "SOURCE_PORT": "done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0hv4bot7kqwj",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  }
+ ]
+}

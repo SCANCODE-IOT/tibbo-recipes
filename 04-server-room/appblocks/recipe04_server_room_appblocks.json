@@ -1,0 +1,4900 @@
+{
+ "id": "6a7027cef9549288e8b5f72b",
+ "name": "Tibbo-recipe-04-Server-Room",
+ "device": "TPP2W(G2)",
+ "description": "Recipe 04 from tibbo.ru: server room monitoring on TPP2(G2): RS-485 Modbus temperature/humidity sensor, leak/door/2 spare dry contacts, siren relay, web console, MQTT.",
+ "shortDescription": "",
+ "version": "0.1.19",
+ "runtime": "tios",
+ "featureFlags": [],
+ "featureFlagMap": {},
+ "features": [
+  {
+   "id": "boardsetting",
+   "settings": {
+    "ID": "mquecbkte5plbdjo9sl",
+    "POE": "0",
+    "5VDIRECT": "0",
+    "WIFIANTENNA": "0",
+    "GPRSANTENNA": "0",
+    "TPB": "true",
+    "VPK": "1",
+    "DIN": "1",
+    "POWERADAPTER": "0",
+    "ASM": "asm+rp",
+    "NOTES": ""
+   }
+  },
+  {
+   "id": "general",
+   "settings": {
+    "ID": "mquecbkttwt2hgq703",
+    "DEVICE_NAME": "Device_Name_1",
+    "FIRMWAREVERSION": "1.0.0",
+    "TIMEZONE": "17",
+    "LATITUDE": "0",
+    "LONGITUDE": "0",
+    "LOGGING": "sys.debugprint"
+   }
+  },
+  {
+   "id": "global_vars",
+   "settings": {
+    "ID": "mquecbktwgvfvpgurtd",
+    "INTERVAL": "1",
+    "DEBUG_PRINT": "0",
+    "VARS": [
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dwc6v5ymdyb",
+       "VARNAME": "temperature",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dwcj5j7evt5",
+       "VARNAME": "humidity",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dwcws9ssjpe",
+       "VARNAME": "sensor_ok",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dwd9a9aa6c2",
+       "VARNAME": "alarm",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dwdmkeygcis",
+       "VARNAME": "muted",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     }
+    ],
+    "AUTOVARS": [
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrluhv919cwahy9",
+       "VARNAME": "T05_S1",
+       "DATATYPE": "byte",
+       "NAME": "",
+       "FEATURE": "mrubrlt15u4ollyy4vs",
+       "FEATURE_SETTING": "NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 255,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrss3tv3pyxdbuoq",
+       "VARNAME": "T05BAUD",
+       "DATATYPE": "string",
+       "NAME": "Tibbit 05 Baud Rate",
+       "FEATURE": "mrubrsjqjgez7pq729s",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 0,
+       "MAXIMUM": 8,
+       "DEFAULT": "9600",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrvhcqmaloecg96j",
+       "VARNAME": "PARITY",
+       "DATATYPE": "string",
+       "NAME": "Tibbit 05 Parity",
+       "FEATURE": "mrubrvavla7vxt2vpsf",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 1,
+       "MAXIMUM": 1,
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrw8wbcce7x2uu0u",
+       "VARNAME": "BITS",
+       "DATATYPE": "string",
+       "NAME": "Tibbit 05 Data Bits",
+       "FEATURE": "mrubrw3wxg4yqjdwoei",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 1,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubsh32a2embdnuvai",
+       "VARNAME": "NETNM",
+       "DATATYPE": "string",
+       "NAME": "Ethernet Netmask",
+       "FEATURE": "mrubsgsn5fle7jbssdo",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 16,
+       "DEFAULT": "255.255.255.0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubshgzsjb4gm63ssr",
+       "VARNAME": "NETGW",
+       "DATATYPE": "string",
+       "NAME": "Ethernet Gateway",
+       "FEATURE": "mrubsh4bc8qcqndpcht",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 16,
+       "DEFAULT": "1.0.0.1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrymiqlhcd1d1rwzu0e",
+       "VARNAME": "TZONE",
+       "DATATYPE": "string",
+       "NAME": "Setting",
+       "FEATURE": "mrymiqezmq36y4mkkkj",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 0,
+       "MAXIMUM": 3,
+       "DEFAULT": "27",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7eljwo0gmyh1e4",
+       "VARNAME": "MQTTI",
+       "DATATYPE": "string",
+       "NAME": "MQTT Client ID",
+       "FEATURE": "mrzo7ea9feve0sv4ygj",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "Client_ID_1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7ezlq467aw7zzak",
+       "VARNAME": "MQTTU",
+       "DATATYPE": "string",
+       "NAME": "MQTT Username",
+       "FEATURE": "mrzo7epx3kygk7rmrs1",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "MQTT_Name_1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7fravh2jgpzc4w",
+       "VARNAME": "MQTPW",
+       "DATATYPE": "string",
+       "NAME": "MQTT Password",
+       "FEATURE": "mrzo7fitpbnham9mxhk",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "Password",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7g6kap2iaa90fkd",
+       "VARNAME": "MQTTH",
+       "DATATYPE": "string",
+       "NAME": "MQTT Server Host Address/IP",
+       "FEATURE": "mrzo7g3tyb6fojffkcn",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "1.0.0.1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7i2o3w3dg4vj2ln",
+       "VARNAME": "MQTSP",
+       "DATATYPE": "string",
+       "NAME": "MQTT Server Port",
+       "FEATURE": "mrzo7ho6f5pcfvevwfa",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 5,
+       "DEFAULT": "1883",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo9b9xeuua0ggpl8d",
+       "VARNAME": "PUBLISH_TOPIC",
+       "DATATYPE": "string",
+       "NAME": "Setting",
+       "FEATURE": "mrzo9b5wfhv28kp5e6a",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "240",
+       "DEFAULT": "",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzt1s0uv1b1k1bagu",
+       "VARNAME": "NETCP",
+       "DATATYPE": "float",
+       "NAME": "Ethernet DHCP",
+       "FEATURE": "mrzt1rujl4lgn820yvi",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzt1sslhhf9lkweny7",
+       "VARNAME": "NETIP",
+       "DATATYPE": "string",
+       "NAME": "Ethernet IP",
+       "FEATURE": "mrzt1sdhn1vc0rp5zup",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 16,
+       "DEFAULT": "192.168.1.40",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrztvqcktdwhdlgoryd",
+       "VARNAME": "WBPWD",
+       "DATATYPE": "string",
+       "NAME": "Web Admin Password",
+       "FEATURE": "mrztvq72hd8zzwdfusm",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 32,
+       "DEFAULT": "",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dw228q2akcr",
+       "VARNAME": "siren",
+       "DATATYPE": "boolean",
+       "NAME": "Tibbit 06",
+       "FEATURE": "mvl0dw0m9r1609a",
+       "FEATURE_SETTING": "L1NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dw2fvhvmouk",
+       "VARNAME": "relay2",
+       "DATATYPE": "boolean",
+       "NAME": "Tibbit 06",
+       "FEATURE": "mvl0dw0m9r1609a",
+       "FEATURE_SETTING": "L2NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dw2sxecr8id",
+       "VARNAME": "leak",
+       "DATATYPE": "boolean",
+       "NAME": "Tibbit 54",
+       "FEATURE": "mvl0dw1cefiw0lg",
+       "FEATURE_SETTING": "L1NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dw3572bvbf7",
+       "VARNAME": "door",
+       "DATATYPE": "boolean",
+       "NAME": "Tibbit 54",
+       "FEATURE": "mvl0dw1cefiw0lg",
+       "FEATURE_SETTING": "L2NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dw3itmbi7g7",
+       "VARNAME": "input3",
+       "DATATYPE": "boolean",
+       "NAME": "Tibbit 54",
+       "FEATURE": "mvl0dw1cefiw0lg",
+       "FEATURE_SETTING": "L3NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dw3vflqxev1",
+       "VARNAME": "input4",
+       "DATATYPE": "boolean",
+       "NAME": "Tibbit 54",
+       "FEATURE": "mvl0dw1cefiw0lg",
+       "FEATURE_SETTING": "L4NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dw4leacok2l",
+       "VARNAME": "T_HIGH",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0dw48n52ciz3",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "-40",
+       "MAXIMUM": "100",
+       "DEFAULT": "30",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dw6r7mpvds0",
+       "VARNAME": "T_LOW",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0dw6e602unei",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "-40",
+       "MAXIMUM": "100",
+       "DEFAULT": "10",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dw870ydxtxn",
+       "VARNAME": "H_HIGH",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0dw7u3f6s6xt",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "100",
+       "DEFAULT": "70",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dw9n9rdrk9b",
+       "VARNAME": "H_LOW",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0dw9aqgumwea",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "100",
+       "DEFAULT": "20",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mvl0dwb3vcutzoc",
+       "VARNAME": "SENSOR_ADDR",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mvl0dwaqy4mkr2q",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "1",
+       "MAXIMUM": "247",
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "net",
+   "settings": {
+    "ID": "mquecbkt7eahgszzc6g",
+    "ENABLED": "1",
+    "DHCP": "1",
+    "IP": "192.168.1.200",
+    "NM": "255.255.255.0",
+    "GI": "192.168.1.1"
+   }
+  },
+  {
+   "id": "flash_devices",
+   "settings": {
+    "ID": "mqueccssuznhrlmb4ap",
+    "FLASH_DEVICES": [
+     {
+      "id": "flash_device",
+      "settings": {
+       "ID": "mrubri0k6lw5x4pzr9b",
+       "NAME": "flash0",
+       "BUILTIN": "1",
+       "BUILTINID": "flash0",
+       "LINKED_FEATURE": "",
+       "FLASH_DEVICE_NAME": "flash0",
+       "PARTITIONS": [
+        {
+         "id": "flash_partition",
+         "settings": {
+          "ID": "mrubri0kwbwn28dswk",
+          "NAME": "boot_partition",
+          "ADDRESS": "8200",
+          "SIZE": "457728",
+          "LABEL": "boot_partition",
+          "MOUNT_POINT": ""
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "flash_device",
+      "settings": {
+       "ID": "mrubri0klfywzjonti",
+       "NAME": "at45db081e",
+       "BUILTIN": "1",
+       "BUILTINID": "at45db081e",
+       "LINKED_FEATURE": "",
+       "FLASH_DEVICE_NAME": "at45db081e",
+       "PARTITIONS": [
+        {
+         "id": "flash_partition",
+         "settings": {
+          "ID": "mrubri0kias1w5xffb",
+          "NAME": "storage_partition",
+          "ADDRESS": "0",
+          "SIZE": "1048576",
+          "LABEL": "storage_partition",
+          "MOUNT_POINT": "/lfs"
+         }
+        }
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "peripheral_wiring",
+   "settings": {
+    "ID": "mquecdkhubfazo3zmsk",
+    "ENABLED": "1",
+    "LAYOUT_DATA": "[]",
+    "CUSTOM_SHAPES": "[]",
+    "CUSTOM_GROUPS": "[]"
+   }
+  },
+  {
+   "id": "datetime",
+   "settings": {
+    "ID": "mquece9nfn3kvdkizho"
+   }
+  },
+  {
+   "id": "dhcp",
+   "settings": {
+    "ID": "mquece9n9swb69v12g"
+   }
+  },
+  {
+   "id": "time",
+   "settings": {
+    "ID": "mquecebjj4h4tkoi25d"
+   }
+  },
+  {
+   "id": "sock",
+   "settings": {
+    "ID": "mquecebjkw6smsjwht"
+   }
+  },
+  {
+   "id": "tibbit_05",
+   "settings": {
+    "ID": "mrubrlt15u4ollyy4vs",
+    "SOCKET": "1",
+    "TIBBIT": "05",
+    "PLATFORM": "",
+    "NAME": "T05_S1",
+    "MODE": "RS485",
+    "BAUD": "9600",
+    "FLOWCONTROL": "0",
+    "PARITY": "0",
+    "BITS": "1",
+    "TXBUF": "1",
+    "RXBUF": "1"
+   }
+  },
+  {
+   "id": "timers",
+   "settings": {
+    "ID": "mrubrq7hry0t2aiqgr",
+    "DEBUG_PRINT": "0",
+    "TIMERS": []
+   }
+  },
+  {
+   "id": "cron",
+   "settings": {
+    "ID": "mrubrq7j6psp7kuo3s6",
+    "SCHEDULES": []
+   }
+  },
+  {
+   "id": "commands",
+   "settings": {
+    "ID": "mrubrq7km9e93bdx0sf",
+    "COMMANDS": [
+     {
+      "id": "command",
+      "settings": {
+       "ID": "mvl0dwdzhmjhv7b",
+       "NAME": "ACK",
+       "DESCRIPTION": "Silence the alarm"
+      }
+     },
+     {
+      "id": "command",
+      "settings": {
+       "ID": "mvl0dwec3jda705",
+       "NAME": "RELAY2_ON",
+       "DESCRIPTION": ""
+      }
+     },
+     {
+      "id": "command",
+      "settings": {
+       "ID": "mvl0dwepresuvrh",
+       "NAME": "RELAY2_OFF",
+       "DESCRIPTION": ""
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "log",
+   "settings": {
+    "ID": "mrubrq7leok0mwos33i",
+    "ENABLED": "0"
+   }
+  },
+  {
+   "id": "stg",
+   "settings": {
+    "ID": "mrubrq7mnv87nufrvr9",
+    "ENABLED": "1",
+    "STG_DEBUG_PRINT": "0",
+    "STORAGE": "FLASH",
+    "STG_TIMESTAMP": "0",
+    "REDUNDANCY": "0",
+    "STG_MAX_NUM_SETTINGS": "0",
+    "STG_RAM_ARRAY_SIZE": "0",
+    "STG_MAX_SETTING_NAME_LEN": "0",
+    "STG_MAX_SETTING_VALUE_LEN": "0",
+    "SETTINGS": [
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubrsjqjgez7pq729s",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "T05BAUD",
+       "NAME": "Tibbit 05 Baud Rate",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 0,
+       "MAX": 8,
+       "INITIALIZE": "A",
+       "DEFAULT": "9600"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubrvavla7vxt2vpsf",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "PARITY",
+       "NAME": "Tibbit 05 Parity",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 1,
+       "MAX": 1,
+       "INITIALIZE": "A",
+       "DEFAULT": "0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubrw3wxg4yqjdwoei",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "BITS",
+       "NAME": "Tibbit 05 Data Bits",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 1,
+       "MAX": 1,
+       "INITIALIZE": "A",
+       "DEFAULT": "1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubsgsn5fle7jbssdo",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETNM",
+       "NAME": "Ethernet Netmask",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 16,
+       "INITIALIZE": "A",
+       "DEFAULT": "255.255.255.0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubsh4bc8qcqndpcht",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETGW",
+       "NAME": "Ethernet Gateway",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 16,
+       "INITIALIZE": "A",
+       "DEFAULT": "192.168.1.1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrymiqezmq36y4mkkkj",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "TZONE",
+       "NAME": "Device Time Zone",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 0,
+       "MAX": 3,
+       "INITIALIZE": "A",
+       "DEFAULT": "17"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7ea9feve0sv4ygj",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTTI",
+       "NAME": "MQTT Client ID",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": "Client_ID_1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7epx3kygk7rmrs1",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTTU",
+       "NAME": "MQTT Username",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": "MQTT_Name_1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7fitpbnham9mxhk",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTPW",
+       "NAME": "MQTT Password",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": ""
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7g3tyb6fojffkcn",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTTH",
+       "NAME": "MQTT Server Host Address/IP",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": "1.0.0.1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7ho6f5pcfvevwfa",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTSP",
+       "NAME": "MQTT Server Port",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 5,
+       "INITIALIZE": "A",
+       "DEFAULT": "1883"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo9b5wfhv28kp5e6a",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "PUBLISH_TOPIC",
+       "NAME": "MQTT Publish Topic Prefix",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": "240",
+       "INITIALIZE": "A",
+       "DEFAULT": ""
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzt1rujl4lgn820yvi",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETCP",
+       "NAME": "Ethernet DHCP",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": 0,
+       "MAX": 1,
+       "INITIALIZE": "A",
+       "DEFAULT": "1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzt1sdhn1vc0rp5zup",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETIP",
+       "NAME": "Ethernet IP",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 16,
+       "INITIALIZE": "A",
+       "DEFAULT": "192.168.1.40"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrztvq72hd8zzwdfusm",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "WBPWD",
+       "NAME": "Web Admin Password",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 32,
+       "INITIALIZE": "A",
+       "DEFAULT": ""
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0dw48n52ciz3",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "T_HIGH",
+       "NAME": "Temperature high, C",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "-40",
+       "MAX": "100",
+       "INITIALIZE": "I",
+       "DEFAULT": "30"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0dw6e602unei",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "T_LOW",
+       "NAME": "Temperature low, C",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "-40",
+       "MAX": "100",
+       "INITIALIZE": "I",
+       "DEFAULT": "10"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0dw7u3f6s6xt",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "H_HIGH",
+       "NAME": "Humidity high, %",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "100",
+       "INITIALIZE": "I",
+       "DEFAULT": "70"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0dw9aqgumwea",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "H_LOW",
+       "NAME": "Humidity low, %",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "100",
+       "INITIALIZE": "I",
+       "DEFAULT": "20"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mvl0dwaqy4mkr2q",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "SENSOR_ADDR",
+       "NAME": "Sensor Modbus address",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "1",
+       "MAX": "247",
+       "INITIALIZE": "I",
+       "DEFAULT": "1"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tbl",
+   "settings": {
+    "ID": "mrubrq7n41jcwl4pn2p",
+    "ENABLED": "0",
+    "TBL_DEBUG_PRINT": "0",
+    "WEBENABLED": "1",
+    "TABLES": [],
+    "STORAGE_PATH": "/lfs"
+   }
+  },
+  {
+   "id": "cell",
+   "settings": {
+    "ID": "mrubrq7om0lm1x7reyj",
+    "ENABLED": "0",
+    "CELL_MODE": "CELL__PPP_MODE_ISENABLED",
+    "CELL_APN": "",
+    "CELL_UN": "myusername@realm",
+    "CELL_PW": "",
+    "CELL_PIN": "?",
+    "CELL_BAND_TYPE": "1",
+    "CELL__DEBUG_PRINT": "1",
+    "CELL_LOG_LEVEL": "2"
+   }
+  },
+  {
+   "id": "bt",
+   "settings": {
+    "ID": "mrubrq7oy4s2mz0bcrt",
+    "ENABLED": "0",
+    "DEVICENAME": "MyBTDevice",
+    "EMULATION": "PL_WLN_BT_EMULATION_MODE_MICROCHIP",
+    "TXBUF": "1",
+    "RXBUF": "1"
+   }
+  },
+  {
+   "id": "mqtt",
+   "settings": {
+    "ID": "mrubrq7paiw1hmfo1bm",
+    "GENERAL": "",
+    "CERTIFICATE": "",
+    "ENABLED": "1",
+    "MQTT_APP_CLIENT_ID": "Client_ID_1",
+    "MQTT_NAME": "MQTT_Name_1",
+    "MQTT_PASSWORD": "",
+    "MQTT_SERVER_HOST": "1.0.0.1",
+    "MQTT_DESTINATION_PORT": "1883",
+    "MQTT_TLS": "0",
+    "MQTT_KEEPALIVE_INTERVAL": "30",
+    "MQTT_DEBUG_PRINT": "1",
+    "CERTIFICATEFILE": "",
+    "CERTIFICATE_PATH": "",
+    "CLIENT_CERTIFICATE_PATH": "",
+    "TOPICS": []
+   }
+  },
+  {
+   "id": "cgg",
+   "settings": {
+    "ID": "mrubrq7pal0qeoxr0u8",
+    "GENERAL": "",
+    "SETTINGS": "",
+    "CONSOLE": "",
+    "ADVANCED": "",
+    "ENABLED": "0",
+    "SERVER": "192.168.1.201",
+    "SERVER_PORT": "1883",
+    "USERNAME": "",
+    "PASSWORD": "",
+    "DEBUG_PRINT": "0",
+    "WIDGETS": [],
+    "WIDGET_GROUPS": [
+     {
+      "id": "widget_group",
+      "settings": {
+       "ID": "mrubrq7pxwbce02prvo",
+       "GROUPID": "group1",
+       "NAME": "Group",
+       "WIDGETS": []
+      }
+     }
+    ],
+    "INTERVAL": "1",
+    "TLS": "0",
+    "GROUPS": [
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrubrq7pau0c4r6v916",
+       "GROUPID": "group1",
+       "NAME": "General",
+       "SETTINGS": []
+      }
+     }
+    ],
+    "CONSOLE_PREVIEW": "cloud",
+    "TABLES": []
+   }
+  },
+  {
+   "id": "httpserver",
+   "settings": {
+    "ID": "mrubrq7qm4xcnjyt9s8",
+    "GENERAL": "",
+    "ADVANCED": "",
+    "ENABLED": "1",
+    "PORT": "80",
+    "SOCKETS": "2",
+    "TXBUF": "10",
+    "RXBUF": "10",
+    "VARBUF": "1",
+    "ENDPOINTS": [],
+    "DEBUG_PRINT": "0",
+    "TLS_ENABLED": "0"
+   }
+  },
+  {
+   "id": "http",
+   "settings": {
+    "ID": "mrubrq7qgx4eh0mu6el",
+    "ENABLED": "0",
+    "MAX_REQUESTS": "5",
+    "DEBUG_PRINT": "0"
+   }
+  },
+  {
+   "id": "socket",
+   "settings": {
+    "ID": "mrubrq7r5r28mns1ko8",
+    "SOCKETS": []
+   }
+  },
+  {
+   "id": "dns",
+   "settings": {
+    "ID": "mrubrq7r3ge8ga8smn3",
+    "ENABLED": "1",
+    "SERVER1": "8.8.8.8",
+    "SERVER2": "",
+    "DNS_TIMEOUT": "5000",
+    "DNS_DEBUG_PRINT": "0"
+   }
+  },
+  {
+   "id": "sntp",
+   "settings": {
+    "ID": "mrubrq7shyohrudx4gn",
+    "ENABLED": "1",
+    "DEBUGPRINT": "0",
+    "SNTP_SERVER": "216.239.35.0"
+   }
+  },
+  {
+   "id": "mbedtls",
+   "settings": {
+    "ID": "mrubrq7spks63m3sm2",
+    "ENABLED": "0",
+    "CONFIGS": "\nCONFIG_MBEDTLS_HEAP_SIZE=30000\nCONFIG_MBEDTLS_SSL_MAX_CONTENT_LEN=4096                \n"
+   }
+  },
+  {
+   "id": "snmp_agent",
+   "settings": {
+    "ID": "mrubrq7sd9emcmt1ad",
+    "GENERAL": "",
+    "SYSTEM": "",
+    "V3": "",
+    "ADVANCED": "",
+    "ENABLED": "0",
+    "PORT": "161",
+    "READ_COMMUNITY": "public",
+    "WRITE_COMMUNITY": "private",
+    "OBJECTS": [],
+    "SYSDESCR": "Tibbo Device",
+    "SYSOBJECTID": "1.3.6.1.4.1.20738",
+    "SYSCONTACT": "",
+    "SYSNAME": "",
+    "SYSLOCATION": "",
+    "V3_ENABLED": "0",
+    "USERS": [],
+    "OBJECT_CAPACITY": "16",
+    "LOG_LEVEL": "4"
+   }
+  },
+  {
+   "id": "smtp_client",
+   "settings": {
+    "ID": "mrubrq7thy56poqyyzm",
+    "GENERAL": "",
+    "AUTH": "",
+    "ADVANCED": "",
+    "ENABLED": "0",
+    "SERVER": "",
+    "PORT": "465",
+    "SECURITY": "tls",
+    "FROM_ADDRESS": "",
+    "AUTH_METHOD": "login",
+    "USERNAME": "",
+    "PASSWORD": "",
+    "TIMEOUT": "10000",
+    "LOG_LEVEL": "3"
+   }
+  },
+  {
+   "id": "modbus_master",
+   "settings": {
+    "ID": "mrubrq7t0jv8nqk7bvd",
+    "DEBUG_PRINT": "0",
+    "TIMEOUT": "1000",
+    "POLL_INTERVAL": "1000",
+    "FRAME_DELAY": "2",
+    "MAX_REQUESTS": "10",
+    "MODBUSDEVICES": []
+   }
+  },
+  {
+   "id": "modbus_slave",
+   "settings": {
+    "ID": "mrubrq7uvezopfuci",
+    "DEBUG_PRINT": "0",
+    "SLAVEPROTOCOL": "modbus_RTU",
+    "DEVICEID": "1",
+    "SLAVE_SERIAL_PORT": "",
+    "SLAVE_TCP_PORT": "502",
+    "MODBUSTABLEITEMS": []
+   }
+  },
+  {
+   "id": "lcd",
+   "settings": {
+    "ID": "mrubrq7uqk6oqszelbr",
+    "GENERAL": "",
+    "IMAGES_GROUP": "",
+    "SETTINGS": "",
+    "ENABLED": "0",
+    "BACKCOLOR": "#000000",
+    "FORECOLOR": "#ffffff",
+    "LOGFONT": "LCD_SMALL_FONT",
+    "WIDGETS": [],
+    "SCREENS": [],
+    "IMAGES": [],
+    "LCD_SCREEN_WIDGET_COLUMNS": 320,
+    "LCD_SCREEN_WIDGET_ROWS": 240,
+    "GROUPS": [
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrubrq7u7p7g8mggced",
+       "GROUPID": "group2",
+       "NAME": "General",
+       "SETTINGS": []
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "lcd_graph",
+   "settings": {
+    "ID": "mrubrq7vlwp02vzb4n",
+    "ENABLED": "0",
+    "MINY": "-100",
+    "MAXY": "100",
+    "STARTX": "0",
+    "STARTY": 0,
+    "WIDTH": 320,
+    "HEIGHT": 240,
+    "FILL": "#00ff00"
+   }
+  },
+  {
+   "id": "web_dashboard",
+   "settings": {
+    "ID": "mrubrq7w5smh555khek",
+    "GENERAL": "",
+    "SETTINGS": "",
+    "ADVANCED": "",
+    "CUSTOM_PAGES": "",
+    "ENABLED": "1",
+    "TABLESENABLED": "1",
+    "SETTINGSENABLED": "1",
+    "WIDGETENABLED": "1",
+    "INTERVAL": "1",
+    "DASHBOARD_TITLE": "Modbus MQTT Gateway",
+    "GROUPS": [
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mvl0dw4y05p2ys9",
+       "GROUPID": "gmvl0dw",
+       "NAME": "Thresholds",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0dw61kl3aytc",
+          "SETTINGID": "mvl0dw48n52ciz3",
+          "NAME": "Temperature high, C",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0dw5o4e6dmp4",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0dw7h10ekys7",
+          "SETTINGID": "mvl0dw6e602unei",
+          "NAME": "Temperature low, C",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0dw74a5pe9nz",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0dw8xs8ogh3i",
+          "SETTINGID": "mvl0dw7u3f6s6xt",
+          "NAME": "Humidity high, %",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0dw8kkafbkjw",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0dwad4yzl0he",
+          "SETTINGID": "mvl0dw9aqgumwea",
+          "NAME": "Humidity low, %",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0dwa085rdzx5",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mvl0dwbtiwjxyfx",
+          "SETTINGID": "mvl0dwaqy4mkr2q",
+          "NAME": "Sensor Modbus address",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mvl0dwbgdeomzov",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrzocamz6onj42hdm",
+       "GROUPID": "webgroup2",
+       "NAME": "General",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrztvxo8z2skfzmlmy",
+          "SETTINGID": "mrztvq72hd8zzwdfusm",
+          "NAME": "Web Admin Password",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrztvxo84a76ch5xj2j",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzocqzl563lrptxbnt",
+          "SETTINGID": "mrymiqezmq36y4mkkkj",
+          "NAME": "Device Time Zone",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8ffw1qcwv64v",
+             "LABEL": "UTC-12:00",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8bgmr8r2yuzw",
+             "LABEL": "UTC-11:00",
+             "VALUE": "1"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8a1mpviy2pde",
+             "LABEL": "UTC-10:00",
+             "VALUE": "2"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz80ryj36l8ou9",
+             "LABEL": "UTC-09:00",
+             "VALUE": "3"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8grvqj16u8o9",
+             "LABEL": "UTC-08:00",
+             "VALUE": "4"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8j4q0fy7gk1",
+             "LABEL": "UTC-07:00",
+             "VALUE": "5"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8z56gyc919v",
+             "LABEL": "UTC-06:00",
+             "VALUE": "6"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8wi8wk73ky9f",
+             "LABEL": "UTC-05:00",
+             "VALUE": "7"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8wopv411gu6k",
+             "LABEL": "UTC-04:30",
+             "VALUE": "8"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8497gvkqwgbn",
+             "LABEL": "UTC-04:00",
+             "VALUE": "9"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8v9iip32fyz",
+             "LABEL": "UTC-03:30",
+             "VALUE": "10"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8c1ltlh1bqa5",
+             "LABEL": "UTC-03:00",
+             "VALUE": "11"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8ypq95t4pl18",
+             "LABEL": "UTC-02:00",
+             "VALUE": "12"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8nz6dyc66iho",
+             "LABEL": "UTC-01:00",
+             "VALUE": "13"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8pqm6y3f2oc",
+             "LABEL": "UTC",
+             "VALUE": "14"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8x3al1g6delm",
+             "LABEL": "UTC+01:00",
+             "VALUE": "15"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz81ht612g4x3n",
+             "LABEL": "UTC+02:00",
+             "VALUE": "16"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8qk1p8lakoc",
+             "LABEL": "UTC+03:00",
+             "VALUE": "17"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8bc6lf1l3317",
+             "LABEL": "UTC+03:30",
+             "VALUE": "18"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8x9d7ievtjpn",
+             "LABEL": "UTC+04:00",
+             "VALUE": "19"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8okoiz8zxcdh",
+             "LABEL": "UTC+04:30",
+             "VALUE": "20"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz87a8u90y3ocb",
+             "LABEL": "UTC+05:00",
+             "VALUE": "21"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8wq62jbrznup",
+             "LABEL": "UTC+05:30",
+             "VALUE": "22"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8aflt8js6x9h",
+             "LABEL": "UTC+05:45",
+             "VALUE": "23"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8ibrll63vzbd",
+             "LABEL": "UTC+06:00",
+             "VALUE": "24"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz88h6ut205i4i",
+             "LABEL": "UTC+06:30",
+             "VALUE": "25"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8s7ixt8z634r",
+             "LABEL": "UTC+07:00",
+             "VALUE": "26"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz80w0jom599cd",
+             "LABEL": "UTC+08:00",
+             "VALUE": "27"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8amqd6jv4baf",
+             "LABEL": "UTC+09:00",
+             "VALUE": "28"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz87q5u5q0083b",
+             "LABEL": "UTC+9:30",
+             "VALUE": "29"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9bi6otz31cfu",
+             "LABEL": "UTC+10:00",
+             "VALUE": "30"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9tadf9gy9ivo",
+             "LABEL": "UTC+11:00",
+             "VALUE": "31"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9hnjkuwnfxoa",
+             "LABEL": "UTC+12:00",
+             "VALUE": "32"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9e8pssio44me",
+             "LABEL": "UTC+13:00",
+             "VALUE": "33"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrucyal20jhh1pzu096n",
+       "GROUPID": "webgroup1",
+       "NAME": "Network",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucyfckj12hj6kxjyk",
+          "SETTINGID": "mrzt1rujl4lgn820yvi",
+          "NAME": "Ethernet DHCP",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyh2yi7uhrx617lt",
+             "LABEL": "Disabled",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyh2ypl43rs4efea",
+             "LABEL": "Enabled",
+             "VALUE": "1"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucyjswtij74ddqhrd",
+          "SETTINGID": "mrzt1sdhn1vc0rp5zup",
+          "NAME": "Ethernet IP",
+          "CONTROL": "IPCTRL",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyjswxhwtnbxkhzj",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucynijjca18967m6",
+          "SETTINGID": "mrubsgsn5fle7jbssdo",
+          "NAME": "Ethernet Netmask",
+          "CONTROL": "IPCTRL",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucynijxabrbbisclr",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucyr06v2woip59x4",
+          "SETTINGID": "mrubsh4bc8qcqndpcht",
+          "NAME": "Ethernet Gateway",
+          "CONTROL": "IPCTRL",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyr06c9xuqg6ctcs",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrubrq7wq74v0983l1",
+       "GROUPID": "group3",
+       "NAME": "Modbus",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucxvahkdeipxow6p",
+          "SETTINGID": "mrubrsjqjgez7pq729s",
+          "NAME": "Tibbit 05 Baud Rate",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdycxomvlqv3",
+             "LABEL": "1200",
+             "VALUE": "1200"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdxu4h6okqc5r",
+             "LABEL": "2400",
+             "VALUE": "2400"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsd9qna3creu29",
+             "LABEL": "4800",
+             "VALUE": "4800"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsd05l7xgbjmkw",
+             "LABEL": "9600",
+             "VALUE": "9600"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdrnlgonp7xg",
+             "LABEL": "19200",
+             "VALUE": "19200"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdkclc3z43ke",
+             "LABEL": "38400",
+             "VALUE": "38400"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdiozr36z2t6",
+             "LABEL": "57600",
+             "VALUE": "57600"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsd53yqo3ocypa",
+             "LABEL": "115200",
+             "VALUE": "115200"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdej9kx01vmgw",
+             "LABEL": "230400",
+             "VALUE": "230400"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdc8xdasfw35s",
+             "LABEL": "460800",
+             "VALUE": "460800"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdd07e0nd1m28",
+             "LABEL": "921600",
+             "VALUE": "921600"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucxzlo3bt860fssz",
+          "SETTINGID": "mrubrvavla7vxt2vpsf",
+          "NAME": "Tibbit 05 Parity",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19gubfymwhwwk",
+             "LABEL": "None",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19g3z05wnh14dq",
+             "LABEL": "Even",
+             "VALUE": "1"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19g1ccumxsnwnu",
+             "LABEL": "Odd",
+             "VALUE": "2"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19gw2cty4zfdh",
+             "LABEL": "Mark(Always 1)",
+             "VALUE": "3"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19g9o15l7expop",
+             "LABEL": "Space(Always 0)",
+             "VALUE": "4"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucy2cfnfz42z6k9d",
+          "SETTINGID": "mrubrw3wxg4yqjdwoei",
+          "NAME": "Tibbit 05 Data Bits",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy3yrv3owj2lnxkl",
+             "LABEL": "7 Bits",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy3yrj9hlwqgy3y",
+             "LABEL": "8 Bits",
+             "VALUE": "1"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrzode0sag5675gjwve",
+       "GROUPID": "webgroup3",
+       "NAME": "MQTT",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzodh80zwtmef5uu7k",
+          "SETTINGID": "mrzo7g3tyb6fojffkcn",
+          "NAME": "MQTT Server Host Address/IP",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzodh80dz1enxil1h8",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzodpwnvu3l4xk63yi",
+          "SETTINGID": "mrzo7ho6f5pcfvevwfa",
+          "NAME": "MQTT Server Port",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzodpwnm1sp9pva68g",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzoeno42afa7plccw",
+          "SETTINGID": "mrzo9b5wfhv28kp5e6a",
+          "NAME": "MQTT Publish Topic Prefix",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzoeno41d9164nayym",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzodvcf6zbhex5v9t5",
+          "SETTINGID": "mrzo7ea9feve0sv4ygj",
+          "NAME": "MQTT Client ID",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzodvcfiz5psa9jjib",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzoefpv4xinht2knh",
+          "SETTINGID": "mrzo7epx3kygk7rmrs1",
+          "NAME": "MQTT Username",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzoefpvngsb8bg3ibs",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzoejtquqx1pdw82lk",
+          "SETTINGID": "mrzo7fitpbnham9mxhk",
+          "NAME": "MQTT Password",
+          "CONTROL": "PASSWORD",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzoejtq8p1xigkbjvf",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     }
+    ],
+    "WIDGETS": [
+     {
+      "id": "card_widget",
+      "settings": {
+       "COLOR": "#1976d2",
+       "DECIMAL_PLACES": "1",
+       "FONT_SIZE": "60",
+       "H": "3",
+       "LABEL": "Temperature, C",
+       "LABEL_FONT_SIZE": "16",
+       "TEXT_COLOR": "#000000",
+       "VARIABLE": "mvl0dwc6v5ymdyb",
+       "VISIBLE": "1",
+       "W": "3",
+       "ID": "mvl0dybbqfl16fe",
+       "X": 0,
+       "Y": 0
+      }
+     },
+     {
+      "id": "card_widget",
+      "settings": {
+       "COLOR": "#1976d2",
+       "DECIMAL_PLACES": "1",
+       "FONT_SIZE": "60",
+       "H": "3",
+       "LABEL": "Humidity, %",
+       "LABEL_FONT_SIZE": "16",
+       "TEXT_COLOR": "#000000",
+       "VARIABLE": "mvl0dwcj5j7evt5",
+       "VISIBLE": "1",
+       "W": "3",
+       "ID": "mvl0dybod82h4oh",
+       "X": 3,
+       "Y": 0
+      }
+     },
+     {
+      "id": "card_widget",
+      "settings": {
+       "COLOR": "#1976d2",
+       "DECIMAL_PLACES": "0",
+       "FONT_SIZE": "60",
+       "H": "3",
+       "LABEL": "Active alarms",
+       "LABEL_FONT_SIZE": "16",
+       "TEXT_COLOR": "#000000",
+       "VARIABLE": "mvl0dwd9a9aa6c2",
+       "VISIBLE": "1",
+       "W": "3",
+       "ID": "mvl0dyc1bmx1e6z",
+       "X": 6,
+       "Y": 0
+      }
+     },
+     {
+      "id": "button_widget",
+      "settings": {
+       "BUTTON_LABEL": "Silence",
+       "COLOR": "#1976d2",
+       "FONT_SIZE": "16",
+       "H": "2",
+       "HAS_INPUT": "0",
+       "LABEL": "Alarm",
+       "LABEL_FONT_SIZE": "16",
+       "TEXT_COLOR": "#000000",
+       "VARIABLE": "mvl0dwdzhmjhv7b",
+       "VISIBLE": "1",
+       "W": "3",
+       "ID": "mvl0dycezqcl254",
+       "X": 0,
+       "Y": 3
+      }
+     },
+     {
+      "id": "button_widget",
+      "settings": {
+       "BUTTON_LABEL": "On",
+       "COLOR": "#1976d2",
+       "FONT_SIZE": "16",
+       "H": "2",
+       "HAS_INPUT": "0",
+       "LABEL": "Relay 2",
+       "LABEL_FONT_SIZE": "16",
+       "TEXT_COLOR": "#000000",
+       "VARIABLE": "mvl0dwec3jda705",
+       "VISIBLE": "1",
+       "W": "3",
+       "ID": "mvl0dycrl7y2zqa",
+       "X": 3,
+       "Y": 3
+      }
+     },
+     {
+      "id": "button_widget",
+      "settings": {
+       "BUTTON_LABEL": "Off",
+       "COLOR": "#1976d2",
+       "FONT_SIZE": "16",
+       "H": "2",
+       "HAS_INPUT": "0",
+       "LABEL": "Relay 2",
+       "LABEL_FONT_SIZE": "16",
+       "TEXT_COLOR": "#000000",
+       "VARIABLE": "mvl0dwepresuvrh",
+       "VISIBLE": "1",
+       "W": "3",
+       "ID": "mvl0dyd42ljtyn9",
+       "X": 6,
+       "Y": 3
+      }
+     }
+    ],
+    "WIDGET_GROUPS": [
+     {
+      "id": "widget_group",
+      "settings": {
+       "ID": "mrubrq7wekb7o2fbbqa",
+       "GROUPID": "group2",
+       "NAME": "Group",
+       "WIDGETS": []
+      }
+     }
+    ],
+    "USER": "admin",
+    "PASSWORD": "",
+    "USER_REGULAR": "user",
+    "USER_PASSWORD": "",
+    "WEB_ADMIN_WIDGET_COLUMNS": "10",
+    "WEB_ADMIN_WIDGET_ROWS": "15",
+    "CONSOLE_PREVIEW": "device",
+    "TABLES": [],
+    "CUSTOM_PAGES_REFRESH_INTERVAL": "2",
+    "CUSTOM_PAGES_JSON": "[]",
+    "CUSTOM_PAGES_EDITOR": ""
+   }
+  },
+  {
+   "id": "luis",
+   "settings": {
+    "ID": "mrubrq7wbczxfpnpxe9",
+    "ENABLED": "0",
+    "BTENABLED": "1",
+    "WEBENABLED": "0",
+    "START_ENABLED": "1",
+    "PASSWORD": "",
+    "GROUPS": []
+   }
+  },
+  {
+   "id": "ds_man",
+   "settings": {
+    "ID": "mrubrq7xu2hhyy4utwf",
+    "ENABLED": "0",
+    "GROUPS": []
+   }
+  },
+  {
+   "id": "custom_features",
+   "settings": {
+    "ID": "mrubrq7xnn81nz3otvq",
+    "FEATURES": []
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubrskaax2o6rk7gxj",
+    "SETTINGID": "BAUD",
+    "LINKEDSETTING": "mrubrsjqjgez7pq729s",
+    "FEATURE": "mrubrlt15u4ollyy4vs"
+   }
+  },
+  {
+   "id": "fd",
+   "settings": {
+    "ID": "mrubrt5tezlln38nbsv",
+    "ENABLED": "1",
+    "FILES": "32",
+    "SECTORS": "100"
+   }
+  },
+  {
+   "id": "filenum",
+   "settings": {
+    "ID": "mrubrtjqr98nsxe2lsb"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubrvbf9d9awq6dmgt",
+    "SETTINGID": "PARITY",
+    "LINKEDSETTING": "mrubrvavla7vxt2vpsf",
+    "FEATURE": "mrubrlt15u4ollyy4vs"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubrw4a1kc2qlt2zg4",
+    "SETTINGID": "BITS",
+    "LINKEDSETTING": "mrubrw3wxg4yqjdwoei",
+    "FEATURE": "mrubrlt15u4ollyy4vs"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubsgsx1s23jr8akod",
+    "SETTINGID": "NM",
+    "LINKEDSETTING": "mrubsgsn5fle7jbssdo",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubsh4icuhl4xcfnpo",
+    "SETTINGID": "GI",
+    "LINKEDSETTING": "mrubsh4bc8qcqndpcht",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "stgcmd_lib",
+   "settings": {
+    "ID": "mrubwb787ck2o5caqji"
+   }
+  },
+  {
+   "id": "node_system",
+   "settings": {
+    "ID": "mruc1kwub9esrimd9d",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 0,
+    "INPUTS": [
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwup7tk263gp98",
+       "NAME": "Halt",
+       "PORTID": "sys.halt",
+       "PARAMS": []
+      }
+     },
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwuampa3o961jw",
+       "NAME": "Reboot",
+       "PORTID": "sys.reboot",
+       "PARAMS": []
+      }
+     }
+    ],
+    "OUTPUTS": [
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwu2i1tshrpyxx",
+       "NAME": "Boot Complete",
+       "PORTID": "boot",
+       "PARAMS": []
+      }
+     },
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwu1r2ew19mmtxh",
+       "NAME": "System tick",
+       "PORTID": "on_sys_timer",
+       "PARAMS": []
+      }
+     }
+    ],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "modbus",
+   "settings": {
+    "ID": "mruc8kyow8g1vgjgacj"
+   }
+  },
+  {
+   "id": "tibbit_21",
+   "settings": {
+    "ID": "mrucxiznr3yjiuzxun",
+    "SOCKET": "2",
+    "TIBBIT": "21",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "tibbit_09",
+   "settings": {
+    "ID": "mrugtu4kfx0wgt59t05",
+    "SOCKET": "11",
+    "TIBBIT": "09",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrymiqfm057j0qm71hef",
+    "SETTINGID": "TIMEZONE",
+    "LINKEDSETTING": "mrymiqezmq36y4mkkkj",
+    "FEATURE": "mquecbkttwt2hgq703"
+   }
+  },
+  {
+   "id": "mqtt_lib",
+   "settings": {
+    "ID": "mrzo79kt29gl5doepyt"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7easqrldtonej4h",
+    "SETTINGID": "MQTT_APP_CLIENT_ID",
+    "LINKEDSETTING": "mrzo7ea9feve0sv4ygj",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7eqchru21c9tx5h",
+    "SETTINGID": "MQTT_NAME",
+    "LINKEDSETTING": "mrzo7epx3kygk7rmrs1",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7fj7f2qppm2qyks",
+    "SETTINGID": "MQTT_PASSWORD",
+    "LINKEDSETTING": "mrzo7fitpbnham9mxhk",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7g49mpujzxx21ll",
+    "SETTINGID": "MQTT_SERVER_HOST",
+    "LINKEDSETTING": "mrzo7g3tyb6fojffkcn",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7hov4l6dcr22pzd",
+    "SETTINGID": "MQTT_DESTINATION_PORT",
+    "LINKEDSETTING": "mrzo7ho6f5pcfvevwfa",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzt1rvlr599ubh8qw",
+    "SETTINGID": "DHCP",
+    "LINKEDSETTING": "mrzt1rujl4lgn820yvi",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzt1sdy89idnrj9jlc",
+    "SETTINGID": "IP",
+    "LINKEDSETTING": "mrzt1sdhn1vc0rp5zup",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrztvq7nv86zswmlg0l",
+    "SETTINGID": "PASSWORD",
+    "LINKEDSETTING": "mrztvq72hd8zzwdfusm",
+    "FEATURE": "mrubrq7w5smh555khek"
+   }
+  },
+  {
+   "id": "tibbit_06",
+   "settings": {
+    "ID": "mvl0dw0m9r1609a",
+    "SOCKET": "5",
+    "TIBBIT": "06",
+    "PLATFORM": "",
+    "NAME": "T06_S5",
+    "L1NAME": "siren",
+    "L2NAME": "relay2"
+   }
+  },
+  {
+   "id": "tibbit_20",
+   "settings": {
+    "ID": "mvl0dw0zmce8xz6",
+    "SOCKET": "6",
+    "TIBBIT": "20",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "tibbit_54",
+   "settings": {
+    "ID": "mvl0dw1cefiw0lg",
+    "SOCKET": "9",
+    "TIBBIT": "54",
+    "PLATFORM": "",
+    "NAME": "T54_S9",
+    "L1NAME": "leak",
+    "L1MODE": "0",
+    "L2NAME": "door",
+    "L2MODE": "0",
+    "L3NAME": "input3",
+    "L3MODE": "0",
+    "L4NAME": "input4",
+    "L4MODE": "0",
+    "INTEDGE": "INT_EDGE_LOW"
+   }
+  },
+  {
+   "id": "tibbit_20",
+   "settings": {
+    "ID": "mvl0dw1p00ca8kj",
+    "SOCKET": "10",
+    "TIBBIT": "20",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mvl0dwf2tlrjom5",
+    "DISPLAY_NAME": "sensor",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_time_interval",
+   "settings": {
+    "ID": "mvl0dwffmabfcu9",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwf2tlrjom5",
+    "ARGUMENTS": [],
+    "INTERVAL": "5"
+   }
+  },
+  {
+   "id": "node_modbus_write",
+   "settings": {
+    "ID": "mvl0dwfsm9b5wjx",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwf2tlrjom5",
+    "ARGUMENTS": [],
+    "DEVICE": "",
+    "PROTOCOL": "modbus_RTU",
+    "SERIAL_PORT": "mrubrlt15u4ollyy4vs",
+    "DEVICEIP": "1.0.0.1",
+    "DEVICEPORT": "502",
+    "FUNCTIONCODE": "ReadInputRegisters",
+    "DEVICEID": "{{$mvl0dwb3vcutzoc}}",
+    "REGISTER_ADDRESS": "1",
+    "LENGTH": "1",
+    "VARTYPE": "SIGNED_INTEGER",
+    "ENDIAN": "BIG",
+    "DATA": ""
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dwg5y0jgn18",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwf2tlrjom5",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwgi64v5c5x",
+       "ARGVALUE": "{{$response_data}}/10",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwc6v5ymdyb"
+   }
+  },
+  {
+   "id": "node_modbus_write",
+   "settings": {
+    "ID": "mvl0dwgvhai0a24",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwf2tlrjom5",
+    "ARGUMENTS": [],
+    "DEVICE": "",
+    "PROTOCOL": "modbus_RTU",
+    "SERIAL_PORT": "mrubrlt15u4ollyy4vs",
+    "DEVICEIP": "1.0.0.1",
+    "DEVICEPORT": "502",
+    "FUNCTIONCODE": "ReadInputRegisters",
+    "DEVICEID": "{{$mvl0dwb3vcutzoc}}",
+    "REGISTER_ADDRESS": "2",
+    "LENGTH": "1",
+    "VARTYPE": "INTEGER",
+    "ENDIAN": "BIG",
+    "DATA": ""
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dwh8kjuwc9u",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwf2tlrjom5",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwhlowsowlz",
+       "ARGVALUE": "{{$response_data}}/10",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwcj5j7evt5"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dwhy8fim2l7",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwf2tlrjom5",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwibiu09pgg",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwcws9ssjpe"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dwio8lhvjqx",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwf2tlrjom5",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwj1ou3vcc6",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwcws9ssjpe"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dwjeywpbrmb",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwf2tlrjom5",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwjrwobbfkk",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwcws9ssjpe"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwk47ugn1ik",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwffmabfcu9",
+    "SOURCE_PORT": "timer_tick",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwfsm9b5wjx",
+    "TARGET_PORT": "modbus_poll",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwkhsqsh12t",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwfsm9b5wjx",
+    "SOURCE_PORT": "modbus_response",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwg5y0jgn18",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwku9r6j0xq",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwg5y0jgn18",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwgvhai0a24",
+    "TARGET_PORT": "modbus_poll",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwl715yi27g",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwgvhai0a24",
+    "SOURCE_PORT": "modbus_response",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwh8kjuwc9u",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwlkqsg1jb5",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwh8kjuwc9u",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwhy8fim2l7",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwlx30vrsau",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwfsm9b5wjx",
+    "SOURCE_PORT": "modbus_timeout",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwio8lhvjqx",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwmamajcszx",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwgvhai0a24",
+    "SOURCE_PORT": "modbus_timeout",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwjeywpbrmb",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mvl0dwmn2obtd2f",
+    "DISPLAY_NAME": "alarms",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 700,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_time_interval",
+   "settings": {
+    "ID": "mvl0dwn0zg0z0qf",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [],
+    "INTERVAL": "1"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dwndp5s5zqd",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwnqb9tml4x",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwd9a9aa6c2"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwo36h3r13d",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwn0zg0z0qf",
+    "SOURCE_PORT": "timer_tick",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwndp5s5zqd",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dwogsy5w5tq",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwotsa0jm8i",
+       "ARGVALUE": "{{$mvl0dwc6v5ymdyb}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwp66ffknn1",
+       "ARGVALUE": ">",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwpjjd79o85",
+       "ARGVALUE": "{{$mvl0dw4leacok2l}}",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwpwj1bvkqc",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwndp5s5zqd",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwogsy5w5tq",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dwq96aakg5z",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 750,
+    "Y": 950,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwqmbdk4ey4",
+       "ARGVALUE": "{{$mvl0dwd9a9aa6c2}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwd9a9aa6c2"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwqzq7hy4sw",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwogsy5w5tq",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwq96aakg5z",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dwrcgn9f6eg",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwrponax6ug",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dws2urrs7xu",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwsfnkc9cmp",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwss63bt87h",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwogsy5w5tq",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwrcgn9f6eg",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwt5c6tx7bb",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwq96aakg5z",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwrcgn9f6eg",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dwtitdgnb0h",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1050,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwtvqs9d2p9",
+       "ARGVALUE": "{{$mvl0dwc6v5ymdyb}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwu8k8onrw1",
+       "ARGVALUE": "<",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwul0a4t5ab",
+       "ARGVALUE": "{{$mvl0dw6r7mpvds0}}",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwuyh3aqkok",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwrcgn9f6eg",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwtitdgnb0h",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dwvbxp2jq4i",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 950,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwvosmu3drs",
+       "ARGVALUE": "{{$mvl0dwd9a9aa6c2}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwd9a9aa6c2"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dww15nkrhfo",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwtitdgnb0h",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwvbxp2jq4i",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dwwepizxuxn",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1350,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwwrtv6nbg6",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwx40zsn0ph",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwxhq4x80do",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwxuf5r7fc8",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwtitdgnb0h",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwwepizxuxn",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dwy7etke9b1",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwvbxp2jq4i",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwwepizxuxn",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dwykjudm08t",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwyx9s6c6rp",
+       "ARGVALUE": "{{$mvl0dwcj5j7evt5}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwzakxo6qfl",
+       "ARGVALUE": ">",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dwznfntkv5d",
+       "ARGVALUE": "{{$mvl0dw870ydxtxn}}",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dx00m4eju41",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwwepizxuxn",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dwykjudm08t",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dx0dsbi0thj",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1650,
+    "Y": 950,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx0qxxd99aa",
+       "ARGVALUE": "{{$mvl0dwd9a9aa6c2}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwd9a9aa6c2"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dx139ejf3a2",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwykjudm08t",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dx0dsbi0thj",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dx1gffyxncu",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1800,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx1t1qrovhr",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx26gxn30ev",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx2jwogardc",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dx2we2ospmf",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dwykjudm08t",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dx1gffyxncu",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dx398uq75sp",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dx0dsbi0thj",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dx1gffyxncu",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dx3my5bn5d3",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1950,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx3zq5sc5tt",
+       "ARGVALUE": "{{$mvl0dwcj5j7evt5}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx4cl1ivp7v",
+       "ARGVALUE": "<",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx4pe1jo39p",
+       "ARGVALUE": "{{$mvl0dw9n9rdrk9b}}",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dx52e4zcmj6",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dx1gffyxncu",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dx3my5bn5d3",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dx5fu8qh1zx",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2100,
+    "Y": 950,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx5s56ibhvn",
+       "ARGVALUE": "{{$mvl0dwd9a9aa6c2}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwd9a9aa6c2"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dx65spmj1q2",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dx3my5bn5d3",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dx5fu8qh1zx",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dx6iztzl5jg",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2250,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx6v0fp9jc6",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx7848r0rld",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx7lfvwdyk3",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dx7ywunla54",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dx3my5bn5d3",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dx6iztzl5jg",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dx8b0cxryc8",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dx5fu8qh1zx",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dx6iztzl5jg",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dx8o90soqh6",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2400,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx91ivdj7yv",
+       "ARGVALUE": "{{$mvl0dw2sxecr8id}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx9e7n1v064",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dx9rrv8jcpd",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxa4rgt4u1f",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dx6iztzl5jg",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dx8o90soqh6",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dxaht60idu3",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2550,
+    "Y": 950,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxau3muelvh",
+       "ARGVALUE": "{{$mvl0dwd9a9aa6c2}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwd9a9aa6c2"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxb7rs7omca",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dx8o90soqh6",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxaht60idu3",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dxbka65m17e",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2700,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxbxzyieoro",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxcaulcdo8j",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxcn4z5bekr",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxd0p6gx3so",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dx8o90soqh6",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxbka65m17e",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxdd7k8xdtc",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxaht60idu3",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxbka65m17e",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dxdq99ry2ce",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2850,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxe34y2ysko",
+       "ARGVALUE": "{{$mvl0dw3572bvbf7}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxegy4uiwlw",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxetces2twp",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxf64vutqkr",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxbka65m17e",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxdq99ry2ce",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dxfjl1ppy7g",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 3000,
+    "Y": 950,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxfwo6z9b5v",
+       "ARGVALUE": "{{$mvl0dwd9a9aa6c2}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwd9a9aa6c2"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxg9me1xwy6",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxdq99ry2ce",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxfjl1ppy7g",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dxgm6o3rfuk",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 3150,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxgzb02xbk6",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxhc9zvjh3g",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxhpba4ied5",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxi28yoh3ks",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxdq99ry2ce",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxgm6o3rfuk",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxif9gfzy5o",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxfjl1ppy7g",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxgm6o3rfuk",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dxis54ct3fm",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 3300,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxj59267nxa",
+       "ARGVALUE": "{{$mvl0dwcws9ssjpe}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxjinxjlhll",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxjvwc2etko",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxk8k8vd3qo",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxgm6o3rfuk",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxis54ct3fm",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dxklmsobu30",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 3450,
+    "Y": 950,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxkyzpvh107",
+       "ARGVALUE": "{{$mvl0dwd9a9aa6c2}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwd9a9aa6c2"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxlbq5ae34z",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxis54ct3fm",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxklmsobu30",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dxlox2uccct",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 3600,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxm10zf3eo7",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxmexik4746",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxmr07rnqdv",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxn4b2ruoa0",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxis54ct3fm",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxlox2uccct",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxnhqv7aboh",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxklmsobu30",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxlox2uccct",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dxnu0qos8o3",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 3750,
+    "Y": 800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxo75wztg51",
+       "ARGVALUE": "{{$mvl0dwd9a9aa6c2}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxok95t2722",
+       "ARGVALUE": ">",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxoxqbbnmmf",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxpad0zrdpu",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxlox2uccct",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxnu0qos8o3",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dxpn7yo0m52",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 4050,
+    "Y": 750,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxq0zknvif0",
+       "ARGVALUE": "{{$mvl0dwdmkeygcis}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxqdeh4909i",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxqq2chh6ip",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dxr3g6ks5qf",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 4350,
+    "Y": 700,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxrg2pcjer4",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dw228q2akcr"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dxrtkxj0p1b",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 4350,
+    "Y": 820,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxs6bdtdwin",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dw228q2akcr"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dxsj89pulc9",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 4050,
+    "Y": 950,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxswc0vpm2z",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dw228q2akcr"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dxt97zvyqd8",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 4350,
+    "Y": 950,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxtmv2ln7lk",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwdmkeygcis"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxtzs5sv9p9",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxnu0qos8o3",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxpn7yo0m52",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxuct8z2sd8",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxpn7yo0m52",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxr3g6ks5qf",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxupncno5ws",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxpn7yo0m52",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxrtkxj0p1b",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxv2xpe0grz",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxnu0qos8o3",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxsj89pulc9",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxvfke5p2ct",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxsj89pulc9",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxt97zvyqd8",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_changed",
+   "settings": {
+    "ID": "mvl0dxvsnsgaqh6",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 1150,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [],
+    "VARIABLE": "mvl0dw228q2akcr"
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mvl0dxw5wsgeyvo",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 1150,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxwig04pwu0",
+       "ARGVALUE": "{{$mvl0dw228q2akcr}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxwv3lqx5lm",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxx832wpwrg",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_beep",
+   "settings": {
+    "ID": "mvl0dxxleowx2yv",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 1150,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dwmn2obtd2f",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dxxy4y563o9",
+       "ARGVALUE": "BB-BB-BB-",
+       "TARGETPARAM": "patternstring"
+      }
+     }
+    ],
+    "CANINT": "PL_PAT_CANINT"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxybe00pnjs",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxvsnsgaqh6",
+    "SOURCE_PORT": "variable_changed",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxw5wsgeyvo",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dxyovy1ri5n",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxw5wsgeyvo",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxxleowx2yv",
+    "TARGET_PORT": "beep.play",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mvl0dxz1czwpoql",
+    "DISPLAY_NAME": "commands",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 1350,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_command_triggered",
+   "settings": {
+    "ID": "mvl0dxzepf21u8h",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 1450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dxz1czwpoql",
+    "ARGUMENTS": [],
+    "COMMAND": "mvl0dwdzhmjhv7b"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dxzrx2osa6s",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 1450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dxz1czwpoql",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy04i9lrbu5",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dwdmkeygcis"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dy0hs6w4wyx",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dxzepf21u8h",
+    "SOURCE_PORT": "on_command_triggered",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dxzrx2osa6s",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_command_triggered",
+   "settings": {
+    "ID": "mvl0dy0ug8fthbw",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 1600,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dxz1czwpoql",
+    "ARGUMENTS": [],
+    "COMMAND": "mvl0dwec3jda705"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dy17l5mk7jm",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 1600,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dxz1czwpoql",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy1kfhnf7qv",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dw2fvhvmouk"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dy1x5pldct5",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dy0ug8fthbw",
+    "SOURCE_PORT": "on_command_triggered",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dy17l5mk7jm",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_command_triggered",
+   "settings": {
+    "ID": "mvl0dy2a3cjwzw2",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 1750,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dxz1czwpoql",
+    "ARGUMENTS": [],
+    "COMMAND": "mvl0dwepresuvrh"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mvl0dy2n4kv7kzd",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 1750,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dxz1czwpoql",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy30s72pafq",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0dw2fvhvmouk"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dy3d6y32l4b",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dy2a3cjwzw2",
+    "SOURCE_PORT": "on_command_triggered",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dy2n4kv7kzd",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mvl0dy3qyjspkzn",
+    "DISPLAY_NAME": "mqtt",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 1950,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_changed",
+   "settings": {
+    "ID": "mvl0dy43kiveypj",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 2050,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dy3qyjspkzn",
+    "ARGUMENTS": [],
+    "VARIABLE": "mvl0dwd9a9aa6c2"
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mvl0dy4gajr4t5l",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 2050,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dy3qyjspkzn",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy4tbeooame",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/alarm",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy56hpeagg7",
+       "ARGVALUE": "{{$mvl0dwd9a9aa6c2}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy5jibg83q6",
+       "ARGVALUE": "QOS_AT_LEAST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy5womtsjpl",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dy6907zyxvc",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dy43kiveypj",
+    "SOURCE_PORT": "variable_changed",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dy4gajr4t5l",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_time_interval",
+   "settings": {
+    "ID": "mvl0dy6m4fdb82a",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dy3qyjspkzn",
+    "ARGUMENTS": [],
+    "INTERVAL": "60"
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mvl0dy6zcqg37le",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dy3qyjspkzn",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy7c4qa6d3m",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/temperature",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy7pu8xtcrx",
+       "ARGVALUE": "{{$mvl0dwc6v5ymdyb}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy82d76zl3m",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy8fhiewu5x",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mvl0dy8suj8nbv2",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0dy3qyjspkzn",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy95gdbf1bf",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/humidity",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy9ifsbpfgz",
+       "ARGVALUE": "{{$mvl0dwcj5j7evt5}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dy9vjwm6za4",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mvl0dya85da6wct",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dyaln9qwk7u",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dy6m4fdb82a",
+    "SOURCE_PORT": "timer_tick",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dy6zcqg37le",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mvl0dyayaxbmkpr",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0dy6zcqg37le",
+    "SOURCE_PORT": "done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0dy8suj8nbv2",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  }
+ ]
+}

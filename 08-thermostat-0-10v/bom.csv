@@ -1,0 +1,13 @@
+Артикул;Наименование;Кол-во;Назначение;Страница в каталоге
+TPP2-GEN2;Плата TPP2(G2), Tibbo Project PCB Size 2 Gen 2;1;Контроллер;https://tibbo.ru/products/tpp2-gen2
+TPB2-KIT;Корпус TPB2 для TPP2;1;Корпус на DIN-рейку;https://tibbo.ru/products/tpb2-kit
+#05 (M1S);Tibbit #05: порт RS-485;1;Сокет S1 - датчик температуры и влажности;https://tibbo.ru/products/tibbit-05-m1s
+#20 (C2);Tibbit #20: колодка на 9 клемм;2;S2+S4 - RS-485 и выходы 0-10 В, S6+S8 - контакты реле;https://tibbo.ru/products/tibbit-20-c2
+#14 (M1S);Tibbit #14: четырёхканальный ЦАП ±10 В;1;Сокет S3 - вентилятор и клапан 0-10 В;https://tibbo.ru/products/tibbit-14-m1s
+#06 (M2T);Tibbit #06: два мощных реле;1;Сокеты S5+S7 - нагреватель и пуск вентилятора;https://tibbo.ru/products/tibbit-06-m2t
+#12 (M1S);Tibbit #12: источник ±15 В;1;Сокет S9 - питание ЦАП #14;https://tibbo.ru/products/tibbit-12-m1s
+#10 (M1T);Tibbit #10: источник питания 5 В от 9-18 В, 1,1 А;1;Сокет S11 - питание от 12 В;https://tibbo.ru/products/tibbit-10-m1t
+#18 (C1);Tibbit #18: разъём питания и 2 клеммы;1;Сокет S12 - вход 12 В;https://tibbo.ru/products/tibbit-18-c1
+-;Блок питания 12 В DC на DIN-рейку, от 1 А;1;Приобретается отдельно;
+-;Датчик температуры и влажности RS-485 Modbus RTU;1;Приобретается отдельно;
+-;EC-вентилятор и/или привод клапана с входом 0-10 В;1;Приобретается отдельно;

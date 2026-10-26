@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=index.html"></head><body>
+<?
+include "global.tbh"
+dim rq as string
+rq = sock.httprqstring
+dim r as byte = val(web_arg(rq, "r"))
+if r >= 1 and r <= CH_COUNT then wd_reboot(r - 1, "manual, web")
+?>
+OK
+</body></html>

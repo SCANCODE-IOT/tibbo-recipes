@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Весы · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:640px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:18px;margin:12px 0}
+#w{font-size:64px;font-weight:700;letter-spacing:-.02em}#u{font-size:24px;color:#6F6C66}
+.st{display:inline-block;padding:3px 10px;border-radius:99px;font-weight:700;font-size:13px}.ok{background:#E7F5EE;color:#177a45}.no{background:#FFF2EA;color:#CC5314}
+small,code{color:#6F6C66}
+</style></head><body>
+<header><b>Tibbo</b> · Весы</header>
+<main>
+<div class=card><span id=w>-</span> <span id=u></span><br><span id=s class=st></span></div>
+<div class=card><small>Строка весов: <code id=l></code></small></div>
+<div class=card><small>
+Вес для учётной системы: <code>http://<? include "global.tbh"
+sock.setdata(net.ip) ?>/weight.txt</code> (вес;единица;1 - стабильный)<br>
+Виртуальный COM-порт: TCP <? sock.setdata(str(CFG_RAW_PORT)) ?> · Modbus TCP: порт <? sock.setdata(str(CFG_MODBUS_PORT)) ?>, регистры 0-1 вес x1000, 2 стабильность
+</small></div>
+</main>
+<script>
+function upd(){fetch('weight.txt?'+Date.now()).then(r=>r.text()).then(t=>{var p=t.split(';');
+document.getElementById('w').textContent=p[0]||'-';document.getElementById('u').textContent=p[1]||'';
+var s=document.getElementById('s');if(p[0]===''){s.textContent='нет данных';s.className='st no'}else if(p[2]==='1'){s.textContent='стабильный';s.className='st ok'}else{s.textContent='нестабильный';s.className='st no'}
+document.getElementById('l').textContent=p[3]||''}).catch(()=>{})}
+upd();setInterval(upd,700);
+</script>
+</body></html>

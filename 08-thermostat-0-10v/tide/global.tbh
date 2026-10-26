@@ -1,0 +1,85 @@
+'=====================================================================
+' Рецепт «Термостат и вентиляция (0-10 В)» · общий заголовок
+' Плата TPP2(G2): #05 в S1, #14 (ЦАП 0-10 В) в S3, #06 (реле) в S5+S7,
+' #12 (+-15 В для #14) в S9, #10 (питание 12 В) в S11. Библиотеки 2_01_05 +
+' драйвер tbt14 из актуальной библиотеки Tibbo (папка libraries проекта).
+'=====================================================================
+include "config.tbh"
+
+#define MQTT_DEBUG_PRINT 0
+#define MQTT_RX_BUFF 2
+#define MQTT_TX_BUFF 4
+#define DHCP_DEBUG_PRINT 0
+#define DNS_DEBUG_PRINT 0
+#define DNS_DEFAULT_SERVER CFG_DNS_SERVER
+#define SI2C_MAX_SIGNATURE_LEN 16
+#define TBT14_DEBUG_PRINT 0
+
+include "sock\trunk\sock.tbh"
+include "dns\trunk\dns.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "mqtt\trunk\mqtt.tbh"
+include "super_i2c\trunk\super_i2c.tbh"
+include "ssi\trunk\ssi.tbh"
+include "libraries/tbt14/tbt14.tbh"
+
+declare function wln_check_association() as pl_wln_association_states
+
+enum pt_types
+	PT_U16,
+	PT_S16,
+	PT_U32,
+	PT_S32,
+	PT_F32
+end enum
+
+enum th_modes
+	TM_OFF,                     'всё выключено
+	TM_AUTO,                    'автоматическое регулирование
+	TM_VENT                     'только вентиляция с ручной скоростью
+end enum
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+declare function dev_id() as string
+declare sub app_point_value(idx as byte, byref value as string)
+declare sub app_point_error(idx as byte, code as byte)
+declare sub app_cycle_done(ok_count as byte, err_count as byte)
+declare mqtt_online as no_yes
+
+'--- modbus_rtu.tbs ---
+declare sub mb_init()
+declare sub point_add(slave as byte, func as byte, addr as word, ptype as pt_types, divider as word, byref pname as string, writable as no_yes)
+declare sub mb_start_cycle()
+declare sub mb_proc_timer()
+declare sub mb_proc_data()
+declare function mb_find_point(byref pname as string) as byte
+declare function mb_write_point(idx as byte, byref value as string) as ok_ng
+declare function mb_point_name(idx as byte) as string
+declare function mb_point_value(idx as byte) as string
+declare pt_count as byte
+
+'--- thermo.tbs ---
+declare sub th_init()
+declare sub th_set_temp(byref v as string)
+declare sub th_set_hum(byref v as string)
+declare sub th_proc_second()
+declare sub th_save()
+declare th_mode as th_modes
+declare th_setpoint as integer
+declare th_hyst as integer
+declare th_pband as integer
+declare th_rh_max as integer
+declare th_manual_fan as byte
+declare th_temp as integer
+declare th_hum as integer
+declare th_have_data as no_yes
+declare th_heater as no_yes
+declare th_valve as byte
+declare th_fan as byte
+
+'--- web.tbs ---
+declare function web_arg(byref rq as string, byref argname as string) as string
+declare sub web_send(byref s as string)
+declare sub web_handle_set(byref rq as string)
+declare function web_tenth(v as integer) as string

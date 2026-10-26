@@ -1,0 +1,70 @@
+'=====================================================================
+' Веб-страница: разбор запроса, вывод по частям, команды
+' set.html?a=ack - квитировать тревогу; ?a=r2on / r2off - реле 2
+' set.html?th=30.0&tl=10.0&hh=70&hl=20 - пороги
+'=====================================================================
+include "global.tbh"
+
+function web_arg(byref rq as string, byref argname as string) as string
+	dim key as string(16)
+	dim i, j as byte
+	web_arg = ""
+	key = "?" + argname + "="
+	i = instr(1, rq, key, 1)
+	if i = 0 then
+		key = "&" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
+	if i = 0 then exit function
+	i = i + len(key)
+	j = i
+	while j <= len(rq)
+		dim c as string(1) = mid(rq, j, 1)
+		if c = "&" or c = " " then goto done
+		j = j + 1
+	wend
+done:
+	web_arg = mid(rq, i, j - i)
+end function
+
+sub web_send(byref s as string)
+	while sock.txfree < len(s)
+		sock.send()
+		doevents
+	wend
+	sock.setdata(s)
+	sock.send()
+end sub
+
+sub web_handle_set(byref rq as string)
+	dim a as string(8) = web_arg(rq, "a")
+	if a = "ack" then
+		mon_ack()
+		exit sub
+	else if a = "r2on" then
+		mon_set_relay2(YES)
+		exit sub
+	else if a = "r2off" then
+		mon_set_relay2(NO)
+		exit sub
+	end if
+	dim th as string(8) = web_arg(rq, "th")
+	if th = "" then exit sub
+	dim tl as string(8) = web_arg(rq, "tl")
+	dim hh as string(8) = web_arg(rq, "hh")
+	dim hl as string(8) = web_arg(rq, "hl")
+	mon_set_limits(strtof(th) * 10, strtof(tl) * 10, strtof(hh) * 10, strtof(hl) * 10)
+end sub
+
+'235 -> "23.5", -52 -> "-5.2"
+function web_tenth(v as integer) as string
+	dim a as word
+	dim s as string(8) = ""
+	if v < 0 then
+		s = "-"
+		a = 0 - v
+	else
+		a = v
+	end if
+	web_tenth = s + str(a / 10) + "." + str(a mod 10)
+end function

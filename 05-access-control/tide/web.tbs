@@ -1,0 +1,102 @@
+'=====================================================================
+' Веб-страница: вход по паролю (токен в адресе), команды
+' set.html?p=<пароль>                      - вход
+' set.html?t=<токен>&a=open                - открыть дверь
+' set.html?t=<токен>&a=add&c=<код>&n=<имя> - добавить карту (c=last - последнюю неизвестную)
+' set.html?t=<токен>&a=del&i=<номер>       - удалить карту
+'=====================================================================
+include "global.tbh"
+
+dim web_token as string(8) = ""
+dim web_next as string(64) = "index.html"
+
+function web_arg(byref rq as string, byref argname as string) as string
+	dim key as string(16)
+	dim i, j as byte
+	web_arg = ""
+	key = "?" + argname + "="
+	i = instr(1, rq, key, 1)
+	if i = 0 then
+		key = "&" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
+	if i = 0 then exit function
+	i = i + len(key)
+	j = i
+	while j <= len(rq)
+		dim c as string(1) = mid(rq, j, 1)
+		if c = "&" or c = " " then goto done
+		j = j + 1
+	wend
+done:
+	web_arg = mid(rq, i, j - i)
+end function
+
+'"%2C" -> ",", "+" -> " " (для кодов и имён латиницей)
+function web_unesc(byref s as string) as string
+	dim i as byte = 1
+	dim c as string(1)
+	web_unesc = ""
+	while i <= len(s)
+		c = mid(s, i, 1)
+		if c = "+" then
+			web_unesc = web_unesc + " "
+		else if c = "%" and i + 2 <= len(s) then
+			web_unesc = web_unesc + chr(val("&h" + mid(s, i + 1, 2)))
+			i = i + 2
+		else
+			web_unesc = web_unesc + c
+		end if
+		i = i + 1
+	wend
+end function
+
+sub web_send(byref s as string)
+	while sock.txfree < len(s)
+		sock.send()
+		doevents
+	wend
+	sock.setdata(s)
+	sock.send()
+end sub
+
+function web_auth(byref rq as string) as no_yes
+	web_auth = NO
+	if web_token = "" then exit function
+	if web_arg(rq, "t") = web_token then web_auth = YES
+end function
+
+sub web_handle_set(byref rq as string)
+	dim p as string(32) = web_arg(rq, "p")
+	if p <> "" then
+		if web_unesc(p) = CFG_WEB_PASSWORD then
+			dim r as string(4) = random(4)
+			web_token = mid(hex(asc(mid(r, 1, 1)) * 256 + asc(mid(r, 2, 1))), 3, 4) + mid(hex(asc(mid(r, 3, 1)) * 256 + asc(mid(r, 4, 1))), 3, 4)
+			log_add("web login")
+		else
+			log_add("web: wrong password")
+		end if
+		web_next = "index.html?t=" + web_token
+		exit sub
+	end if
+	if web_auth(rq) = NO then
+		web_next = "index.html"
+		exit sub
+	end if
+	web_next = "index.html?t=" + web_token
+	dim a as string(8) = web_arg(rq, "a")
+	if a = "open" then
+		acc_open("web")
+	else if a = "add" then
+		dim c as string(32) = web_unesc(web_arg(rq, "c"))
+		if c = "last" then c = acc_last_unknown
+		if cards_add(c, web_unesc(web_arg(rq, "n"))) = OK then
+			log_add("card added " + c)
+		end if
+		web_next = "cards.html?t=" + web_token
+	else if a = "del" then
+		cards_delete(val(web_arg(rq, "i")))
+		log_add("card deleted")
+		web_next = "cards.html?t=" + web_token
+	end if
+end sub

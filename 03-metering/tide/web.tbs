@@ -1,0 +1,45 @@
+'=====================================================================
+' Веб-страница: разбор запроса, вывод по частям, команды
+' set.html?w=1&v=123.456 - записать показание счётчика воды 1, м3
+'=====================================================================
+include "global.tbh"
+
+function web_arg(byref rq as string, byref argname as string) as string
+	dim key as string(16)
+	dim i, j as byte
+	web_arg = ""
+	key = "?" + argname + "="
+	i = instr(1, rq, key, 1)
+	if i = 0 then
+		key = "&" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
+	if i = 0 then exit function
+	i = i + len(key)
+	j = i
+	while j <= len(rq)
+		dim c as string(1) = mid(rq, j, 1)
+		if c = "&" or c = " " then goto done
+		j = j + 1
+	wend
+done:
+	web_arg = mid(rq, i, j - i)
+end function
+
+sub web_send(byref s as string)
+	while sock.txfree < len(s)
+		sock.send()
+		doevents
+	wend
+	sock.setdata(s)
+	sock.send()
+end sub
+
+sub web_handle_set(byref rq as string)
+	dim w as string(4) = web_arg(rq, "w")
+	dim v as string(16) = web_arg(rq, "v")
+	if w = "" or v = "" then exit sub
+	dim ch as byte = val(w)
+	if ch < 1 or ch > W_COUNT then exit sub
+	pulse_set_m3(ch - 1, v)
+end sub

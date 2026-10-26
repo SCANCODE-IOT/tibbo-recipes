@@ -1,0 +1,45 @@
+'=====================================================================
+' Рецепт «Сбор данных 4-20 мА с веб-графиком» · настройки
+' Четыре датчика 4-20 мА (давление, уровень, расход и т.п.) через
+' резисторы 250 Ом на входах Tibbit #13. Текущие значения и график
+' за сутки на веб-странице, средние за минуту - в MQTT, выгрузка CSV.
+'=====================================================================
+
+'--- Сеть ---------------------------------------------------------------
+#define CFG_USE_DHCP 1
+const CFG_IP = "192.168.1.209"
+const CFG_NETMASK = "255.255.255.0"
+const CFG_GATEWAY = "192.168.1.1"
+const CFG_DNS_SERVER = "8.8.8.8"
+
+'--- MQTT ---------------------------------------------------------------
+#define CFG_USE_MQTT 1
+const CFG_MQTT_HOST = "192.168.1.10"
+#define CFG_MQTT_PORT 1883
+const CFG_MQTT_USER = ""
+const CFG_MQTT_PASSWORD = ""
+const CFG_TOPIC_ROOT = "tibbo"
+
+'--- Каналы: имя (латиница), единица, значение при 4 мА и при 20 мА ------
+'Значения - в сотых долях единицы: 1000 = 10.00
+const CFG_NAME1 = "pressure"
+const CFG_UNIT1 = "bar"
+#define CFG_LO1 0
+#define CFG_HI1 1000
+const CFG_NAME2 = "level"
+const CFG_UNIT2 = "m"
+#define CFG_LO2 0
+#define CFG_HI2 500
+const CFG_NAME3 = "flow"
+const CFG_UNIT3 = "m3/h"
+#define CFG_LO3 0
+#define CFG_HI3 2000
+const CFG_NAME4 = "ch4"
+const CFG_UNIT4 = "%"
+#define CFG_LO4 0
+#define CFG_HI4 10000
+
+#define CFG_SHUNT_OHM 250                   'сопротивление шунта: 250 Ом -> 1-5 В
+
+'--- Отладка ------------------------------------------------------------
+#define CFG_DEBUG 1

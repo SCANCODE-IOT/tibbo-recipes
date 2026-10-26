@@ -1,0 +1,84 @@
+'=====================================================================
+' Список карт в EEPROM: MAX_CARDS записей по 20 байт с адреса 64:
+' [1] "C" - запись занята, [2..12] код карты, [13] длина кода,
+' [14..19] имя (до 6 символов латиницей), [20] длина имени.
+'=====================================================================
+include "global.tbh"
+
+#define CARD_BASE 64
+#define CARD_SIZE 20
+
+dim cards_count as byte = 0
+dim c_code(MAX_CARDS) as string(12)
+dim c_name(MAX_CARDS) as string(8)
+
+sub cards_load()
+	dim i as byte
+	dim r as string(CARD_SIZE)
+	cards_count = 0
+	for i = 0 to MAX_CARDS - 1
+		r = stor.getdata(CARD_BASE + i * CARD_SIZE, CARD_SIZE)
+		if left(r, 1) = "C" then
+			c_code(i) = mid(r, 2, asc(mid(r, 2 + 11, 1)))
+			c_name(i) = mid(r, 14, asc(mid(r, 2 + 18, 1)))
+			cards_count = cards_count + 1
+		else
+			c_code(i) = ""
+			c_name(i) = ""
+		end if
+	next i
+	dbg("Cards: " + str(cards_count))
+end sub
+
+function cards_find(byref code as string) as byte
+	dim i as byte
+	cards_find = 255
+	if code = "" then exit function
+	for i = 0 to MAX_CARDS - 1
+		if c_code(i) = code then
+			cards_find = i
+			exit function
+		end if
+	next i
+end function
+
+'запись: [1] "C", [2..12] код (до 11 символов), [13] длина кода,
+'[14..19] имя (до 6 символов), [20] длина имени
+function cards_add(byref code as string, byref cname as string) as ok_ng
+	dim i as byte
+	cards_add = NG
+	if code = "" or len(code) > 11 then exit function
+	if cards_find(code) <> 255 then
+		cards_add = OK
+		exit function
+	end if
+	for i = 0 to MAX_CARDS - 1
+		if c_code(i) = "" then
+			dim n as string(6) = left(cname, 6)
+			dim r as string(CARD_SIZE) = "C" + code + strgen(11 - len(code), " ") + chr(len(code)) + n + strgen(6 - len(n), " ") + chr(len(n))
+			stor.setdata(r, CARD_BASE + i * CARD_SIZE)
+			c_code(i) = code
+			c_name(i) = n
+			cards_count = cards_count + 1
+			cards_add = OK
+			exit function
+		end if
+	next i
+end function
+
+sub cards_delete(idx as byte)
+	if idx >= MAX_CARDS then exit sub
+	if c_code(idx) = "" then exit sub
+	stor.setdata("-", CARD_BASE + idx * CARD_SIZE)
+	c_code(idx) = ""
+	c_name(idx) = ""
+	cards_count = cards_count - 1
+end sub
+
+function cards_code(idx as byte) as string
+	cards_code = c_code(idx)
+end function
+
+function cards_name(idx as byte) as string
+	cards_name = c_name(idx)
+end function

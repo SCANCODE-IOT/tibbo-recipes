@@ -1,0 +1,259 @@
+'=====================================================================
+' Проверки по очереди одним сокетом: подключение TCP к адресу:порту.
+' Канал жив, если ответил хотя бы один из его адресов.
+'=====================================================================
+include "global.tbh"
+
+'#06 в S1+S3: реле 1 - линия A S1, реле 2 - линия B S1; LOW - реле включено.
+'Питание устройства идёт через нормально замкнутый контакт (NC):
+'реле выключено - питание есть; включили реле - питание пропало.
+#define IO_RL1 PL_IO_NUM_9_TX0
+#define IO_RL2 PL_IO_NUM_8_RX0
+
+dim wd_fails(CH_COUNT) as byte
+dim wd_reboots(CH_COUNT) as word
+dim wd_last_ok(CH_COUNT) as dword
+dim chk_sock as byte
+dim st(CH_COUNT) as ch_states
+dim timer_s(CH_COUNT) as word
+dim series(CH_COUNT) as byte
+dim round_ok(CH_COUNT) as no_yes
+dim period_s as word = 0
+'очередь проверок текущего раунда
+dim q_ch(4) as byte
+dim q_host(4) as string(16)
+dim q_port(4) as word
+dim q_len as byte = 0
+dim q_pos as byte = 0
+dim busy as no_yes = NO
+dim busy_s as byte = 0
+
+declare sub relay(ch as byte, cut as no_yes)
+declare sub start_round()
+declare sub next_check()
+declare sub check_done(ok as no_yes)
+declare sub round_done()
+
+sub wd_init()
+	dim i as byte
+	io.num = IO_RL1
+	io.enabled = YES
+	io.state = HIGH
+	io.num = IO_RL2
+	io.enabled = YES
+	io.state = HIGH
+	chk_sock = sock_get("CHK")
+	sock.num = chk_sock
+	sock.protocol = PL_SOCK_PROTOCOL_TCP
+	sock.inconmode = PL_SOCK_INCONMODE_NONE
+	sock.reconmode = PL_SOCK_RECONMODE_3
+	sock.connectiontout = 0
+	for i = 0 to CH_COUNT - 1
+		wd_fails(i) = 0
+		wd_reboots(i) = 0
+		wd_last_ok(i) = 0
+		series(i) = 0
+		st(i) = ST_BOOTING
+		timer_s(i) = 30                       'после включения сторожа - 30 с на сеть
+	next i
+#if CFG_CH1_ENABLED = 0
+	st(0) = ST_DISABLED
+#endif
+#if CFG_CH2_ENABLED = 0
+	st(1) = ST_DISABLED
+#endif
+end sub
+
+sub relay(ch as byte, cut as no_yes)
+	if ch = 0 then
+		io.num = IO_RL1
+	else
+		io.num = IO_RL2
+	end if
+	if cut = YES then
+		io.state = LOW
+	else
+		io.state = HIGH
+	end if
+end sub
+
+sub wd_reboot(ch as byte, byref why as string)
+	if st(ch) = ST_POWER_OFF or st(ch) = ST_DISABLED then exit sub
+	relay(ch, YES)
+	st(ch) = ST_POWER_OFF
+	timer_s(ch) = CFG_POWER_OFF_S
+	wd_reboots(ch) = wd_reboots(ch) + 1
+	series(ch) = series(ch) + 1
+	log_add(wd_name(ch) + ": power cycle (" + why + ")")
+end sub
+
+sub wd_proc_second()
+	dim i as byte
+	for i = 0 to CH_COUNT - 1
+		select case st(i)
+		case ST_POWER_OFF
+			timer_s(i) = timer_s(i) - 1
+			if timer_s(i) = 0 then
+				relay(i, NO)
+				st(i) = ST_BOOTING
+				timer_s(i) = CFG_BOOT_WAIT_S
+				log_add(wd_name(i) + ": power restored")
+			end if
+		case ST_BOOTING
+			timer_s(i) = timer_s(i) - 1
+			if timer_s(i) = 0 then
+				st(i) = ST_FAILING
+				wd_fails(i) = 0
+			end if
+		case ST_PAUSE
+			timer_s(i) = timer_s(i) - 1
+			if timer_s(i) = 0 then
+				st(i) = ST_FAILING
+				wd_fails(i) = 0
+				series(i) = 0
+			end if
+		end select
+	next i
+	'зависшее подключение
+	if busy = YES then
+		busy_s = busy_s + 1
+		if busy_s >= CFG_CONNECT_TIMEOUT_S then check_done(NO)
+	end if
+	period_s = period_s + 1
+	if period_s >= CFG_CHECK_PERIOD_S and busy = NO then
+		period_s = 0
+		start_round()
+	end if
+end sub
+
+sub start_round()
+	dim i as byte
+	q_len = 0
+	q_pos = 0
+	for i = 0 to CH_COUNT - 1
+		round_ok(i) = NO
+		if st(i) = ST_OK or st(i) = ST_FAILING then
+			if i = 0 then
+				q_ch(q_len) = 0
+				q_host(q_len) = CFG_CH1_HOST1
+				q_port(q_len) = CFG_CH1_PORT1
+				q_len = q_len + 1
+				if CFG_CH1_HOST2 <> "" then
+					q_ch(q_len) = 0
+					q_host(q_len) = CFG_CH1_HOST2
+					q_port(q_len) = CFG_CH1_PORT2
+					q_len = q_len + 1
+				end if
+			else
+				q_ch(q_len) = 1
+				q_host(q_len) = CFG_CH2_HOST1
+				q_port(q_len) = CFG_CH2_PORT1
+				q_len = q_len + 1
+				if CFG_CH2_HOST2 <> "" then
+					q_ch(q_len) = 1
+					q_host(q_len) = CFG_CH2_HOST2
+					q_port(q_len) = CFG_CH2_PORT2
+					q_len = q_len + 1
+				end if
+			end if
+		end if
+	next i
+	next_check()
+end sub
+
+sub next_check()
+	'канал уже ответил - его остальные адреса не проверяем
+	while q_pos < q_len
+		if round_ok(q_ch(q_pos)) = NO then goto go
+		q_pos = q_pos + 1
+	wend
+	round_done()
+	exit sub
+go:
+	sock.num = chk_sock
+	sock.targetip = q_host(q_pos)
+	sock.targetport = q_port(q_pos)
+	busy = YES
+	busy_s = 0
+	sock.connect()
+end sub
+
+sub wd_sock_event(newstatesimple as pl_sock_state_simple)
+	if busy = NO then exit sub
+	if newstatesimple = PL_SSTS_EST then
+		check_done(YES)
+	else if newstatesimple = PL_SSTS_CLOSED then
+		check_done(NO)
+	end if
+end sub
+
+sub check_done(ok as no_yes)
+	busy = NO
+	sock.num = chk_sock
+	sock.discard()
+	if ok = YES then round_ok(q_ch(q_pos)) = YES
+	q_pos = q_pos + 1
+	next_check()
+end sub
+
+sub round_done()
+	dim i as byte
+	for i = 0 to CH_COUNT - 1
+		if st(i) = ST_OK or st(i) = ST_FAILING then
+			if round_ok(i) = YES then
+				if st(i) <> ST_OK then log_add(wd_name(i) + ": OK")
+				st(i) = ST_OK
+				wd_fails(i) = 0
+				series(i) = 0
+				wd_last_ok(i) = sys.timercount / 2
+			else
+				st(i) = ST_FAILING
+				wd_fails(i) = wd_fails(i) + 1
+				if wd_fails(i) >= CFG_FAILS_TO_REBOOT then
+					if series(i) >= CFG_MAX_REBOOTS then
+						st(i) = ST_PAUSE
+						timer_s(i) = CFG_LONG_PAUSE_MIN * 60
+						log_add(wd_name(i) + ": still down, pause")
+					else
+						wd_reboot(i, str(wd_fails(i)) + " failed checks")
+					end if
+				end if
+			end if
+		end if
+	next i
+end sub
+
+function wd_name(ch as byte) as string
+	if ch = 0 then
+		wd_name = CFG_CH1_NAME
+	else
+		wd_name = CFG_CH2_NAME
+	end if
+end function
+
+function wd_targets(ch as byte) as string
+	if ch = 0 then
+		wd_targets = CFG_CH1_HOST1 + ":" + str(CFG_CH1_PORT1)
+		if CFG_CH1_HOST2 <> "" then wd_targets = wd_targets + ", " + CFG_CH1_HOST2 + ":" + str(CFG_CH1_PORT2)
+	else
+		wd_targets = CFG_CH2_HOST1 + ":" + str(CFG_CH2_PORT1)
+		if CFG_CH2_HOST2 <> "" then wd_targets = wd_targets + ", " + CFG_CH2_HOST2 + ":" + str(CFG_CH2_PORT2)
+	end if
+end function
+
+function wd_state_text(ch as byte) as string
+	select case st(ch)
+	case ST_OK
+		wd_state_text = "отвечает"
+	case ST_FAILING
+		wd_state_text = "не отвечает: " + str(wd_fails(ch)) + " из " + str(CFG_FAILS_TO_REBOOT)
+	case ST_POWER_OFF
+		wd_state_text = "питание выключено, " + str(timer_s(ch)) + " с"
+	case ST_BOOTING
+		wd_state_text = "ждём загрузки, " + str(timer_s(ch)) + " с"
+	case ST_PAUSE
+		wd_state_text = "пауза после " + str(CFG_MAX_REBOOTS) + " перезагрузок, " + str(timer_s(ch) / 60) + " мин"
+	case else
+		wd_state_text = "выключен в настройках"
+	end select
+end function

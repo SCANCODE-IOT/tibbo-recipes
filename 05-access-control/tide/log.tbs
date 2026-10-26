@@ -1,0 +1,26 @@
+'=====================================================================
+' Журнал событий в памяти (последние LOG_SIZE записей, до перезагрузки)
+'=====================================================================
+include "global.tbh"
+
+dim log_count as byte = 0
+dim log_buf(LOG_SIZE) as string(48)
+dim log_head as byte = 0
+dim log_no as word = 0
+
+sub log_add(byref s as string)
+	log_no = log_no + 1
+	dim t as dword = sys.timercount / 2
+	log_buf(log_head) = lstr(t) + "s #" + str(log_no) + " " + left(s, 30)
+	log_head = log_head + 1
+	if log_head >= LOG_SIZE then log_head = 0
+	if log_count < LOG_SIZE then log_count = log_count + 1
+	dbg(s)
+end sub
+
+'0 - самая новая запись
+function log_line(n as byte) as string
+	dim i as integer = log_head - 1 - n
+	if i < 0 then i = i + LOG_SIZE
+	log_line = log_buf(i)
+end function

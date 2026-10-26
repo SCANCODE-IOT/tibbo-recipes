@@ -1,0 +1,34 @@
+'=====================================================================
+' Рецепт «Шлюз Modbus RTU -> MQTT» · настройки
+' Всё, что нужно поменять под объект, собрано в этом файле и в config.tbs.
+' После правки: сборка (F7) и загрузка на устройство (F5 или Device Explorer).
+'=====================================================================
+
+'--- Сеть ---------------------------------------------------------------
+#define CFG_USE_DHCP 1                      '1 - получить адрес по DHCP, 0 - статический адрес ниже
+const CFG_IP = "192.168.1.200"              'статический IP (если CFG_USE_DHCP 0)
+const CFG_NETMASK = "255.255.255.0"
+const CFG_GATEWAY = "192.168.1.1"
+const CFG_DNS_SERVER = "8.8.8.8"            'нужен, только если брокер задан именем
+
+'--- MQTT-брокер --------------------------------------------------------
+const CFG_MQTT_HOST = "192.168.1.10"        'IP-адрес или имя брокера (Mosquitto, Wiren Board, облако)
+const CFG_MQTT_PORT = 1883
+const CFG_MQTT_USER = ""                    'пусто - без логина
+const CFG_MQTT_PASSWORD = ""
+const CFG_TOPIC_ROOT = "tibbo"              'топики: tibbo/<id устройства>/<имя точки>
+
+'--- RS-485 (Tibbit #05 в сокете S1, порт ser.num=0) --------------------
+#define CFG_RS485_BAUD 9600                 '1200 ... 115200
+#define CFG_RS485_PARITY PL_SER_PR_NONE     'PL_SER_PR_NONE, PL_SER_PR_EVEN, PL_SER_PR_ODD
+#define CFG_RS485_PORT 0
+
+'--- Опрос -------------------------------------------------------------
+#define CFG_POLL_PERIOD_MS 5000             'как часто опрашивать все точки, мс
+#define CFG_REPLY_TIMEOUT_MS 500            'сколько ждать ответа прибора, мс
+#define CFG_MAX_POINTS 16                   'сколько точек можно описать в config.tbs
+#define CFG_PUBLISH_ON_CHANGE_ONLY 0        '1 - публиковать только изменившиеся значения
+#define CFG_REPUBLISH_EVERY 12              'при CFG_PUBLISH_ON_CHANGE_ONLY 1: всё равно публиковать раз в N циклов
+
+'--- Отладка ------------------------------------------------------------
+#define CFG_DEBUG 1                         '1 - печать в окно Output в TIDE (debug-сборка)

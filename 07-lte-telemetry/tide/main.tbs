@@ -1,0 +1,277 @@
+'=====================================================================
+' Рецепт «Телеметрия удалённого объекта по LTE» · события
+' MQTT: <root>/<id>/<имя входа> = 0|1, temperature = 23.5, status = online
+' (подключение), report = JSON со всеми значениями раз в CFG_REPORT_MIN мин.
+'=====================================================================
+include "global.tbh"
+
+dim tick as byte = 0
+dim sec_div as byte = 0
+dim report_s as word = 0
+dim mqtt_online as no_yes = NO
+dim ppp_up as no_yes = NO
+dim topic_base as string(48)
+dim dev as string(16)
+dim app_host as string(64) = CFG_MQTT_HOST
+dim app_user as string(32) = CFG_MQTT_USER
+dim app_pass as string(32) = CFG_MQTT_PASSWORD
+dim app_cid as string(32)
+dim apn as string(32) = CFG_APN
+dim apn_user as string(32) = CFG_APN_USER
+dim apn_pass as string(32) = CFG_APN_PASSWORD
+dim sim_pin as string(8) = CFG_SIM_PIN
+
+dim in_line(4) as pl_io_num
+dim in_st(4) as byte
+dim in_cnt(4) as byte
+dim in_pub(4) as byte
+dim t_ch as byte
+dim t_ok as no_yes = NO
+dim temp10 as integer = 0
+dim temp_pub as integer = -9999
+
+declare function in_name(i as byte) as string
+declare sub publish(byref name as string, byref value as string)
+declare sub report_all()
+declare function tenth(v as integer) as string
+declare function make_id() as string
+
+sub on_sys_init()
+	sys.wdperiod = 1000
+	sys.wdautoreset = DISABLED
+	sys.wdenabled = YES
+	sys.onsystimerperiod = 10           '100 мс
+	pat.play("G-G-------", PL_PAT_CANINT)
+	dev = make_id()
+	topic_base = CFG_TOPIC_ROOT + "/" + dev + "/"
+	app_cid = "tibbo-" + dev
+
+	'#54 в S5: замкнут - LOW
+	in_line(0) = PL_IO_NUM_13_TX2
+	in_line(1) = PL_IO_NUM_12_RX2
+	in_line(2) = PL_IO_NUM_2
+	in_line(3) = PL_IO_NUM_18_INT2
+	dim i as byte
+	for i = 0 to 3
+		io.num = in_line(i)
+		io.enabled = NO
+		in_st(i) = 0
+		in_cnt(i) = 0
+		in_pub(i) = 255
+	next i
+
+	'#29 в S12 (линии сокета S11): температура в шкафу
+	if tbt29_init("TEMP", NO, PL_IO_NUM_34, PL_IO_NUM_35, t_ch) = TBT29_OK then
+		t_ok = YES
+	else
+		dbg("Tibbit #29 not found")
+	end if
+
+	dns_start(sock_get("DNS"))
+	cell_init(apn, apn_user, apn_pass, sim_pin)
+	cell_start()
+	dbg("LTE telemetry, id " + dev)
+end sub
+
+sub on_sys_timer()
+	sys.wdreset()
+	dim i as byte
+	dim v as byte
+	'входы, антидребезг 0,3 с
+	for i = 0 to 3
+		io.num = in_line(i)
+		if io.state = LOW then
+			v = 1
+		else
+			v = 0
+		end if
+		if v <> in_st(i) then
+			in_cnt(i) = in_cnt(i) + 1
+			if in_cnt(i) >= 3 then
+				in_st(i) = v
+				in_cnt(i) = 0
+			end if
+		else
+			in_cnt(i) = 0
+		end if
+		if in_st(i) <> in_pub(i) and mqtt_online = YES then
+			publish(in_name(i), str(in_st(i)))
+			in_pub(i) = in_st(i)
+		end if
+	next i
+
+	cell_proc_timer()
+	tick = tick + 1
+	if tick >= 5 then
+		tick = 0
+		dns_proc_timer()
+		mqtt_proc_timer()
+	end if
+	sec_div = sec_div + 1
+	if sec_div >= 10 then
+		sec_div = 0
+		if t_ok = YES then
+			temp10 = tbt29_get_c(t_ch) * 10
+			'температура - при изменении на 1 °C и больше
+			if mqtt_online = YES and (temp10 - temp_pub > 10 or temp_pub - temp10 > 10) then
+				publish("temperature", tenth(temp10))
+				temp_pub = temp10
+				if temp10 > CFG_TEMP_HIGH then publish("overheat", "1")
+			end if
+		end if
+		report_s = report_s + 1
+		if report_s >= CFG_REPORT_MIN * 60 then
+			report_s = 0
+			report_all()
+		end if
+	end if
+end sub
+
+sub publish(byref name as string, byref value as string)
+	if mqtt_online = NO then exit sub
+	dim t as string(96) = topic_base + name
+	mqtt_publish(t, value, QOS_AT_LEAST_ONCE)
+end sub
+
+sub report_all()
+	if mqtt_online = NO then exit sub
+	dim s as string(200) = "{"
+	dim i as byte
+	for i = 0 to 3
+		s = s + chr(34) + in_name(i) + chr(34) + ":" + str(in_st(i)) + ","
+	next i
+	if t_ok = YES then s = s + chr(34) + "temperature" + chr(34) + ":" + tenth(temp10) + ","
+	s = s + chr(34) + "uptime_min" + chr(34) + ":" + lstr(sys.timercount / 120) + "}"
+	publish("report", s)
+end sub
+
+function in_name(i as byte) as string
+	select case i
+	case 0
+		in_name = CFG_IN1_NAME
+	case 1
+		in_name = CFG_IN2_NAME
+	case 2
+		in_name = CFG_IN3_NAME
+	case else
+		in_name = CFG_IN4_NAME
+	end select
+end function
+
+function tenth(v as integer) as string
+	dim a as word
+	dim s as string(2) = ""
+	if v < 0 then
+		s = "-"
+		a = 0 - v
+	else
+		a = v
+	end if
+	tenth = s + str(a / 10) + "." + str(a mod 10)
+end function
+
+'--- сотовая связь ---
+sub callback_ppp_connected()
+	ppp_up = YES
+	dbg("LTE: connected, IP " + ppp.ip)
+	pat.play("~G", PL_PAT_CANINT)
+	mqtt_start(PL_SOCK_INTERFACE_PPP, app_host, CFG_MQTT_PORT, app_user, app_pass, app_cid, false)
+end sub
+
+sub callback_ppp_disconnected()
+	ppp_up = NO
+	mqtt_online = NO
+	dbg("LTE: disconnected, library will reconnect")
+	pat.play("G-G-------", PL_PAT_CANINT)
+end sub
+
+sub callback_sms_received(phone_number as string, message as string)
+end sub
+
+sub on_ser_data_arrival()
+	cell_proc_data()
+end sub
+
+sub on_sock_data_arrival()
+	dns_proc_data()
+	mqtt_proc_data()
+end sub
+
+sub on_sock_event(newstate as enum pl_sock_state, newstatesimple as enum pl_sock_state_simple)
+	cell_proc_sock_event(newstate, newstatesimple)
+	mqtt_sock_event(newstate, newstatesimple)
+end sub
+
+'--- MQTT ---
+sub callback_mqtt_connect_ok()
+	dim i as byte
+	mqtt_online = YES
+	dbg("MQTT: connected")
+	publish("status", "online")
+	for i = 0 to 3
+		in_pub(i) = 255
+	next i
+	temp_pub = -9999
+	report_all()
+end sub
+
+sub callback_mqtt_connect_lost()
+	mqtt_online = NO
+	dbg("MQTT: connection lost")
+end sub
+
+sub callback_mqtt_sub_ok()
+end sub
+
+sub callback_mqtt_notif(byref topic as string, byref data as string, remaining_bytes as dword)
+end sub
+
+sub callback_dns_failure(status as en_dns_status_codes)
+end sub
+
+sub callback_dns_answer_acquired(return_type as en_dns_return_type, byref return_string as string)
+	mqtt_dns_answer_acquired(return_type, return_string)
+end sub
+
+sub callback_dns_ok()
+end sub
+
+sub callback_dns_pre_buffrq(num_of_pages_required as byte)
+end sub
+
+sub callback_dns_buff_released()
+end sub
+
+function wln_check_association() as pl_wln_association_states
+	wln_check_association = PL_WLN_NOT_ASSOCIATED
+end function
+
+function make_id() as string
+	dim m as string(24) = net.mac
+	dim part as string(4) = ""
+	dim i as byte
+	dim c as string(1)
+	make_id = ""
+	for i = 1 to len(m) + 1
+		if i <= len(m) then
+			c = mid(m, i, 1)
+		else
+			c = "."
+		end if
+		if c = "." then
+			dim h as string(8) = hex(val(part))
+			h = right(h, len(h) - 2)
+			if len(h) < 2 then h = "0" + h
+			make_id = make_id + h
+			part = ""
+		else
+			part = part + c
+		end if
+	next i
+end function
+
+sub dbg(byref s as string)
+#if CFG_DEBUG
+	sys.debugprint(s + chr(13) + chr(10))
+#endif
+end sub

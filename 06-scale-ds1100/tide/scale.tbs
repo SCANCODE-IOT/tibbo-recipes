@@ -1,0 +1,113 @@
+'=====================================================================
+' Разбор строки весов: первое число со знаком и точкой/запятой, единица
+' после него, признак стабильности. Строка заканчивается CR или LF.
+'=====================================================================
+include "global.tbh"
+
+dim scale_weight as string(16) = ""
+dim scale_unit as string(4) = ""
+dim scale_stable as no_yes = NO
+dim scale_line as string(40) = ""
+dim scale_age as word = 65535
+dim scale_milli as long = 0
+dim acc as string(64) = ""
+
+declare sub scale_parse(byref ln as string)
+
+sub scale_init()
+	ser.num = 0
+	ser.enabled = NO
+	ser.interface = PL_SER_SI_FULLDUPLEX
+	ser.flowcontrol = PL_SER_FC_DISABLED
+	ser.baudrate = ser.div9600 * 9600 / CFG_BAUD
+	ser.parity = CFG_PARITY
+	ser.bits = CFG_BITS
+	ser.interchardelay = 0
+	ser.esctype = PL_SER_ET_DISABLED
+	ser.rxbuffrq(2)
+	ser.txbuffrq(1)
+end sub
+
+sub scale_feed(byref s as string)
+	dim i as byte
+	dim c as string(1)
+	for i = 1 to len(s)
+		c = mid(s, i, 1)
+		if c = chr(13) or c = chr(10) then
+			if acc <> "" then scale_parse(acc)
+			acc = ""
+		else
+			if len(acc) < 60 then acc = acc + c
+		end if
+	next i
+end sub
+
+sub scale_parse(byref ln as string)
+	dim i as byte = 1
+	dim n as byte = len(ln)
+	dim c as string(1)
+	dim num as string(16) = ""
+	dim started as no_yes = NO
+	dim sign as string(1) = ""
+	'найти первое число
+	while i <= n
+		c = mid(ln, i, 1)
+		if c >= "0" and c <= "9" then
+			started = YES
+			num = num + c
+		else if (c = "." or c = ",") and started = YES then
+			num = num + "."
+		else if (c = "-" or c = "+") and started = NO then
+			sign = c
+		else if c = " " and started = NO then
+			'пробелы между знаком и цифрами
+		else if started = YES then
+			goto got
+		else
+			sign = ""
+		end if
+		i = i + 1
+	wend
+got:
+	if num = "" then exit sub
+	'единица измерения сразу после числа
+	dim u as string(4) = ""
+	while i <= n and len(u) < 3
+		c = mid(ln, i, 1)
+		if (c >= "a" and c <= "z") or (c >= "A" and c <= "Z") then
+			u = u + c
+		else if c <> " " or u <> "" then
+			goto unit_done
+		end if
+		i = i + 1
+	wend
+unit_done:
+	'убрать ведущие нули: "0012.345" -> "12.345"
+	while len(num) > 1 and left(num, 1) = "0" and mid(num, 2, 1) <> "."
+		num = right(num, len(num) - 1)
+	wend
+	if sign = "-" then
+		scale_weight = "-" + num
+	else
+		scale_weight = num
+	end if
+	scale_unit = u
+	if CFG_STABLE_MARK = "" then
+		scale_stable = YES
+	else if instr(1, ln, CFG_STABLE_MARK, 1) > 0 then
+		scale_stable = YES
+	else
+		scale_stable = NO
+	end if
+	scale_line = left(ln, 40)
+	scale_age = 0
+	scale_milli = strtof(scale_weight) * 1000
+end sub
+
+sub scale_poll()
+	if CFG_POLL_CMD = "" then exit sub
+	ser.num = 0
+	if ser.txfree < len(CFG_POLL_CMD) then exit sub
+	ser.setdata(CFG_POLL_CMD)
+	ser.send()
+end sub

@@ -1,0 +1,35 @@
+'=====================================================================
+' Веб: разбор запроса и вывод по частям
+'=====================================================================
+include "global.tbh"
+
+function web_arg(byref rq as string, byref argname as string) as string
+	dim key as string(16)
+	dim i, j as byte
+	web_arg = ""
+	key = "?" + argname + "="
+	i = instr(1, rq, key, 1)
+	if i = 0 then
+		key = "&" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
+	if i = 0 then exit function
+	i = i + len(key)
+	j = i
+	while j <= len(rq)
+		dim c as string(1) = mid(rq, j, 1)
+		if c = "&" or c = " " then goto done
+		j = j + 1
+	wend
+done:
+	web_arg = mid(rq, i, j - i)
+end function
+
+sub web_send(byref s as string)
+	while sock.txfree < len(s)
+		sock.send()
+		doevents
+	wend
+	sock.setdata(s)
+	sock.send()
+end sub

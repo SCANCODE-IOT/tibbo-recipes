@@ -1,0 +1,241 @@
+'=====================================================================
+' Логика двери: разбор Wiegand, решение о доступе, замок, тревоги
+'=====================================================================
+include "global.tbh"
+
+'#08 в S1 (UART 0): линия C - CTRL (HIGH - режим Wiegand); линии порта не трогаем
+'#06 в S5+S7: реле 1 (линия A S5) - замок, реле 2 (линия B S5) - сирена; LOW - включено
+'#54 в S9: 1 - кнопка выхода, 2 - датчик двери (замкнут = закрыта), 3 - пожарная тревога
+#define IO_RDR_CTRL PL_IO_NUM_0
+#define IO_LOCK PL_IO_NUM_13_TX2
+#define IO_SIREN PL_IO_NUM_12_RX2
+
+dim acc_last_unknown as string(16) = ""
+dim door_closed as no_yes = YES
+dim fire_active as no_yes = NO
+dim unlock_left as byte = 0
+dim held_s as word = 0
+dim siren_left as byte = 0
+dim in_line(4) as pl_io_num
+dim in_cnt(4) as byte
+dim in_st(4) as no_yes
+dim held_alarm as no_yes = NO
+
+declare sub lock_out()
+declare function bits_ok(byref b as string) as no_yes
+declare function bits_code(byref b as string) as string
+
+sub acc_init()
+	dim i as byte
+	io.num = IO_LOCK
+	io.enabled = YES
+	io.state = HIGH
+	io.num = IO_SIREN
+	io.enabled = YES
+	io.state = HIGH
+	in_line(0) = PL_IO_NUM_32
+	in_line(1) = PL_IO_NUM_33
+	in_line(2) = PL_IO_NUM_4
+	in_line(3) = PL_IO_NUM_20_INT4
+	for i = 0 to 3
+		io.num = in_line(i)
+		io.enabled = NO
+		in_cnt(i) = 0
+		in_st(i) = NO
+	next i
+	'считыватель: Wiegand (CTRL = HIGH), конец посылки - пауза 50 мс
+	io.num = IO_RDR_CTRL
+	io.enabled = YES
+	io.state = HIGH
+	ser.num = 0
+	ser.mode = PL_SER_MODE_WIEGAND
+	ser.rxbuffrq(1)
+	ser.txbuffrq(1)
+	sys.buffalloc()
+	ser.interchardelay = 5
+	ser.enabled = YES
+	ser.rxclear()
+	beep.divider = 120000000 / (4 * 2700)
+end sub
+
+'каждые 100 мс: входы с антидребезгом 0,2 с
+sub acc_proc_tick()
+	dim i as byte
+	dim c as no_yes
+	for i = 0 to 3
+		io.num = in_line(i)
+		if io.state = LOW then
+			c = YES
+		else
+			c = NO
+		end if
+		if c <> in_st(i) then
+			in_cnt(i) = in_cnt(i) + 1
+			if in_cnt(i) >= 2 then
+				in_st(i) = c
+				in_cnt(i) = 0
+				select case i
+				case 0
+					if c = YES then acc_open("exit button")
+				case 1
+#if CFG_DOOR_SENSOR
+					door_closed = c
+					if c = NO then
+						if unlock_left = 0 and fire_active = NO then
+							log_add("ALARM: door forced open")
+							siren_left = CFG_ALARM_S
+						else
+							log_add("door opened")
+						end if
+					else
+						log_add("door closed")
+						held_s = 0
+						if held_alarm = YES then
+							held_alarm = NO
+							beep.play("-", PL_BEEP_CANINT)
+						end if
+						unlock_left = 0               'дверь закрыли - запираем сразу
+					end if
+#endif
+				case 2
+#if CFG_FIRE_INPUT
+					fire_active = c
+					if c = YES then
+						log_add("FIRE: door unlocked")
+					else
+						log_add("fire alarm cleared")
+					end if
+#endif
+				end select
+				lock_out()
+			end if
+		else
+			in_cnt(i) = 0
+		end if
+	next i
+end sub
+
+sub acc_proc_second()
+	if unlock_left > 0 then
+		unlock_left = unlock_left - 1
+		if unlock_left = 0 then lock_out()
+	end if
+	if siren_left > 0 then
+		siren_left = siren_left - 1
+		lock_out()
+	end if
+#if CFG_DOOR_SENSOR
+	if door_closed = NO and fire_active = NO then
+		held_s = held_s + 1
+		if held_s = CFG_HELD_OPEN_S then
+			held_alarm = YES
+			log_add("ALARM: door held open")
+			beep.play("B-B-B-------*", PL_BEEP_CANINT)
+		end if
+	end if
+#endif
+end sub
+
+sub lock_out()
+	io.num = IO_LOCK
+	if unlock_left > 0 or fire_active = YES then
+		io.state = LOW
+	else
+		io.state = HIGH
+	end if
+	io.num = IO_SIREN
+	if siren_left > 0 then
+		io.state = LOW
+	else
+		io.state = HIGH
+	end if
+end sub
+
+sub acc_open(byref who as string)
+	unlock_left = CFG_UNLOCK_S
+	lock_out()
+	beep.play("B", PL_BEEP_CANINT)
+	pat.play("G~", PL_PAT_CANINT)
+	log_add("OPEN: " + who)
+end sub
+
+'посылка Wiegand: строка из "0"/"1"
+sub acc_wiegand(byref bits as string)
+	if bits_ok(bits) = NO then
+		log_add("bad read, " + str(len(bits)) + " bits")
+		exit sub
+	end if
+	dim code as string(16) = bits_code(bits)
+	dim idx as byte = cards_find(code)
+	if idx = 255 then
+		acc_last_unknown = code
+		log_add("DENIED: card " + code)
+		beep.play("B-B-B-", PL_BEEP_CANINT)
+		pat.play("R-R-R-", PL_PAT_CANINT)
+	else
+		acc_open(cards_name(idx) + " (" + code + ")")
+	end if
+end sub
+
+'проверка чётности для 26 и 34 бит; другие длины принимаются без проверки
+function bits_ok(byref b as string) as no_yes
+	dim n as byte = len(b)
+	dim i, h, ones as byte
+	bits_ok = YES
+	if n <> 26 and n <> 34 then
+		if n < 8 or n > 66 then bits_ok = NO
+		exit function
+	end if
+	h = n / 2
+	ones = 0
+	for i = 1 to h
+		if mid(b, i, 1) = "1" then ones = ones + 1
+	next i
+	if (ones and 1) <> 0 then bits_ok = NO
+	ones = 0
+	for i = h + 1 to n
+		if mid(b, i, 1) = "1" then ones = ones + 1
+	next i
+	if (ones and 1) <> 1 then bits_ok = NO
+end function
+
+'26 бит -> "FFF,NNNNN" (код объекта, номер карты), иначе - десятичный номер из бит без чётности
+function bits_code(byref b as string) as string
+	dim n as byte = len(b)
+	dim i as byte
+	dim v as dword = 0
+	dim f as word = 0
+	if n = 26 then
+		for i = 2 to 9
+			f = f * 2
+			if mid(b, i, 1) = "1" then f = f + 1
+		next i
+		for i = 10 to 25
+			v = v * 2
+			if mid(b, i, 1) = "1" then v = v + 1
+		next i
+		bits_code = str(f) + "," + lstr(v)
+		exit function
+	end if
+	dim last as byte = n - 1
+	dim first as byte = 2
+	if last - first > 31 then first = last - 31
+	for i = first to last
+		v = v * 2
+		if mid(b, i, 1) = "1" then v = v + 1
+	next i
+	bits_code = lstr(v)
+end function
+
+function acc_status() as string
+	if fire_active = YES then
+		acc_status = "пожарная тревога: дверь открыта"
+	else if unlock_left > 0 then
+		acc_status = "открыто (" + str(unlock_left) + " с)"
+	else
+		acc_status = "заперто"
+	end if
+	if door_closed = NO then acc_status = acc_status + ", дверь открыта"
+	if held_alarm = YES then acc_status = acc_status + ", ТРЕВОГА: не закрыта"
+	if siren_left > 0 then acc_status = acc_status + ", ТРЕВОГА: взлом"
+end function

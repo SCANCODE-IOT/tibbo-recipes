@@ -1,0 +1,52 @@
+'=====================================================================
+' Рецепт «СКУД на одну дверь» · общий заголовок
+' Плата TPP2(G2): #08 (Wiegand) в S1, #06 (замок и сирена) в S5+S7,
+' #54 (кнопка, дверь, пожарный вход) в S9, #09 (питание 12 В) в S11.
+'=====================================================================
+include "config.tbh"
+
+#define DHCP_DEBUG_PRINT 0
+include "sock\trunk\sock.tbh"
+include "dhcp\trunk\dhcp.tbh"
+
+#define MAX_CARDS 90
+#define LOG_SIZE 30
+
+declare function wln_check_association() as pl_wln_association_states
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+
+'--- access.tbs ---
+declare sub acc_init()
+declare sub acc_proc_tick()
+declare sub acc_proc_second()
+declare sub acc_wiegand(byref bits as string)
+declare sub acc_open(byref who as string)
+declare function acc_status() as string
+declare acc_last_unknown as string(16)
+declare door_closed as no_yes
+declare fire_active as no_yes
+
+'--- cards.tbs ---
+declare sub cards_load()
+declare function cards_find(byref code as string) as byte
+declare function cards_add(byref code as string, byref cname as string) as ok_ng
+declare sub cards_delete(idx as byte)
+declare function cards_code(idx as byte) as string
+declare function cards_name(idx as byte) as string
+declare cards_count as byte
+
+'--- log.tbs ---
+declare sub log_add(byref s as string)
+declare function log_line(n as byte) as string
+declare log_count as byte
+
+'--- web.tbs ---
+declare function web_arg(byref rq as string, byref argname as string) as string
+declare function web_unesc(byref s as string) as string
+declare sub web_send(byref s as string)
+declare function web_auth(byref rq as string) as no_yes
+declare sub web_handle_set(byref rq as string)
+declare web_token as string(8)
+declare web_next as string(64)

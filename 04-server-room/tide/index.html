@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="10">
+<title>Серверная · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:760px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:14px;margin:12px 0}
+table{border-collapse:collapse;width:100%}td,th{padding:7px 6px;border-bottom:1px solid #EFE9E1;text-align:left}th{font-size:13px;color:#6F6C66;font-weight:600}
+td.v{font-weight:700;text-align:right;white-space:nowrap}
+form{display:flex;gap:6px;align-items:center;flex-wrap:wrap}input{padding:4px;width:110px}button{padding:5px 10px;border:0;border-radius:8px;background:#2C2B28;color:#fff}
+small{color:#6F6C66}.err{color:#C0392B}
+</style>
+<style>.big{font-size:34px;font-weight:700}.ok{color:#177a45}.al{background:#FDECEA;border-color:#F5B7B1}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}</style>
+</head><body>
+<header><b>Tibbo</b> · Мониторинг серверной</header>
+<main>
+<?
+include "global.tbh"
+dim s as string
+dim i as byte
+if mon_alarms = 0 then
+	s = "<div class=card><b class=ok>Норма</b></div>"
+else
+	s = "<div class='card al'><b>Тревога:</b> " + mon_alarm_text(mon_alarms)
+	if mon_acked = YES then
+		s = s + " <small>(квитирована)</small>"
+	else
+		s = s + " <a href='set.html?a=ack'><button>Квитировать</button></a>"
+	end if
+	s = s + "</div>"
+end if
+web_send(s)
+s = "<div class=grid><div class=card><small>Температура, °C</small><div class=big>"
+if mon_temp = "" then
+	s = s + "-"
+else
+	s = s + mon_temp
+end if
+s = s + "</div></div><div class=card><small>Влажность, %</small><div class=big>"
+if mon_hum = "" then
+	s = s + "-"
+else
+	s = s + mon_hum
+end if
+s = s + "</div></div></div>"
+web_send(s)
+s = "<div class=card><table><tr><td>Протечка</td><td class=v>"
+if mon_input(0) = YES then
+	s = s + "<span class=err>ЕСТЬ</span>"
+else
+	s = s + "нет"
+end if
+s = s + "</td></tr><tr><td>Дверь</td><td class=v>"
+if (mon_alarms and AL_DOOR) <> 0 then
+	s = s + "открыта"
+else
+	s = s + "закрыта"
+end if
+s = s + "</td></tr><tr><td>" + CFG_IN3_NAME + "</td><td class=v>"
+if mon_input(2) = YES then
+	s = s + "сработал"
+else
+	s = s + "норма"
+end if
+s = s + "</td></tr><tr><td>" + CFG_IN4_NAME + "</td><td class=v>"
+if mon_input(3) = YES then
+	s = s + "сработал"
+else
+	s = s + "норма"
+end if
+s = s + "</td></tr><tr><td>Реле 2</td><td class=v>"
+if mon_relay2 = YES then
+	s = s + "включено <a href='set.html?a=r2off'><button>Выключить</button></a>"
+else
+	s = s + "выключено <a href='set.html?a=r2on'><button>Включить</button></a>"
+end if
+s = s + "</td></tr></table></div>"
+web_send(s)
+s = "<div class=card><b>Пороги</b><form action='set.html'>t выше <input name=th value=" + web_tenth(mon_t_high) + "> ниже <input name=tl value=" + web_tenth(mon_t_low) + "> RH выше <input name=hh value=" + web_tenth(mon_h_high) + "> ниже <input name=hl value=" + web_tenth(mon_h_low) + "><button>Сохранить</button></form>"
+s = s + "<p><small>Тревога по температуре и влажности - если порог нарушен дольше " + str(CFG_ALARM_DELAY_S) + " с. IP " + net.ip + " · id " + dev_id() + "</small></p></div>"
+web_send(s)
+?>
+</main></body></html>

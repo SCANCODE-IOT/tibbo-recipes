@@ -1,0 +1,8 @@
+Артикул;Наименование;Кол-во;Назначение;Страница в каталоге
+TPP2-GEN2;Плата TPP2(G2), Tibbo Project PCB Size 2 Gen 2;1;Контроллер;https://tibbo.ru/products/tpp2-gen2
+TPB2-KIT;Корпус TPB2 для TPP2;1;Корпус на DIN-рейку;https://tibbo.ru/products/tpb2-kit
+#06 (M2T);Tibbit #06: два мощных реле;1;Сокеты S1+S3 - питание двух устройств;https://tibbo.ru/products/tibbit-06-m2t
+#20 (C2);Tibbit #20: колодка на 9 клемм;1;S2+S4 - контакты реле;https://tibbo.ru/products/tibbit-20-c2
+#09 (M1S);Tibbit #09: источник питания 5 В от 9-18 В;1;Сокет S11 - питание от 12 В;https://tibbo.ru/products/tibbit-09-m1s
+#18 (C1);Tibbit #18: разъём питания и 2 клеммы;1;Сокет S12 - вход 12 В;https://tibbo.ru/products/tibbit-18-c1
+-;Блок питания 12 В DC, от 0,5 А;1;Приобретается отдельно;

@@ -1,0 +1,55 @@
+'=====================================================================
+' Рецепт «Шлюз Modbus RTU -> MQTT» · общий заголовок
+' Плата TPP2(G2) · Tibbit #05 (RS-485) в S1 · библиотеки Tibbo 2_01_05
+'=====================================================================
+include "config.tbh"
+
+'--- настройки библиотек (до include) ---
+#define MQTT_DEBUG_PRINT 0
+#define MQTT_RX_BUFF 2
+#define MQTT_TX_BUFF 4
+#define DHCP_DEBUG_PRINT 0
+#define DNS_DEBUG_PRINT 0
+#define DNS_DEFAULT_SERVER CFG_DNS_SERVER
+
+include "sock\trunk\sock.tbh"
+include "dns\trunk\dns.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "mqtt\trunk\mqtt.tbh"
+
+'--- Wi-Fi в рецепте не используется: заглушка для библиотеки DHCP на платформе TPP2W(G2).
+'    Нужен Wi-Fi (модуль WA2000) - подключите библиотеку wln и удалите заглушку в main.tbs.
+declare function wln_check_association() as pl_wln_association_states
+
+'--- типы точек ---
+enum pt_types
+	PT_U16,
+	PT_S16,
+	PT_U32,
+	PT_S32,
+	PT_F32
+end enum
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+declare sub net_start_mqtt()
+declare function dev_id() as string
+declare sub app_point_value(idx as byte, byref value as string)
+declare sub app_point_error(idx as byte, code as byte)
+declare sub app_cycle_done(ok_count as byte, err_count as byte)
+declare mqtt_online as no_yes
+declare net_ready as no_yes
+
+'--- config.tbs ---
+declare sub config_points()
+
+'--- modbus_rtu.tbs ---
+declare sub mb_init()
+declare sub point_add(slave as byte, func as byte, addr as word, ptype as pt_types, divider as word, byref pname as string, writable as no_yes)
+declare sub mb_start_cycle()
+declare sub mb_proc_timer()
+declare sub mb_proc_data()
+declare function mb_find_point(byref pname as string) as byte
+declare function mb_write_point(idx as byte, byref value as string) as ok_ng
+declare function mb_point_name(idx as byte) as string
+declare pt_count as byte

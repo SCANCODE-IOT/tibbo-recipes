@@ -1,0 +1,95 @@
+'=====================================================================
+' Помощники веб-страниц: разбор запроса, вывод, команды
+' Команды: set.html?c=1&a=on|off|auto
+'          set.html?c=1&on1=18:00&off1=07:00&on2=&off2=&wd=1   (расписание)
+'          set.html?t=2026-10-23T14:30                            (часы вручную)
+'=====================================================================
+include "global.tbh"
+
+'значение параметра из строки запроса: "GET /set.html?c=1&a=on HTTP/1.1"
+function web_arg(byref rq as string, byref argname as string) as string
+	dim key as string(16)
+	dim i, j as byte
+	web_arg = ""
+	key = "?" + argname + "="
+	i = instr(1, rq, key, 1)
+	if i = 0 then
+		key = "&" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
+	if i = 0 then exit function
+	i = i + len(key)
+	j = i
+	while j <= len(rq)
+		dim c as string(1) = mid(rq, j, 1)
+		if c = "&" or c = " " then goto done
+		j = j + 1
+	wend
+done:
+	web_arg = mid(rq, i, j - i)
+end function
+
+function web_hhmm(m as word) as string
+	dim h as string(2) = str(m / 60)
+	dim mm as string(2) = str(m mod 60)
+	if len(h) < 2 then h = "0" + h
+	if len(mm) < 2 then mm = "0" + mm
+	web_hhmm = h + ":" + mm
+end function
+
+'"18:00" или "18%3A00" -> 1080; пусто или ошибка -> 0
+function web_parse_hhmm(byref s as string) as word
+	dim t as string(16) = s
+	dim p as byte = instr(1, t, "%3A", 1)
+	if p > 0 then t = left(t, p - 1) + ":" + mid(t, p + 3, 2)
+	p = instr(1, t, ":", 1)
+	web_parse_hhmm = 0
+	if p < 2 then exit function
+	dim h as word = val(left(t, p - 1))
+	dim m as word = val(mid(t, p + 1, 2))
+	if h > 23 or m > 59 then exit function
+	web_parse_hhmm = h * 60 + m
+end function
+
+'вывод части страницы: ждём место в буфере сокета
+sub web_send(byref s as string)
+	while sock.txfree < len(s)
+		sock.send()
+		doevents
+	wend
+	sock.setdata(s)
+	sock.send()
+end sub
+
+sub web_handle_set(byref rq as string)
+	dim cs as string(4) = web_arg(rq, "c")
+	dim t as string(24) = web_arg(rq, "t")
+	if t <> "" then
+		'2026-10-23T14%3A30 или 2026-10-23T14:30
+		dim y as byte = val(mid(t, 3, 2))
+		dim mo as byte = val(mid(t, 6, 2))
+		dim dd as byte = val(mid(t, 9, 2))
+		dim tm as string(8) = mid(t, 12, 8)
+		if y > 0 and mo > 0 and dd > 0 then light_set_clock(daycount(y, mo, dd), web_parse_hhmm(tm), 0)
+		exit sub
+	end if
+	if cs = "" then exit sub
+	dim ch as byte = val(cs)
+	if ch < 1 or ch > CH_COUNT then exit sub
+	ch = ch - 1
+	dim a as string(8) = web_arg(rq, "a")
+	if a = "on" then
+		light_set_mode(ch, MODE_ON)
+	else if a = "off" then
+		light_set_mode(ch, MODE_OFF)
+	else if a = "auto" then
+		light_set_mode(ch, MODE_AUTO)
+	else if instr(1, rq, "on1=", 1) > 0 then
+		dim wd as no_yes = NO
+		if web_arg(rq, "wd") = "1" then wd = YES
+		light_set_schedule(ch, web_parse_hhmm(web_arg(rq, "on1")), web_parse_hhmm(web_arg(rq, "off1")), web_parse_hhmm(web_arg(rq, "on2")), web_parse_hhmm(web_arg(rq, "off2")), wd)
+	else
+		exit sub
+	end if
+	light_save()
+end sub

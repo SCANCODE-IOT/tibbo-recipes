@@ -1,0 +1,320 @@
+'=====================================================================
+' Modbus RTU master для одного порта RS-485: опрос точек по кругу,
+' таймаут ответа, CRC16, запись одного регистра (функция 6) вне очереди.
+'=====================================================================
+include "global.tbh"
+
+#define MB_RX_MAX 64
+
+dim pt_count as byte = 0
+dim pt_slave(CFG_MAX_POINTS) as byte
+dim pt_func(CFG_MAX_POINTS) as byte
+dim pt_addr(CFG_MAX_POINTS) as word
+dim pt_type(CFG_MAX_POINTS) as pt_types
+dim pt_div(CFG_MAX_POINTS) as word
+dim pt_name(CFG_MAX_POINTS) as string(32)
+dim pt_wr(CFG_MAX_POINTS) as no_yes
+dim pt_last(CFG_MAX_POINTS) as string(16)
+
+dim mb_busy as no_yes = NO
+dim mb_cur as byte = 0
+dim mb_sent_ms as dword = 0
+dim mb_rx as string(MB_RX_MAX)
+dim mb_expect as byte = 0
+dim mb_is_write as no_yes = NO
+dim mb_cycle_on as no_yes = NO
+dim mb_ok as byte = 0
+dim mb_err as byte = 0
+dim mb_cycles as byte = 0
+
+dim wr_pending as no_yes = NO
+dim wr_idx as byte = 0
+dim wr_value as word = 0
+
+declare sub mb_send_read(idx as byte)
+declare sub mb_send_write()
+declare sub mb_next()
+declare function mb_crc16(byref s as string) as word
+declare function mb_w(byref s as string, pos as byte) as word
+declare function mb_f32(hi as word, lo as word) as real
+declare function mb_format(idx as byte, byref d as string) as string
+
+sub mb_init()
+	ser.num = CFG_RS485_PORT
+	ser.enabled = NO
+	ser.interface = PL_SER_SI_HALFDUPLEX       'RS-485: линия DIR #05 = RTS порта (линия C сокета)
+	ser.dircontrol = PL_SER_DCP_LOWFORINPUT     'DIR: LOW - приём, HIGH - передача
+	ser.rtsmap = PL_IO_NUM_0                   'линия C сокета S1 = DIR Tibbit #05
+	io.num = PL_IO_NUM_0
+	io.enabled = YES                           'по документации #05 линию RTS нужно сделать выходом
+	ser.flowcontrol = PL_SER_FC_DISABLED
+	ser.baudrate = ser.div9600 * 9600 / CFG_RS485_BAUD
+	ser.parity = CFG_RS485_PARITY
+	ser.bits = PL_SER_BB_8
+	ser.interchardelay = 1                     'пауза 10 мс = конец кадра
+	ser.esctype = PL_SER_ET_DISABLED
+	ser.rxbuffrq(1)
+	ser.txbuffrq(1)
+	sys.buffalloc()
+	ser.enabled = YES
+end sub
+
+sub point_add(slave as byte, func as byte, addr as word, ptype as pt_types, divider as word, byref pname as string, writable as no_yes)
+	if pt_count >= CFG_MAX_POINTS then exit sub
+	pt_slave(pt_count) = slave
+	pt_func(pt_count) = func
+	pt_addr(pt_count) = addr
+	pt_type(pt_count) = ptype
+	if divider = 0 then divider = 1
+	pt_div(pt_count) = divider
+	pt_name(pt_count) = pname
+	pt_wr(pt_count) = writable
+	pt_last(pt_count) = ""
+	pt_count = pt_count + 1
+end sub
+
+function mb_point_name(idx as byte) as string
+	mb_point_name = pt_name(idx)
+end function
+
+function mb_find_point(byref pname as string) as byte
+	dim i as byte
+	mb_find_point = 255
+	for i = 0 to pt_count - 1
+		if pt_name(i) = pname then
+			mb_find_point = i
+			exit function
+		end if
+	next i
+end function
+
+sub mb_start_cycle()
+	if pt_count = 0 or mb_cycle_on = YES then exit sub
+	mb_cycle_on = YES
+	mb_cur = 0
+	mb_ok = 0
+	mb_err = 0
+	mb_cycles = mb_cycles + 1
+	if mb_cycles > CFG_REPUBLISH_EVERY then mb_cycles = 1
+	if mb_busy = NO then mb_next()
+end sub
+
+'следующий запрос: сначала отложенная запись, потом очередная точка цикла
+sub mb_next()
+	if wr_pending = YES then
+		mb_send_write()
+		exit sub
+	end if
+	if mb_cycle_on = NO then exit sub
+	if mb_cur >= pt_count then
+		mb_cycle_on = NO
+		app_cycle_done(mb_ok, mb_err)
+		exit sub
+	end if
+	mb_send_read(mb_cur)
+end sub
+
+sub mb_send_read(idx as byte)
+	dim q as word = 1
+	dim f as string(8)
+	if pt_type(idx) = PT_U32 or pt_type(idx) = PT_S32 or pt_type(idx) = PT_F32 then q = 2
+	f = chr(pt_slave(idx)) + chr(pt_func(idx)) + chr(pt_addr(idx) / 256) + chr(pt_addr(idx) mod 256) + chr(0) + chr(q)
+	dim crc as word = mb_crc16(f)
+	f = f + chr(crc mod 256) + chr(crc / 256)
+	mb_expect = 5 + q * 2
+	mb_is_write = NO
+	ser.num = CFG_RS485_PORT
+	ser.rxclear()
+	mb_rx = ""
+	ser.setdata(f)
+	ser.send()
+	mb_busy = YES
+	mb_sent_ms = sys.timercountms
+end sub
+
+sub mb_send_write()
+	dim f as string(8)
+	dim i as byte = wr_idx
+	wr_pending = NO
+	f = chr(pt_slave(i)) + chr(6) + chr(pt_addr(i) / 256) + chr(pt_addr(i) mod 256) + chr(wr_value / 256) + chr(wr_value mod 256)
+	dim crc as word = mb_crc16(f)
+	f = f + chr(crc mod 256) + chr(crc / 256)
+	mb_expect = 8
+	mb_is_write = YES
+	ser.num = CFG_RS485_PORT
+	ser.rxclear()
+	mb_rx = ""
+	ser.setdata(f)
+	ser.send()
+	mb_busy = YES
+	mb_sent_ms = sys.timercountms
+end sub
+
+'значение из MQTT: "23.5" с делителем 10 -> 235 в регистр
+function mb_write_point(idx as byte, byref value as string) as ok_ng
+	dim r as real
+	dim v as long
+	mb_write_point = NG
+	if idx >= pt_count then exit function
+	if pt_wr(idx) = NO or pt_func(idx) <> 3 then exit function
+	if pt_type(idx) <> PT_U16 and pt_type(idx) <> PT_S16 then exit function
+	r = strtof(value) * pt_div(idx)
+	if r >= 0 then
+		v = r + 0.5
+	else
+		v = r - 0.5
+	end if
+	if pt_type(idx) = PT_U16 and (v < 0 or v > 65535) then exit function
+	if pt_type(idx) = PT_S16 and (v < -32768 or v > 32767) then exit function
+	if v < 0 then v = v + 65536
+	wr_value = v
+	wr_idx = idx
+	wr_pending = YES
+	if mb_busy = NO then mb_next()
+	mb_write_point = OK
+end function
+
+sub mb_proc_data()
+	dim room as byte
+	if mb_busy = NO then
+		ser.rxclear()
+		exit sub
+	end if
+	room = MB_RX_MAX - len(mb_rx)
+	mb_rx = mb_rx + ser.getdata(room)
+	if len(mb_rx) < 5 then exit sub
+	'ответ с ошибкой: функция | &h80, 5 байт
+	if (asc(mid(mb_rx, 2, 1)) and &h80) <> 0 then
+		mb_busy = NO
+		mb_err = mb_err + 1
+		if mb_is_write = NO then
+			app_point_error(mb_cur, asc(mid(mb_rx, 3, 1)))
+			mb_cur = mb_cur + 1
+		else
+			app_point_error(wr_idx, asc(mid(mb_rx, 3, 1)))
+		end if
+		mb_next()
+		exit sub
+	end if
+	if len(mb_rx) < mb_expect then exit sub
+
+	dim body as string(MB_RX_MAX) = left(mb_rx, mb_expect - 2)
+	dim crc as word = mb_crc16(body)
+	mb_busy = NO
+	if asc(mid(mb_rx, mb_expect - 1, 1)) <> (crc mod 256) or asc(mid(mb_rx, mb_expect, 1)) <> (crc / 256) then
+		mb_err = mb_err + 1
+		if mb_is_write = NO then
+			app_point_error(mb_cur, 254)          '254 - ошибка CRC
+			mb_cur = mb_cur + 1
+		else
+			app_point_error(wr_idx, 254)
+		end if
+		mb_next()
+		exit sub
+	end if
+
+	if mb_is_write = YES then
+		pt_last(wr_idx) = ""                      'перечитать и опубликовать в следующем цикле
+	else
+		dim v as string(24) = mb_format(mb_cur, mb_rx)
+		mb_ok = mb_ok + 1
+#if CFG_PUBLISH_ON_CHANGE_ONLY
+		if v <> pt_last(mb_cur) or mb_cycles = 1 then
+			app_point_value(mb_cur, v)
+		end if
+#else
+		app_point_value(mb_cur, v)
+#endif
+		pt_last(mb_cur) = v
+		mb_cur = mb_cur + 1
+	end if
+	mb_next()
+end sub
+
+sub mb_proc_timer()
+	if mb_busy = NO then exit sub
+	if sys.timercountms - mb_sent_ms < CFG_REPLY_TIMEOUT_MS then exit sub
+	mb_busy = NO
+	mb_err = mb_err + 1
+	if mb_is_write = NO then
+		app_point_error(mb_cur, 255)              '255 - прибор не ответил
+		mb_cur = mb_cur + 1
+	else
+		app_point_error(wr_idx, 255)
+	end if
+	mb_next()
+end sub
+
+'--- разбор значения ответа (данные с 4-го байта) ---
+function mb_format(idx as byte, byref d as string) as string
+	dim hi as word = mb_w(d, 4)
+	dim lo as word = 0
+	dim r as real
+	dim sv as long
+	if mb_expect > 7 then lo = mb_w(d, 6)
+	select case pt_type(idx)
+	case PT_U16:
+		r = hi
+	case PT_S16:
+		sv = hi
+		if sv > 32767 then sv = sv - 65536
+		r = sv
+	case PT_U32:
+		r = hi * 65536.0 + lo
+	case PT_S32:
+		r = hi * 65536.0 + lo
+		if hi > 32767 then r = r - 4294967296.0
+	case else:
+		r = mb_f32(hi, lo)
+	end select
+	if pt_div(idx) <> 1 then r = r / pt_div(idx)
+	if pt_type(idx) <> PT_F32 and pt_div(idx) = 1 then
+		mb_format = ftostr(r, FTOSTR_MODE_PLAIN, 0)
+	else
+		mb_format = ftostr(r, FTOSTR_MODE_PLAIN, 3)
+	end if
+end function
+
+function mb_w(byref s as string, pos as byte) as word
+	mb_w = asc(mid(s, pos, 1)) * 256 + asc(mid(s, pos + 1, 1))
+end function
+
+'IEEE 754 single из двух регистров (старшее слово первым)
+function mb_f32(hi as word, lo as word) as real
+	dim e as integer = (hi shr 7) and &hFF
+	dim m as real = (hi and &h7F) * 65536.0 + lo
+	dim i as integer
+	if e = 0 and m = 0 then
+		mb_f32 = 0
+		exit function
+	end if
+	m = 1 + m / 8388608.0
+	e = e - 127
+	if e > 0 then
+		for i = 1 to e
+			m = m * 2
+		next i
+	else if e < 0 then
+		for i = 1 to 0 - e
+			m = m / 2
+		next i
+	end if
+	if (hi and &h8000) <> 0 then m = 0 - m
+	mb_f32 = m
+end function
+
+function mb_crc16(byref s as string) as word
+	dim crc as word = &hFFFF
+	dim i, j as byte
+	for i = 1 to len(s)
+		crc = crc xor asc(mid(s, i, 1))
+		for j = 1 to 8
+			if (crc and 1) = 1 then
+				crc = (crc shr 1) xor &hA001
+			else
+				crc = crc shr 1
+			end if
+		next j
+	next i
+	mb_crc16 = crc
+end function

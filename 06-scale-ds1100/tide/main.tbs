@@ -1,0 +1,161 @@
+'=====================================================================
+' Рецепт «Умный Serial-over-IP для весов» · события
+' TCP 1001 - прозрачный канал к весам (одно подключение),
+' HTTP 80 - веб-страница и weight.txt, TCP 502 - Modbus TCP (чтение веса).
+'=====================================================================
+include "global.tbh"
+
+dim raw_sock as byte
+dim mb_sock as byte
+dim halfsec as byte = 0
+dim net_up as no_yes = NO
+
+declare sub net_started()
+declare sub modbus_tcp(byref q as string)
+
+sub on_sys_init()
+	sys.onsystimerperiod = 50           '0,5 с
+
+	dim i, s as byte
+	for i = 1 to 2
+		s = sock_get("WEB")
+		sock.num = s
+		sock.protocol = PL_SOCK_PROTOCOL_TCP
+		sock.inconmode = PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
+		sock.httpmode = YES
+		sock.httpportlist = "80"
+		sock.rxbuffrq(1)
+		sock.txbuffrq(2)
+		sock.varbuffrq(1)
+	next i
+	raw_sock = sock_get("RAW")
+	sock.num = raw_sock
+	sock.protocol = PL_SOCK_PROTOCOL_TCP
+	sock.inconmode = PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
+	sock.localportlist = str(CFG_RAW_PORT)
+	sock.reconmode = PL_SOCK_RECONMODE_3
+	sock.rxbuffrq(1)
+	sock.txbuffrq(2)
+	mb_sock = sock_get("MBT")
+	sock.num = mb_sock
+	sock.protocol = PL_SOCK_PROTOCOL_TCP
+	sock.inconmode = PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
+	sock.localportlist = str(CFG_MODBUS_PORT)
+	sock.rxbuffrq(1)
+	sock.txbuffrq(1)
+	scale_init()
+	sys.buffalloc()
+	ser.num = 0
+	ser.enabled = YES
+	pat.play("G-G-------", PL_PAT_CANINT)
+
+#if CFG_USE_DHCP
+	dhcp_start(PL_SOCK_INTERFACE_NET, "", "")
+#else
+	net.ip = CFG_IP
+	net.netmask = CFG_NETMASK
+	net.gatewayip = CFG_GATEWAY
+	net_started()
+#endif
+end sub
+
+sub net_started()
+	if net_up = YES then exit sub
+	net_up = YES
+	pat.play("~G", PL_PAT_CANINT)
+	dbg("Scale gateway, web: http://" + net.ip + "/")
+end sub
+
+sub on_sys_timer()
+	dhcp_proc_timer()
+	if scale_age < 65535 then scale_age = scale_age + 1
+	halfsec = halfsec + 1
+	if halfsec >= CFG_POLL_HALFSEC then
+		halfsec = 0
+		scale_poll()
+	end if
+end sub
+
+'весы -> разбор + прозрачный канал
+sub on_ser_data_arrival()
+	dim s as string(128) = ser.getdata(128)
+	scale_feed(s)
+	sock.num = raw_sock
+	if sock.statesimple = PL_SSTS_EST then
+		if sock.txfree >= len(s) then
+			sock.setdata(s)
+			sock.send()
+		end if
+	end if
+end sub
+
+sub on_sock_data_arrival()
+	if sock.num = raw_sock then
+		dim d as string(128) = sock.getdata(128)
+		ser.num = 0
+		if ser.txfree >= len(d) then
+			ser.setdata(d)
+			ser.send()
+		end if
+		exit sub
+	end if
+	if sock.num = mb_sock then
+		dim q as string(64) = sock.getdata(64)
+		modbus_tcp(q)
+		exit sub
+	end if
+	dhcp_proc_data()
+end sub
+
+'Modbus TCP: функции 3 и 4, регистры 0-2
+'0-1: вес x1000, int32 (старшее слово первым), 2: 1 - вес стабильный, 3: возраст данных, с
+sub modbus_tcp(byref q as string)
+	if len(q) < 12 then exit sub
+	dim fn as byte = asc(mid(q, 8, 1))
+	dim start as word = asc(mid(q, 9, 1)) * 256 + asc(mid(q, 10, 1))
+	dim cnt as word = asc(mid(q, 11, 1)) * 256 + asc(mid(q, 12, 1))
+	dim r as string(32)
+	if (fn <> 3 and fn <> 4) or start + cnt > 4 or cnt = 0 then
+		r = left(q, 4) + chr(0) + chr(3) + mid(q, 7, 1) + chr(fn or &h80) + chr(2)
+	else
+		dim regs as string(8)
+		dim v as long = scale_milli
+		dim hi as word = (v shr 16) and &hFFFF
+		dim lo as word = v and &hFFFF
+		dim st as word = 0
+		if scale_stable = YES then st = 1
+		dim age as word = scale_age / 2
+		regs = chr(hi / 256) + chr(hi mod 256) + chr(lo / 256) + chr(lo mod 256) + chr(0) + chr(st) + chr(age / 256) + chr(age mod 256)
+		dim body as string(16) = mid(regs, start * 2 + 1, cnt * 2)
+		r = left(q, 4) + chr(0) + chr(3 + len(body)) + mid(q, 7, 1) + chr(fn) + chr(len(body)) + body
+	end if
+	sock.num = mb_sock
+	sock.setdata(r)
+	sock.send()
+end sub
+
+sub callback_dhcp_ok(renew as no_yes, interface as pl_sock_interfaces, byref ip as string, byref gateway_ip as string, byref netmask as string, lease_time as dword)
+	if renew = YES and net.ip = ip then exit sub
+	net.ip = ip
+	net.gatewayip = gateway_ip
+	net.netmask = netmask
+	net_started()
+end sub
+
+sub callback_dhcp_failure(interface as pl_sock_interfaces, failure_code as en_dhcp_status_codes)
+end sub
+
+sub callback_dhcp_pre_clear_ip(interface as pl_sock_interfaces)
+end sub
+
+sub callback_dhcp_pre_buffrq(required_buff_pages as byte)
+end sub
+
+sub callback_dhcp_buff_released()
+end sub
+
+sub dbg(byref s as string)
+#if CFG_DEBUG
+	sys.debugprint(s + chr(13) + chr(10))
+#endif
+end sub

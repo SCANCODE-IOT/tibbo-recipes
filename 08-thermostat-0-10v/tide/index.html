@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="15">
+<title>Термостат · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:760px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:14px;margin:12px 0}
+table{border-collapse:collapse;width:100%}td,th{padding:7px 6px;border-bottom:1px solid #EFE9E1;text-align:left}th{font-size:13px;color:#6F6C66;font-weight:600}
+td.v{font-weight:700;text-align:right;white-space:nowrap}
+form{display:flex;gap:6px;align-items:center;flex-wrap:wrap}input{padding:4px;width:110px}button{padding:5px 10px;border:0;border-radius:8px;background:#2C2B28;color:#fff}
+small{color:#6F6C66}.err{color:#C0392B}
+</style>
+<style>.big{font-size:34px;font-weight:700}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bar{height:8px;background:#F2ECE4;border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:#EC6C2E}</style>
+</head><body>
+<header><b>Tibbo</b> · Термостат и вентиляция</header>
+<main>
+<?
+include "global.tbh"
+dim s as string
+s = "<div class=grid><div class=card><small>Температура, °C</small><div class=big>"
+if th_have_data = YES then
+	s = s + web_tenth(th_temp)
+else
+	s = s + "<span class=err>нет данных</span>"
+end if
+s = s + "</div><small>уставка " + web_tenth(th_setpoint) + "</small></div><div class=card><small>Влажность, %</small><div class=big>"
+if th_have_data = YES then
+	s = s + web_tenth(th_hum)
+else
+	s = s + "-"
+end if
+s = s + "</div></div></div>"
+web_send(s)
+s = "<div class=card><table><tr><td>Нагреватель</td><td class=v>"
+if th_heater = YES then
+	s = s + "включён"
+else
+	s = s + "выключен"
+end if
+s = s + "</td></tr><tr><td>Клапан нагрева</td><td class=v>" + str(th_valve) + " %</td></tr><tr><td colspan=2><div class=bar><i style='width:" + str(th_valve) + "%'></i></div></td></tr>"
+s = s + "<tr><td>Вентилятор</td><td class=v>" + str(th_fan) + " %</td></tr><tr><td colspan=2><div class=bar><i style='width:" + str(th_fan) + "%'></i></div></td></tr></table></div>"
+web_send(s)
+s = "<div class=card><b>Режим</b><form action='set.html'><select name=m><option value=1"
+if th_mode = TM_AUTO then s = s + " selected"
+s = s + ">Авто</option><option value=2"
+if th_mode = TM_VENT then s = s + " selected"
+s = s + ">Только вентиляция</option><option value=0"
+if th_mode = TM_OFF then s = s + " selected"
+s = s + ">Выключено</option></select> скорость вручную, % <input name=f value=" + str(th_manual_fan) + "><button>Применить</button></form></div>"
+web_send(s)
+s = "<div class=card><b>Уставки</b><form action='set.html'>t, °C <input name=sp value=" + web_tenth(th_setpoint) + "> гистерезис <input name=hy value=" + web_tenth(th_hyst) + "> зона П <input name=pb value=" + web_tenth(th_pband) + "> RH макс <input name=rh value=" + web_tenth(th_rh_max) + "><button>Сохранить</button></form>"
+s = s + "<p><small>IP " + net.ip + " · id " + dev_id() + "</small></p></div>"
+web_send(s)
+?>
+</main></body></html>

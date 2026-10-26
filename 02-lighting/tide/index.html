@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Освещение · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:760px;margin:0 auto;padding:12px 16px}
+.ch{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:14px;margin:12px 0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.st{font-weight:700;padding:3px 10px;border-radius:99px}.on{background:#FFF2EA;color:#CC5314}.off{background:#eee;color:#6F6C66}
+.btns a{display:inline-block;padding:7px 12px;border:1px solid #DDD4C8;border-radius:8px;margin:6px 6px 0 0;text-decoration:none;color:#2C2B28}
+.btns a.sel{background:#EC6C2E;border-color:#EC6C2E;color:#fff}
+form{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px;font-size:14px}
+input[type=time]{padding:4px}button{padding:6px 12px;border:0;border-radius:8px;background:#2C2B28;color:#fff}
+small{color:#6F6C66}
+</style></head><body>
+<header><b>Tibbo</b> · Управление освещением</header>
+<main>
+<?
+include "global.tbh"
+dim i as byte
+dim s as string
+s = "<p><small>Время: " + light_clock_str()
+if ntp_ok = YES then
+	s = s + " (SNTP)"
+else
+	s = s + " (не синхронизировано)"
+end if
+s = s + " · IP " + net.ip + "</small></p>"
+web_send(s)
+for i = 0 to CH_COUNT - 1
+	s = "<div class=ch><div class=top><b>" + str(i + 1) + ". " + light_name(i) + "</b><span class='st "
+	if ch_out(i) = YES then
+		s = s + "on'>ВКЛ</span></div>"
+	else
+		s = s + "off'>ВЫКЛ</span></div>"
+	end if
+	web_send(s)
+	s = "<div class=btns><a href='set.html?c=" + str(i + 1) + "&a=on'"
+	if ch_mode(i) = MODE_ON then s = s + " class=sel"
+	s = s + ">Включить</a><a href='set.html?c=" + str(i + 1) + "&a=off'"
+	if ch_mode(i) = MODE_OFF then s = s + " class=sel"
+	s = s + ">Выключить</a><a href='set.html?c=" + str(i + 1) + "&a=auto'"
+	if ch_mode(i) = MODE_AUTO then s = s + " class=sel"
+	s = s + ">По расписанию</a></div>"
+	web_send(s)
+	s = "<form action='set.html'><input type=hidden name=c value=" + str(i + 1) + ">вкл <input type=time name=on1 value=" + web_hhmm(ch_on1(i)) + "> выкл <input type=time name=off1 value=" + web_hhmm(ch_off1(i)) + ">"
+	web_send(s)
+	s = " и <input type=time name=on2 value=" + web_hhmm(ch_on2(i)) + "> - <input type=time name=off2 value=" + web_hhmm(ch_off2(i)) + "> <label><input type=checkbox name=wd value=1"
+	if ch_wd(i) = YES then s = s + " checked"
+	s = s + "> будни</label><button>Сохранить</button></form></div>"
+	web_send(s)
+next i
+?>
+<form action="set.html"><small>Часы вручную:</small> <input type="datetime-local" name="t"> <button>Установить</button></form>
+<p><small>Одинаковое время «вкл» и «выкл» - окно не используется. Окно может переходить через полночь (18:00 - 07:00).</small></p>
+</main></body></html>

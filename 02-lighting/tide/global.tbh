@@ -1,0 +1,56 @@
+'=====================================================================
+' Рецепт «Управление освещением» · общий заголовок
+' Плата TPP2(G2): #06 в S1 и S5 (4 реле), #54 в S9 (4 кнопки), #33 в S11 (питание)
+' Библиотеки Tibbo 2_01_05
+'=====================================================================
+include "config.tbh"
+
+#define DHCP_DEBUG_PRINT 0
+#define SNTP_DEBUG_PRINT 0
+
+include "sock\trunk\sock.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "sntp\trunk\sntp.tbh"
+
+#define CH_COUNT 4
+
+enum ch_modes
+	MODE_OFF,                   'выключен вручную
+	MODE_ON,                    'включён вручную
+	MODE_AUTO                   'по расписанию; кнопка или веб меняют состояние до следующего события расписания
+end enum
+
+'--- Wi-Fi не используется: заглушка для библиотеки DHCP на платформе TPP2W(G2) ---
+declare function wln_check_association() as pl_wln_association_states
+
+'--- состояние (light.tbs) ---
+declare ch_mode(CH_COUNT) as ch_modes
+declare ch_out(CH_COUNT) as no_yes
+declare ch_on1(CH_COUNT) as word
+declare ch_off1(CH_COUNT) as word
+declare ch_on2(CH_COUNT) as word
+declare ch_off2(CH_COUNT) as word
+declare ch_wd(CH_COUNT) as no_yes
+declare time_ok as no_yes
+declare ntp_ok as no_yes
+
+declare sub light_init()
+declare sub light_set_out(ch as byte, st_on as no_yes)
+declare sub light_set_mode(ch as byte, mode as ch_modes)
+declare sub light_set_schedule(ch as byte, on1 as word, off1 as word, on2 as word, off2 as word, wd as no_yes)
+declare sub light_proc_timer()
+declare sub light_save()
+declare function light_name(ch as byte) as string
+declare function light_now_min() as word
+declare sub light_set_clock(days as word, mins as word, secs as byte)
+declare function light_clock_str() as string
+
+'--- веб (web.tbs) ---
+declare function web_arg(byref rq as string, byref argname as string) as string
+declare function web_hhmm(m as word) as string
+declare function web_parse_hhmm(byref s as string) as word
+declare sub web_send(byref s as string)
+declare sub web_handle_set(byref rq as string)
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)

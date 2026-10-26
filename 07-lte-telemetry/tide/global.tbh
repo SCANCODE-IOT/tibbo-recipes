@@ -1,0 +1,38 @@
+'=====================================================================
+' Рецепт «Телеметрия удалённого объекта по LTE» · общий заголовок
+' Плата TPP2(G2): #45 (LTE) в S1-S4, #54 (входы) в S5, #10 (питание 12 В)
+' в S9, #29 (температура) в S12. Библиотеки Tibbo 2_01_05 + cellular и tbt29
+' из актуальной библиотеки Tibbo (папка libraries проекта).
+'=====================================================================
+include "config.tbh"
+
+'--- модем: линии сокетов S1/S3 под Tibbit #45, порт UART 0 ---
+#define CELL_IO_SHUTDOWN PL_IO_NUM_11_TX1
+#define CELL_IO_PWR PL_IO_NUM_10_RX1
+#define CELL_IO_RESET PL_IO_NUM_1
+#define CELL_IO_STATUS PL_IO_NUM_17_INT1
+#define CELL_SER_PORT 0
+#define CELL_LOG_LEVEL 1
+#define CELL__DEBUG_PRINT 1
+#define CELL__PPP_MODE_ISENABLED 1
+#define CELL__AT_USERMODE_ISENABLED 0
+#define CELL__GPS_MODE_ISENABLED 0
+
+#define MQTT_DEBUG_PRINT 0
+#define MQTT_RX_BUFF 2
+#define MQTT_TX_BUFF 2
+#define DNS_DEBUG_PRINT 0
+#define DNS_DEFAULT_SERVER CFG_DNS_SERVER
+#define SI2C_MAX_SIGNATURE_LEN 16
+#define TBT29_DEBUG_PRINT 0
+
+include "sock\trunk\sock.tbh"
+include "dns\trunk\dns.tbh"
+include "mqtt\trunk\mqtt.tbh"
+include "super_i2c\trunk\super_i2c.tbh"
+include "ssi\trunk\ssi.tbh"
+include "libraries/cellular/cellular.tbh"
+include "libraries/tbt29/tbt29.tbh"
+
+declare sub dbg(byref s as string)
+declare function wln_check_association() as pl_wln_association_states

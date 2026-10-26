@@ -1,0 +1,268 @@
+'=====================================================================
+' Каналы освещения: выходы, кнопки, расписание, хранение в EEPROM
+'=====================================================================
+include "global.tbh"
+
+'линии по раскладке TPP2(G2): #06 в S1 (каналы 1-2), #06 в S5 (каналы 3-4), #54 в S9 (кнопки 1-4)
+'реле #06: LOW - включено; кнопка #54: замкнута - LOW
+#define EE_MAGIC "L2"
+#define EE_BASE 1
+#define EE_CH 16
+
+dim ch_mode(CH_COUNT) as ch_modes
+dim ch_out(CH_COUNT) as no_yes
+dim ch_on1(CH_COUNT) as word
+dim ch_off1(CH_COUNT) as word
+dim ch_on2(CH_COUNT) as word
+dim ch_off2(CH_COUNT) as word
+dim ch_wd(CH_COUNT) as no_yes
+dim time_ok as no_yes = NO
+dim ntp_ok as no_yes = NO
+
+dim relay_line(CH_COUNT) as pl_io_num
+dim btn_line(CH_COUNT) as pl_io_num
+dim btn_prev(CH_COUNT) as low_high
+dim btn_cnt(CH_COUNT) as byte
+dim last_min as word = 65535
+dim sec_div as byte = 0
+
+declare function in_window(m as word, w_on as word, w_off as word) as no_yes
+declare function sched_state(ch as byte, day as word, m as word) as no_yes
+declare sub light_load()
+declare function w2s(w as word) as string
+declare function s2w(byref s as string, pos as byte) as word
+
+sub light_init()
+	dim i as byte
+	relay_line(0) = PL_IO_NUM_9_TX0
+	relay_line(1) = PL_IO_NUM_8_RX0
+	relay_line(2) = PL_IO_NUM_13_TX2
+	relay_line(3) = PL_IO_NUM_12_RX2
+	btn_line(0) = PL_IO_NUM_32
+	btn_line(1) = PL_IO_NUM_33
+	btn_line(2) = PL_IO_NUM_4
+	btn_line(3) = PL_IO_NUM_20_INT4
+	for i = 0 to CH_COUNT - 1
+		io.num = relay_line(i)
+		io.enabled = YES                'сначала выход, потом уровень
+		io.state = HIGH                 'реле выключено
+		ch_out(i) = NO
+		io.num = btn_line(i)
+		io.enabled = NO                 'вход
+		btn_prev(i) = HIGH
+		btn_cnt(i) = 0
+	next i
+	light_load()
+	if rtc.running = YES then
+		dim d, m as word
+		dim s as byte
+		rtc.getdata(d, m, s)
+		if d > 9000 then time_ok = YES    'дата позже 2024 года - часы уже были установлены
+	end if
+	'применить режимы сразу после включения
+	for i = 0 to CH_COUNT - 1
+		light_set_mode(i, ch_mode(i))
+	next i
+end sub
+
+function light_name(ch as byte) as string
+	select case ch
+	case 0
+		light_name = CFG_NAME1
+	case 1
+		light_name = CFG_NAME2
+	case 2
+		light_name = CFG_NAME3
+	case else
+		light_name = CFG_NAME4
+	end select
+end function
+
+sub light_set_out(ch as byte, st_on as no_yes)
+	if ch >= CH_COUNT then exit sub
+	ch_out(ch) = st_on
+	io.num = relay_line(ch)
+	if st_on = YES then
+		io.state = LOW
+	else
+		io.state = HIGH
+	end if
+end sub
+
+sub light_set_mode(ch as byte, mode as ch_modes)
+	if ch >= CH_COUNT then exit sub
+	ch_mode(ch) = mode
+	select case mode
+	case MODE_ON
+		light_set_out(ch, YES)
+	case MODE_OFF
+		light_set_out(ch, NO)
+	case else
+		if time_ok = YES then
+			dim d, m as word
+			dim s as byte
+			rtc.getdata(d, m, s)
+			light_set_out(ch, sched_state(ch, d, m))
+		end if
+	end select
+end sub
+
+sub light_set_schedule(ch as byte, on1 as word, off1 as word, on2 as word, off2 as word, wd as no_yes)
+	if ch >= CH_COUNT then exit sub
+	ch_on1(ch) = on1
+	ch_off1(ch) = off1
+	ch_on2(ch) = on2
+	ch_off2(ch) = off2
+	ch_wd(ch) = wd
+	if ch_mode(ch) = MODE_AUTO then light_set_mode(ch, MODE_AUTO)
+end sub
+
+'окно [on, off) с переходом через полночь; on = off - окно выключено
+function in_window(m as word, w_on as word, w_off as word) as no_yes
+	in_window = NO
+	if w_on = w_off then exit function
+	if w_on < w_off then
+		if m >= w_on and m < w_off then in_window = YES
+	else
+		if m >= w_on or m < w_off then in_window = YES
+	end if
+end function
+
+function sched_state(ch as byte, day as word, m as word) as no_yes
+	sched_state = NO
+	if ch_wd(ch) = YES then
+		dim wdn as pl_days_of_week = weekday(day)
+		if wdn = PL_DOW_SATURDAY or wdn = PL_DOW_SUNDAY then exit function
+	end if
+	if in_window(m, ch_on1(ch), ch_off1(ch)) = YES or in_window(m, ch_on2(ch), ch_off2(ch)) = YES then sched_state = YES
+end function
+
+'вызывается каждые 100 мс
+sub light_proc_timer()
+	dim i as byte
+	dim st as low_high
+	'кнопки: нажатие = два отсчёта подряд LOW после отпускания
+	for i = 0 to CH_COUNT - 1
+		io.num = btn_line(i)
+		st = io.state
+		if st = LOW then
+			if btn_cnt(i) < 255 then btn_cnt(i) = btn_cnt(i) + 1
+			if btn_cnt(i) = 2 and btn_prev(i) = HIGH then
+				btn_prev(i) = LOW
+				if ch_out(i) = YES then
+					light_set_out(i, NO)
+					if ch_mode(i) <> MODE_AUTO then ch_mode(i) = MODE_OFF
+				else
+					light_set_out(i, YES)
+					if ch_mode(i) <> MODE_AUTO then ch_mode(i) = MODE_ON
+				end if
+				if ch_mode(i) <> MODE_AUTO then light_save()
+			end if
+		else
+			btn_cnt(i) = 0
+			btn_prev(i) = HIGH
+		end if
+	next i
+
+	'расписание: раз в секунду смотрим, не сменилась ли минута
+	sec_div = sec_div + 1
+	if sec_div < 10 then exit sub
+	sec_div = 0
+	if time_ok = NO then exit sub
+	dim d, m as word
+	dim s as byte
+	rtc.getdata(d, m, s)
+	if m = last_min then exit sub
+	dim prev as word = last_min
+	last_min = m
+	if prev = 65535 then exit sub
+	dim pd as word = d
+	if prev > m then pd = d - 1
+	'в режиме AUTO меняем выход только на границе окна расписания: ручное переключение живёт до следующего события
+	for i = 0 to CH_COUNT - 1
+		if ch_mode(i) = MODE_AUTO then
+			dim now_st as no_yes = sched_state(i, d, m)
+			if now_st <> sched_state(i, pd, prev) then light_set_out(i, now_st)
+		end if
+	next i
+end sub
+
+sub light_set_clock(days as word, mins as word, secs as byte)
+	rtc.setdata(days, mins, secs)
+	time_ok = YES
+	last_min = 65535
+	dim i as byte
+	for i = 0 to CH_COUNT - 1
+		if ch_mode(i) = MODE_AUTO then light_set_mode(i, MODE_AUTO)
+	next i
+end sub
+
+function light_now_min() as word
+	dim d, m as word
+	dim s as byte
+	rtc.getdata(d, m, s)
+	light_now_min = m
+end function
+
+function light_clock_str() as string
+	dim d, m as word
+	dim s as byte
+	if time_ok = NO then
+		light_clock_str = "not set"
+		exit function
+	end if
+	rtc.getdata(d, m, s)
+	dim dd as string(2) = str(date(d))
+	dim mm as string(2) = str(month(d))
+	if len(dd) < 2 then dd = "0" + dd
+	if len(mm) < 2 then mm = "0" + mm
+	light_clock_str = dd + "." + mm + "." + str(2000 + year(d)) + " " + web_hhmm(m)
+end function
+
+'--- EEPROM: 2 байта метки, затем по 16 байт на канал: режим, будни, 4 времени ---
+sub light_save()
+	dim i as byte
+	dim r as string(16)
+	stor.setdata(EE_MAGIC, EE_BASE)
+	for i = 0 to CH_COUNT - 1
+		r = chr(ch_mode(i)) + chr(ch_wd(i)) + w2s(ch_on1(i)) + w2s(ch_off1(i)) + w2s(ch_on2(i)) + w2s(ch_off2(i))
+		stor.setdata(r, EE_BASE + 2 + i * EE_CH)
+	next i
+end sub
+
+sub light_load()
+	dim i as byte
+	dim r as string(16)
+	if stor.getdata(EE_BASE, 2) <> EE_MAGIC then
+		for i = 0 to CH_COUNT - 1
+			ch_mode(i) = MODE_AUTO
+			ch_wd(i) = NO
+			ch_on1(i) = CFG_DEF_ON1
+			ch_off1(i) = CFG_DEF_OFF1
+			ch_on2(i) = CFG_DEF_ON2
+			ch_off2(i) = CFG_DEF_OFF2
+		next i
+		light_save()
+		exit sub
+	end if
+	for i = 0 to CH_COUNT - 1
+		r = stor.getdata(EE_BASE + 2 + i * EE_CH, 10)
+		ch_mode(i) = asc(mid(r, 1, 1))
+		if ch_mode(i) > MODE_AUTO then ch_mode(i) = MODE_AUTO
+		ch_wd(i) = asc(mid(r, 2, 1))
+		if ch_wd(i) <> YES then ch_wd(i) = NO
+		ch_on1(i) = s2w(r, 3)
+		ch_off1(i) = s2w(r, 5)
+		ch_on2(i) = s2w(r, 7)
+		ch_off2(i) = s2w(r, 9)
+	next i
+end sub
+
+function w2s(w as word) as string
+	w2s = chr(w / 256) + chr(w mod 256)
+end function
+
+function s2w(byref s as string, pos as byte) as word
+	s2w = asc(mid(s, pos, 1)) * 256 + asc(mid(s, pos + 1, 1))
+	if s2w >= 1440 then s2w = 0
+end function

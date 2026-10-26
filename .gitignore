@@ -1,0 +1,4 @@
+*.tpc
+*.pdb
+*.obj
+tmp/

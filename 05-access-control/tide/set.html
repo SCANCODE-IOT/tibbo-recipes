@@ -1,0 +1,8 @@
+<?
+include "global.tbh"
+dim rq as string
+rq = sock.httprqstring
+web_handle_set(rq)
+dim s as string = "<!DOCTYPE html><html><head><meta charset='utf-8'><meta http-equiv='refresh' content='0; url=" + web_next + "'></head><body>OK</body></html>"
+web_send(s)
+?>

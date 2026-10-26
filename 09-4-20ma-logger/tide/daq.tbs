@@ -1,0 +1,163 @@
+'=====================================================================
+' Измерение: раз в секунду 4 канала Tibbit #13, пересчёт мВ -> мА ->
+' единицы, среднее за минуту в кольцевой буфер на сутки.
+' Ток < 3,6 мА или > 21 мА - обрыв или неисправность датчика.
+'=====================================================================
+include "global.tbh"
+
+'#13 в S1: CLK - линия A, DATA - линия B
+#define T13_CLK PL_IO_NUM_9_TX0
+#define T13_DATA PL_IO_NUM_8_RX0
+#define NO_DATA -32768
+
+dim daq_count as word = 0
+dim daq_fault(CH_COUNT) as no_yes
+dim daq_minute_ready as no_yes = NO
+dim adc_ch as byte
+dim adc_ok as no_yes = NO
+dim ua(CH_COUNT) as long                    'последний ток, мкА
+dim val_now(CH_COUNT) as long               'последнее значение, сотые
+dim sum(CH_COUNT) as long
+dim cnt(CH_COUNT) as byte
+dim hist(CH_COUNT, HIST_LEN) as integer     'средние за минуту, сотые (до +-327.67 при делителе 100)
+dim head as word = 0
+dim sec as byte = 0
+dim lo(CH_COUNT) as long
+dim hi(CH_COUNT) as long
+
+declare function scale_val(ch as byte, x_ua as long) as long
+declare function fmt100(v as long) as string
+
+sub daq_init()
+	dim i as byte
+	dim j as word
+	lo(0) = CFG_LO1
+	hi(0) = CFG_HI1
+	lo(1) = CFG_LO2
+	hi(1) = CFG_HI2
+	lo(2) = CFG_LO3
+	hi(2) = CFG_HI3
+	lo(3) = CFG_LO4
+	hi(3) = CFG_HI4
+	for i = 0 to CH_COUNT - 1
+		daq_fault(i) = YES
+		sum(i) = 0
+		cnt(i) = 0
+		for j = 0 to HIST_LEN - 1
+			hist(i, j) = NO_DATA
+		next j
+	next i
+	if tbt13_init("ADC", T13_DATA, T13_CLK, adc_ch, NO) = OK then
+		adc_ok = YES
+	else
+		dbg("Tibbit #13: init failed")
+	end if
+end sub
+
+sub daq_proc_second()
+	dim i as byte
+	dim mv as integer
+	if adc_ok = NO then exit sub
+	for i = 0 to CH_COUNT - 1
+		tbt13_channel_select(i, adc_ch)
+		tbt13_get_prev(adc_ch)                      'первое чтение после выбора канала отбрасываем
+		mv = tbt13_get_prev_mv(adc_ch)
+		ua(i) = mv
+		ua(i) = ua(i) * 1000 / CFG_SHUNT_OHM
+		if ua(i) < 3600 or ua(i) > 21000 then
+			daq_fault(i) = YES
+		else
+			daq_fault(i) = NO
+			val_now(i) = scale_val(i, ua(i))
+			sum(i) = sum(i) + val_now(i)
+			cnt(i) = cnt(i) + 1
+		end if
+	next i
+	sec = sec + 1
+	if sec < 60 then exit sub
+	sec = 0
+	for i = 0 to CH_COUNT - 1
+		if cnt(i) > 0 then
+			dim avg as long = sum(i) / cnt(i)
+			if avg > 32767 then avg = 32767
+			if avg < -32767 then avg = -32767
+			hist(i, head) = avg
+		else
+			hist(i, head) = NO_DATA
+		end if
+		sum(i) = 0
+		cnt(i) = 0
+	next i
+	head = head + 1
+	if head >= HIST_LEN then head = 0
+	if daq_count < HIST_LEN then daq_count = daq_count + 1
+	daq_minute_ready = YES
+end sub
+
+'4 мА -> lo, 20 мА -> hi
+function scale_val(ch as byte, x_ua as long) as long
+	scale_val = lo(ch) + (x_ua - 4000) * (hi(ch) - lo(ch)) / 16000
+end function
+
+function daq_now(ch as byte) as string
+	if daq_fault(ch) = YES then
+		daq_now = ""
+	else
+		daq_now = fmt100(val_now(ch))
+	end if
+end function
+
+function daq_ma(ch as byte) as string
+	daq_ma = fmt100(ua(ch) / 10)
+end function
+
+'n = 0 - самая старая из накопленных точек
+function daq_hist(ch as byte, n as word) as string
+	dim i as long = head
+	i = i - daq_count + n
+	if i < 0 then i = i + HIST_LEN
+	if hist(ch, i) = NO_DATA then
+		daq_hist = ""
+	else
+		daq_hist = fmt100(hist(ch, i))
+	end if
+end function
+
+function daq_name(ch as byte) as string
+	select case ch
+	case 0
+		daq_name = CFG_NAME1
+	case 1
+		daq_name = CFG_NAME2
+	case 2
+		daq_name = CFG_NAME3
+	case else
+		daq_name = CFG_NAME4
+	end select
+end function
+
+function daq_unit(ch as byte) as string
+	select case ch
+	case 0
+		daq_unit = CFG_UNIT1
+	case 1
+		daq_unit = CFG_UNIT2
+	case 2
+		daq_unit = CFG_UNIT3
+	case else
+		daq_unit = CFG_UNIT4
+	end select
+end function
+
+'1234 -> "12.34", -5 -> "-0.05"
+function fmt100(v as long) as string
+	dim a as long = v
+	dim s as string(2) = ""
+	if v < 0 then
+		s = "-"
+		a = 0 - v
+	end if
+	dim f as string(2) = lstr(a mod 100)
+	if len(f) < 2 then f = "0" + f
+	fmt100 = s + lstr(a / 100) + "." + f
+end function

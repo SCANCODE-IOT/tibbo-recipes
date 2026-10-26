@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>СКУД · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}header a{color:#fff;margin-left:12px}
+main{max-width:760px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:14px;margin:12px 0}
+table{border-collapse:collapse;width:100%}td,th{padding:6px;border-bottom:1px solid #EFE9E1;text-align:left;font-size:14px}
+form{display:flex;gap:6px;align-items:center;flex-wrap:wrap}input{padding:5px}button{padding:6px 12px;border:0;border-radius:8px;background:#2C2B28;color:#fff}
+.go{background:#EC6C2E}small{color:#6F6C66}code{font-size:13px}
+</style></head><body>
+<header><b>Tibbo</b> · СКУД</header>
+<main>
+
+<?
+include "global.tbh"
+dim rq as string
+dim s as string
+dim i as byte
+rq = sock.httprqstring
+if web_auth(rq) = NO then
+	s = "<div class=card><b>Вход</b><form action='set.html'><input type=password name=p placeholder='пароль'><button>Войти</button></form></div>"
+	web_send(s)
+else
+dim t as string(16) = "?t=" + web_token
+s = "<p><a href='index.html" + t + "'>Обновить</a> · <a href='cards.html" + t + "'>Карты (" + str(cards_count) + ")</a></p>"
+s = s + "<div class=card><b>Дверь:</b> " + acc_status() + "<form action='set.html'><input type=hidden name=t value=" + web_token + "><input type=hidden name=a value=open><button class=go>Открыть дверь</button></form></div>"
+web_send(s)
+if acc_last_unknown <> "" then
+	s = "<div class=card>Последняя неизвестная карта: <code>" + acc_last_unknown + "</code><form action='set.html'><input type=hidden name=t value=" + web_token + "><input type=hidden name=a value=add><input type=hidden name=c value=last><input name=n maxlength=6 placeholder='имя'><button>Добавить</button></form></div>"
+	web_send(s)
+end if
+s = "<div class=card><b>Журнал</b> <small>(время - секунды с включения)</small><table>"
+web_send(s)
+for i = 0 to log_count - 1
+	s = "<tr><td>" + log_line(i) + "</td></tr>"
+	web_send(s)
+next i
+s = "</table></div>"
+web_send(s)
+end if
+?>
+</main></body></html>

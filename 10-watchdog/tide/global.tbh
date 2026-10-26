@@ -1,0 +1,46 @@
+'=====================================================================
+' Рецепт «Сторожевой узел» · общий заголовок
+' Плата TPP2(G2): #06 (два реле) в S1+S3, #09 (питание 12 В) в S11.
+'=====================================================================
+include "config.tbh"
+
+#define DHCP_DEBUG_PRINT 0
+include "sock\trunk\sock.tbh"
+include "dhcp\trunk\dhcp.tbh"
+
+#define CH_COUNT 2
+#define LOG_SIZE 20
+
+enum ch_states
+	ST_OK,                      'отвечает
+	ST_FAILING,                 'проверки не проходят, считаем
+	ST_POWER_OFF,               'питание выключено
+	ST_BOOTING,                 'ждём загрузки
+	ST_PAUSE,                   'длинная пауза после серии перезагрузок
+	ST_DISABLED
+end enum
+
+declare function wln_check_association() as pl_wln_association_states
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+declare sub log_add(byref s as string)
+declare function log_line(n as byte) as string
+declare log_count as byte
+
+'--- watch.tbs ---
+declare sub wd_init()
+declare sub wd_proc_second()
+declare sub wd_sock_event(newstatesimple as pl_sock_state_simple)
+declare sub wd_reboot(ch as byte, byref why as string)
+declare function wd_name(ch as byte) as string
+declare function wd_state_text(ch as byte) as string
+declare function wd_targets(ch as byte) as string
+declare wd_fails(CH_COUNT) as byte
+declare wd_reboots(CH_COUNT) as word
+declare wd_last_ok(CH_COUNT) as dword
+declare chk_sock as byte
+
+'--- web.tbs ---
+declare function web_arg(byref rq as string, byref argname as string) as string
+declare sub web_send(byref s as string)

@@ -1,0 +1,16 @@
+<?
+include "global.tbh"
+dim s as string
+if scale_age > 10 then
+	s = ";;0;"
+else
+	s = scale_weight + ";" + scale_unit + ";"
+	if scale_stable = YES then
+		s = s + "1;"
+	else
+		s = s + "0;"
+	end if
+	s = s + scale_line
+end if
+web_send(s)
+?>

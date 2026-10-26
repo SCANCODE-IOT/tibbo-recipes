@@ -1,0 +1,121 @@
+'=====================================================================
+' Рецепт «Сторожевой узел» · события, журнал
+'=====================================================================
+include "global.tbh"
+
+dim tick as byte = 0
+dim net_up as no_yes = NO
+dim log_count as byte = 0
+dim log_buf(LOG_SIZE) as string(56)
+dim log_head as byte = 0
+
+declare sub net_started()
+
+sub on_sys_init()
+	sys.wdperiod = 1000
+	sys.wdautoreset = DISABLED
+	sys.wdenabled = YES
+	sys.onsystimerperiod = 10
+	pat.play("G-G-------", PL_PAT_CANINT)
+
+	dim i, s as byte
+	for i = 1 to 2
+		s = sock_get("WEB")
+		sock.num = s
+		sock.protocol = PL_SOCK_PROTOCOL_TCP
+		sock.inconmode = PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
+		sock.httpmode = YES
+		sock.httpportlist = "80"
+		sock.rxbuffrq(1)
+		sock.txbuffrq(4)
+		sock.varbuffrq(1)
+	next i
+	wd_init()
+	sock.num = chk_sock
+	sock.rxbuffrq(1)
+	sock.txbuffrq(1)
+	sys.buffalloc()
+	log_add("watchdog started")
+
+#if CFG_USE_DHCP
+	dhcp_start(PL_SOCK_INTERFACE_NET, "", "")
+#else
+	net.ip = CFG_IP
+	net.netmask = CFG_NETMASK
+	net.gatewayip = CFG_GATEWAY
+	net_started()
+#endif
+end sub
+
+sub net_started()
+	if net_up = YES then exit sub
+	net_up = YES
+	dbg("Watchdog, web: http://" + net.ip + "/")
+end sub
+
+sub on_sys_timer()
+	sys.wdreset()
+	tick = tick + 1
+	if tick >= 10 then
+		tick = 0
+		wd_proc_second()
+	end if
+	if tick = 0 or tick = 5 then dhcp_proc_timer()
+end sub
+
+sub on_sock_data_arrival()
+	if sock.num = chk_sock then
+		sock.rxclear()
+		exit sub
+	end if
+	dhcp_proc_data()
+end sub
+
+sub on_sock_event(newstate as enum pl_sock_state, newstatesimple as enum pl_sock_state_simple)
+	if sock.num = chk_sock then wd_sock_event(newstatesimple)
+end sub
+
+sub log_add(byref s as string)
+	dim t as dword = sys.timercount / 2
+	log_buf(log_head) = lstr(t / 60) + " min: " + left(s, 40)
+	log_head = log_head + 1
+	if log_head >= LOG_SIZE then log_head = 0
+	if log_count < LOG_SIZE then log_count = log_count + 1
+	dbg(s)
+end sub
+
+function log_line(n as byte) as string
+	dim i as integer = log_head - 1 - n
+	if i < 0 then i = i + LOG_SIZE
+	log_line = log_buf(i)
+end function
+
+sub callback_dhcp_ok(renew as no_yes, interface as pl_sock_interfaces, byref ip as string, byref gateway_ip as string, byref netmask as string, lease_time as dword)
+	if renew = YES and net.ip = ip then exit sub
+	net.ip = ip
+	net.gatewayip = gateway_ip
+	net.netmask = netmask
+	net_started()
+end sub
+
+sub callback_dhcp_failure(interface as pl_sock_interfaces, failure_code as en_dhcp_status_codes)
+end sub
+
+sub callback_dhcp_pre_clear_ip(interface as pl_sock_interfaces)
+end sub
+
+sub callback_dhcp_pre_buffrq(required_buff_pages as byte)
+end sub
+
+sub callback_dhcp_buff_released()
+end sub
+
+function wln_check_association() as pl_wln_association_states
+	wln_check_association = PL_WLN_NOT_ASSOCIATED
+end function
+
+sub dbg(byref s as string)
+#if CFG_DEBUG
+	sys.debugprint(s + chr(13) + chr(10))
+#endif
+end sub

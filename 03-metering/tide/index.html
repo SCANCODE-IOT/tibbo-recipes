@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="15">
+<title>Учёт ресурсов · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:760px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:14px;margin:12px 0}
+table{border-collapse:collapse;width:100%}td,th{padding:7px 6px;border-bottom:1px solid #EFE9E1;text-align:left}th{font-size:13px;color:#6F6C66;font-weight:600}
+td.v{font-weight:700;text-align:right;white-space:nowrap}
+form{display:flex;gap:6px;align-items:center;flex-wrap:wrap}input{padding:4px;width:110px}button{padding:5px 10px;border:0;border-radius:8px;background:#2C2B28;color:#fff}
+small{color:#6F6C66}.err{color:#C0392B}
+</style></head><body>
+<header><b>Tibbo</b> · Учёт электроэнергии и воды</header>
+<main>
+<?
+include "global.tbh"
+dim i as byte
+dim s as string
+s = "<div class=card><b>Электроэнергия (Modbus)</b><table><tr><th>Точка</th><th style='text-align:right'>Значение</th></tr>"
+web_send(s)
+for i = 0 to pt_count - 1
+	s = "<tr><td>" + mb_point_name(i) + "</td><td class=v>"
+	if mb_point_value(i) = "" then
+		s = s + "<span class=err>нет ответа</span>"
+	else
+		s = s + mb_point_value(i)
+	end if
+	s = s + "</td></tr>"
+	web_send(s)
+next i
+s = "</table>"
+if mb_errors > 0 then s = s + "<p class=err><small>Ошибок в последнем цикле опроса: " + str(mb_errors) + "</small></p>"
+s = s + "</div><div class=card><b>Вода, м3</b><table>"
+web_send(s)
+for i = 0 to W_COUNT - 1
+	s = "<tr><td>" + pulse_name(i) + "</td><td class=v>" + pulse_m3(i) + "</td><td><form action='set.html'><input type=hidden name=w value=" + str(i + 1) + "><input name=v placeholder='показание'><button>Записать</button></form></td></tr>"
+	web_send(s)
+next i
+s = "</table><p><small>Сверьте показания с табло счётчиков и запишите их один раз при монтаже. Дальше контроллер считает сам.</small></p></div>"
+s = s + "<p><small>IP " + net.ip + " · id " + dev_id() + " · MQTT: "
+if mqtt_online = YES then
+	s = s + "на связи"
+else
+	s = s + "нет связи"
+end if
+s = s + "</small></p>"
+web_send(s)
+?>
+</main></body></html>

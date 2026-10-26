@@ -1,0 +1,13 @@
+'=====================================================================
+' Вывод веб-страницы по частям
+'=====================================================================
+include "global.tbh"
+
+sub web_send(byref s as string)
+	while sock.txfree < len(s)
+		sock.send()
+		doevents
+	wend
+	sock.setdata(s)
+	sock.send()
+end sub

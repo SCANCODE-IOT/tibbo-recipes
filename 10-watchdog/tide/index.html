@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="10">
+<title>Сторож · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:760px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:14px;margin:12px 0}
+table{border-collapse:collapse;width:100%}td{padding:6px;border-bottom:1px solid #EFE9E1;font-size:14px}
+button{padding:6px 12px;border:0;border-radius:8px;background:#2C2B28;color:#fff}small{color:#6F6C66}
+</style></head><body>
+<header><b>Tibbo</b> · Сторожевой узел</header>
+<main>
+<?
+include "global.tbh"
+dim s as string
+dim i as byte
+for i = 0 to CH_COUNT - 1
+	s = "<div class=card><b>" + str(i + 1) + ". " + wd_name(i) + "</b> - " + wd_state_text(i) + "<br><small>проверка: " + wd_targets(i) + " · перезагрузок: " + str(wd_reboots(i)) + "</small>"
+	s = s + "<p><a href='set.html?r=" + str(i + 1) + "'><button>Перезагрузить сейчас</button></a></p></div>"
+	web_send(s)
+next i
+s = "<div class=card><b>Журнал</b> <small>(минуты с включения сторожа)</small><table>"
+web_send(s)
+for i = 0 to log_count - 1
+	s = "<tr><td>" + log_line(i) + "</td></tr>"
+	web_send(s)
+next i
+s = "</table></div><p><small>IP " + net.ip + "</small></p>"
+web_send(s)
+?>
+</main></body></html>

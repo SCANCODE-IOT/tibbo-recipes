@@ -1,0 +1,49 @@
+'=====================================================================
+' Рецепт «Учёт электроэнергии и воды» · настройки
+' Счётчики электроэнергии с Modbus RTU (RS-485) + до 4 счётчиков воды
+' с импульсным выходом (геркон, «сухой контакт»). Показания - на веб-странице
+' контроллера и в MQTT.
+'=====================================================================
+
+'--- Сеть ---------------------------------------------------------------
+#define CFG_USE_DHCP 1                      '1 - адрес по DHCP, 0 - статический адрес ниже
+const CFG_IP = "192.168.1.202"
+const CFG_NETMASK = "255.255.255.0"
+const CFG_GATEWAY = "192.168.1.1"
+const CFG_DNS_SERVER = "8.8.8.8"
+
+'--- MQTT (можно выключить: показания останутся на веб-странице) -------
+#define CFG_USE_MQTT 1
+const CFG_MQTT_HOST = "192.168.1.10"        'IP или имя брокера
+#define CFG_MQTT_PORT 1883
+const CFG_MQTT_USER = ""
+const CFG_MQTT_PASSWORD = ""
+const CFG_TOPIC_ROOT = "tibbo"              'топики: tibbo/<id>/<имя>
+
+'--- RS-485: Tibbit #05 в сокете S1, порт ser.num = 0 --------------------
+#define CFG_RS485_PORT 0
+#define CFG_RS485_BAUD 9600
+#define CFG_RS485_PARITY PL_SER_PR_NONE     'PL_SER_PR_NONE / PL_SER_PR_EVEN / PL_SER_PR_ODD
+#define CFG_POLL_PERIOD_MS 10000            'опрос счётчиков раз в 10 с
+#define CFG_REPLY_TIMEOUT_MS 500
+#define CFG_MAX_POINTS 16
+#define CFG_PUBLISH_ON_CHANGE_ONLY 0
+#define CFG_REPUBLISH_EVERY 6
+
+'--- Счётчики воды: Tibbit #54 в сокете S9, входы 1-4 -------------------
+'Сколько литров на один импульс (по паспорту счётчика: обычно 1, 10 или 100)
+#define CFG_PULSE_L1 10
+#define CFG_PULSE_L2 10
+#define CFG_PULSE_L3 10
+#define CFG_PULSE_L4 10
+'Названия для веб-страницы и MQTT (латиница, без пробелов)
+const CFG_WNAME1 = "water_cold"
+const CFG_WNAME2 = "water_hot"
+const CFG_WNAME3 = "water3"
+const CFG_WNAME4 = "water4"
+'Как часто сохранять показания в энергонезависимую память, минут
+'(чаще - меньше потеря при отключении питания, но быстрее износ памяти)
+#define CFG_SAVE_MINUTES 10
+
+'--- Отладка ------------------------------------------------------------
+#define CFG_DEBUG 1

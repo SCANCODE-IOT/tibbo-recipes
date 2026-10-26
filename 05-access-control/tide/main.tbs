@@ -1,0 +1,101 @@
+'=====================================================================
+' Рецепт «СКУД на одну дверь» · события
+'=====================================================================
+include "global.tbh"
+
+dim tick as byte = 0
+dim net_up as no_yes = NO
+
+declare sub net_started()
+
+sub on_sys_init()
+	sys.wdperiod = 1000
+	sys.wdautoreset = DISABLED
+	sys.wdenabled = YES
+	sys.onsystimerperiod = 10           '100 мс
+	pat.play("G-G-------", PL_PAT_CANINT)
+
+	dim i, s as byte
+	for i = 1 to 2
+		s = sock_get("WEB")
+		sock.num = s
+		sock.protocol = PL_SOCK_PROTOCOL_TCP
+		sock.inconmode = PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
+		sock.httpmode = YES
+		sock.httpportlist = "80"
+		sock.rxbuffrq(1)
+		sock.txbuffrq(8)
+		sock.varbuffrq(1)
+	next i
+	sys.buffalloc()
+
+	acc_init()
+	cards_load()
+	log_add("controller started")
+
+#if CFG_USE_DHCP
+	dhcp_start(PL_SOCK_INTERFACE_NET, "", "")
+#else
+	net.ip = CFG_IP
+	net.netmask = CFG_NETMASK
+	net.gatewayip = CFG_GATEWAY
+	net_started()
+#endif
+end sub
+
+sub net_started()
+	if net_up = YES then exit sub
+	net_up = YES
+	dbg("Access control, web: http://" + net.ip + "/")
+end sub
+
+sub on_sys_timer()
+	sys.wdreset()
+	acc_proc_tick()
+	tick = tick + 1
+	if tick >= 10 then
+		tick = 0
+		acc_proc_second()
+	end if
+	if tick = 5 or tick = 0 then dhcp_proc_timer()
+end sub
+
+sub on_ser_data_arrival()
+	if ser.num <> 0 then exit sub
+	dim b as string(70) = ser.getdata(70)
+	acc_wiegand(b)
+end sub
+
+sub on_sock_data_arrival()
+	dhcp_proc_data()
+end sub
+
+sub callback_dhcp_ok(renew as no_yes, interface as pl_sock_interfaces, byref ip as string, byref gateway_ip as string, byref netmask as string, lease_time as dword)
+	if renew = YES and net.ip = ip then exit sub
+	net.ip = ip
+	net.gatewayip = gateway_ip
+	net.netmask = netmask
+	net_started()
+end sub
+
+sub callback_dhcp_failure(interface as pl_sock_interfaces, failure_code as en_dhcp_status_codes)
+end sub
+
+sub callback_dhcp_pre_clear_ip(interface as pl_sock_interfaces)
+end sub
+
+sub callback_dhcp_pre_buffrq(required_buff_pages as byte)
+end sub
+
+sub callback_dhcp_buff_released()
+end sub
+
+function wln_check_association() as pl_wln_association_states
+	wln_check_association = PL_WLN_NOT_ASSOCIATED
+end function
+
+sub dbg(byref s as string)
+#if CFG_DEBUG
+	sys.debugprint(s + chr(13) + chr(10))
+#endif
+end sub
