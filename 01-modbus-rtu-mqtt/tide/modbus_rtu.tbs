@@ -48,7 +48,12 @@ sub mb_init()
 	io.num = PL_IO_NUM_0
 	io.enabled = YES                           'по документации #05 линию RTS нужно сделать выходом
 	ser.flowcontrol = PL_SER_FC_DISABLED
-	ser.baudrate = ser.div9600 * 9600 / CFG_RS485_BAUD
+	'делитель без промежуточного 9600*N: на 16-битных платформах он не помещается в word
+#if CFG_RS485_BAUD >= 9600
+	ser.baudrate = ser.div9600 / (CFG_RS485_BAUD / 9600)
+#else
+	ser.baudrate = ser.div9600 * (9600 / CFG_RS485_BAUD)
+#endif
 	ser.parity = CFG_RS485_PARITY
 	ser.bits = PL_SER_BB_8
 	ser.interchardelay = 1                     'пауза 10 мс = конец кадра

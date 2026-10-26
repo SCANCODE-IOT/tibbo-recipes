@@ -10,6 +10,7 @@ dim mqtt_online as no_yes = NO
 dim mb_errors as byte = 0
 dim net_ready as no_yes = NO
 dim tick as byte = 0
+dim lib_tick as byte = 0
 dim poll_ms as dword = 0
 dim min_ms as dword = 0
 dim topic_base as string(48)
@@ -88,6 +89,10 @@ sub on_sys_timer()
 		min_ms = min_ms + 60000
 		pulse_proc_minute()
 	end if
+	'библиотеки DHCP, DNS и MQTT рассчитаны на вызов раз в 0,5 с
+	lib_tick = lib_tick + 1
+	if lib_tick < 5 then exit sub
+	lib_tick = 0
 	dhcp_proc_timer()
 	dns_proc_timer()
 #if CFG_USE_MQTT
