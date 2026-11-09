@@ -1,6 +1,6 @@
 # Рецепты Tibbo: готовые решения автоматизации
 
-Десять типовых задач, решённых от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC, вариант для [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
+Тринадцать задач, решённых от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC или проект [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
 
 Описания и страницы со спецификацией и ценами - на [tibbo.ru/recipes](https://tibbo.ru/recipes).
 
@@ -16,6 +16,9 @@
 | 08 | [Термостат и вентиляция (0-10 В)](08-thermostat-0-10v/) - Датчик температуры и влажности RS-485, нагреватель на реле, клапан и EC-вентилятор 0-10 В, уставки на веб-странице, MQTT. | TPP2(G2) | да |
 | 09 | [Сбор данных 4-20 мА с веб-графиком](09-4-20ma-logger/) - Четыре датчика 4-20 мА: значения в инженерных единицах, график за сутки на веб-странице, CSV и MQTT. | TPP2(G2) | да |
 | 10 | [Сторожевой узел: проверка связи и перезагрузка по питанию](10-watchdog/) - Проверяет связь с роутером, камерой или интернетом и перезагружает зависшее устройство по питанию через реле. | TPP2(G2) | да |
+| 11 | [Контроллер, с которым говорит нейросеть (MCP)](11-ai-mcp-controller/) - Claude, ChatGPT или локальная модель читают датчики и переключают реле обычными фразами и пишут правила, которые плата выполняет сама. Бета. | LTPP3(G2) | - |
+| 12 | [Андон: световая колонна и учёт простоев станка](12-andon/) - Кнопки оператора зажигают световую колонну, контроллер считает минуты работы и простоя, остановки и детали за смену. | TPP2(G2) | да |
+| 13 | [Чёрный ящик RS-485: что было на линии перед сбоем](13-rs485-black-box/) - Слушает линию, хранит последние 150 кадров и замораживает снимок при ошибке CRC, исключении Modbus или тишине. | TPP2(G2) | - |
 
 ## Принципы
 
@@ -23,6 +26,7 @@
 - **Раскладка, которую одобряет AppBlocks.** Разъёмы выбраны так, чтобы редактор AppBlocks не отмечал сокеты жёлтыми треугольниками: источнику питания #09/#10 - #18, датчику #29 - #00-3. Если документация Tibbo допускает вариант дешевле, но редактор его не принимает, он описан в README рецепта как нишевый.
 - **Все настройки объекта в одном файле** `tide/config.tbh`: сеть, MQTT, адреса приборов, пороги.
 - **Проверка.** Каждый проект собирается в TIDE (библиотеки 2_01_05) без ошибок и предупреждений; варианты AppBlocks открываются в редакторе без ошибок и собираются облачным компилятором. На реальном оборудовании рецепты не проверялись - перед установкой на объект проверьте комплект на стенде.
+- **Рецепты 11-13 проверены иначе.** 12 - проект AppBlocks, собран компилятором Tibbo через сборщик AppBlocks; 13 - Tibbo BASIC, собран тем же компилятором, библиотеки лежат в папке проекта; 11 - программа на Python для Linux-платы, 27 автотестов на эмуляторе. Как и остальные, на настоящем железе они не запускались.
 
 ## Как начать
 
@@ -36,7 +40,7 @@
 
 # Tibbo recipes: ready-made automation solutions
 
-Ten typical automation tasks solved end to end on Tibbo hardware: a TIDE project (Tibbo BASIC), an AppBlocks variant, a bill of materials, a Tibbit socket layout with power budget and assembly notes. Documentation inside each recipe is in Russian.
+Thirteen automation tasks solved end to end on Tibbo hardware: a TIDE project (Tibbo BASIC), an AppBlocks variant, a bill of materials, a Tibbit socket layout with power budget and assembly notes. Documentation inside each recipe is in Russian.
 
 | # | Recipe | Board | AppBlocks |
 |---|---|---|---|
@@ -50,11 +54,15 @@ Ten typical automation tasks solved end to end on Tibbo hardware: a TIDE project
 | 08 | [Thermostat and ventilation (0-10 V)](08-thermostat-0-10v/) | TPP2(G2) | yes |
 | 09 | [4-20 mA data logger with web chart](09-4-20ma-logger/) | TPP2(G2) | yes |
 | 10 | [Network watchdog with power-cycle reboot](10-watchdog/) | TPP2(G2) | yes |
+| 11 | [A controller that an AI talks to (MCP), beta](11-ai-mcp-controller/) | LTPP3(G2) | - |
+| 12 | [Andon: stack light and machine downtime counters](12-andon/) | TPP2(G2) | yes |
+| 13 | [RS-485 black box: what was on the bus before a failure](13-rs485-black-box/) | TPP2(G2) | - |
 
 Every project builds in TIDE (libraries 2_01_05) with no errors or warnings, and AppBlocks variants open without errors and build in the cloud. Connectors are chosen so that the AppBlocks editor does not flag any socket (power Tibbits #09/#10 use #18, the #29 sensor sits next to #00-3). **Not tested on real hardware** - verify on a bench before deployment.
 
 ## Versions
 
+- **1.2.0** (2026-11-10): three new recipes. 11 - an MCP server on the Linux board LTPP3(G2): an AI reads sensors, switches relays and writes rules (Python, 27 tests on a board emulator, beta). 12 - Andon, an AppBlocks project built with the Tibbo compiler through the AppBlocks builder. 13 - RS-485 black box in Tibbo BASIC, built with the same compiler; frame splitting checked on a model. None of them has run on real hardware yet.
 - **1.1.0** (2026-10-26): recipes 02-05 - inputs of #54 on #21 in S10 and the #09 supply on #18 in S12 instead of one #20 (the AppBlocks editor accepts only #18 for power Tibbits); recipe 07 - #00-3 in S11 powers the #29 sensor; recipe 09 - #12 moved to S9; exact terminal numbers in the READMEs.
 - **1.0.1**: UART divider without overflow on 16-bit DS1100 (recipe 06), library timer period in recipe 03.
 - **1.0**: first release.

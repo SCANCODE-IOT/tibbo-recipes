@@ -1,0 +1,1 @@
+declare function stgcmd_proc_cmd(byref cmd_str as string) as string

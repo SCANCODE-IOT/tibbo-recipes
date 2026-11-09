@@ -1,0 +1,274 @@
+'=====================================================================
+' Линия RS-485: приём, разбор на кадры по контрольной сумме, кольцо
+' последних кадров, снимок при сбое
+'=====================================================================
+include "global.tbh"
+
+dim ring(RING_SIZE) as frame_rec
+dim ring_head as byte = 0                   'куда писать следующий кадр
+dim ring_count as byte = 0
+dim snap(RING_SIZE) as frame_rec
+dim snap_count as byte = 0
+dim snap_reason as snap_reasons = SNAP_NONE
+dim snap_time as dword = 0
+dim snap_missed as word = 0                 'сбои, случившиеся после снимка, пока он не снят
+dim cnt_frames as dword = 0
+dim cnt_crc as dword = 0
+dim cnt_exc as dword = 0
+dim cnt_silence as word = 0
+dim cnt_overrun as word = 0
+dim addr_id(ADDR_MAX) as byte
+dim addr_frames(ADDR_MAX) as dword
+dim addr_exc(ADDR_MAX) as word
+dim addr_count as byte = 0
+
+dim crc_tab(16) as word
+dim quiet_s as word = 0                     'секунд тишины подряд
+dim bus_alive as no_yes = NO                'обмен на линии уже видели
+dim silence_reported as no_yes = NO
+dim carry as string(250)                    'начало кадра, оборванного концом порции
+
+declare sub ring_add(byref d as string, total as byte, fl as byte)
+declare sub addr_note(a as byte, is_exc as no_yes)
+declare sub bus_trigger(reason as snap_reasons)
+declare function bus_len_ok(byref s as string, start as byte, l as byte) as no_yes
+declare function bus_scan(byref s as string, skip as byte, commit as no_yes) as byte
+
+sub bus_init()
+	'таблица CRC-16 Modbus (полином &hA001) на полубайт: два шага на байт вместо восьми
+	crc_tab(0) = &h0000 : crc_tab(1) = &hCC01 : crc_tab(2) = &hD801 : crc_tab(3) = &h1400
+	crc_tab(4) = &hF001 : crc_tab(5) = &h3C00 : crc_tab(6) = &h2800 : crc_tab(7) = &hE401
+	crc_tab(8) = &hA001 : crc_tab(9) = &h6C00 : crc_tab(10) = &h7800 : crc_tab(11) = &hB401
+	crc_tab(12) = &h5000 : crc_tab(13) = &h9C01 : crc_tab(14) = &h8801 : crc_tab(15) = &h4400
+
+	ser.num = CFG_RS485_PORT
+	ser.enabled = NO
+	ser.interface = PL_SER_SI_HALFDUPLEX       'RS-485: линия DIR #05 = RTS порта (линия C сокета)
+	ser.dircontrol = PL_SER_DCP_LOWFORINPUT     'DIR: LOW - приём. Передачи в этой прошивке нет, линия всегда в приёме
+	ser.rtsmap = PL_IO_NUM_0                   'линия C сокета S1 = DIR Tibbit #05
+	io.num = PL_IO_NUM_0
+	io.enabled = YES
+	ser.flowcontrol = PL_SER_FC_DISABLED
+#if CFG_RS485_BAUD >= 9600
+	ser.baudrate = ser.div9600 / (CFG_RS485_BAUD / 9600)
+#else
+	ser.baudrate = ser.div9600 * (9600 / CFG_RS485_BAUD)
+#endif
+	ser.parity = CFG_RS485_PARITY
+	ser.bits = PL_SER_BB_8
+	ser.interchardelay = 1                     'событие приходит после паузы 10 мс: обычно это запрос и ответ вместе
+	ser.esctype = PL_SER_ET_DISABLED
+	ser.rxbuffrq(4)
+	ser.txbuffrq(1)
+end sub
+
+'Длина кадра должна подходить его функции Modbus: иначе случайное совпадение суммы
+'посреди длинного ответа приняли бы за конец кадра
+function bus_len_ok(byref s as string, start as byte, l as byte) as no_yes
+	dim fn as byte
+	bus_len_ok = YES
+	fn = asc(mid(s, start + 1, 1))
+	if fn >= 128 then
+		if l <> 5 then bus_len_ok = NO
+		exit function
+	end if
+	if fn >= 1 and fn <= 4 then
+		if l <> 8 and l <> 5 + asc(mid(s, start + 2, 1)) then bus_len_ok = NO
+		exit function
+	end if
+	if fn = 5 or fn = 6 then
+		if l <> 8 then bus_len_ok = NO
+		exit function
+	end if
+	if fn = 15 or fn = 16 then
+		if l = 8 then exit function
+		if l < 10 then
+			bus_len_ok = NO
+			exit function
+		end if
+		if l <> 9 + asc(mid(s, start + 6, 1)) then bus_len_ok = NO
+	end if
+end function
+
+'Один проход по порции: границы кадров там, где CRC-16 от начала кадра равна нулю
+'(сумма кадра вместе с его двумя байтами CRC всегда даёт ноль).
+'skip - какую по счёту границу пропустить (0 - никакую), commit = YES - записывать кадры в кольцо.
+'Возвращает позицию хвоста без верной суммы или 0, если порция разобрана целиком.
+function bus_scan(byref s as string, skip as byte, commit as no_yes) as byte
+	dim i, n, start, b, l, seen, a, fn as byte
+	dim crc as word
+	n = len(s)
+	start = 1
+	seen = 0
+	crc = &hFFFF
+	for i = 1 to n
+		b = asc(mid(s, i, 1))
+		crc = crc_tab((crc xor b) and 15) xor (crc shr 4)
+		crc = crc_tab((crc xor (b shr 4)) and 15) xor (crc shr 4)
+		if crc = 0 and i - start >= 3 then
+			l = i - start + 1
+			if bus_len_ok(s, start, l) = YES then
+				seen = seen + 1
+				if seen <> skip then
+					if commit = YES then
+						a = asc(mid(s, start, 1))
+						fn = asc(mid(s, start + 1, 1))
+						if fn >= 128 then
+							ring_add(mid(s, start, l), l, FL_EXCEPTION)
+							cnt_exc = cnt_exc + 1
+							addr_note(a, YES)
+#if CFG_TRIG_EXCEPTION
+							bus_trigger(SNAP_EXCEPTION)
+#endif
+						else
+							ring_add(mid(s, start, l), l, 0)
+							addr_note(a, NO)
+						end if
+					end if
+					start = i + 1
+					crc = &hFFFF
+				end if
+			end if
+		end if
+	next i
+	if start <= n then
+		bus_scan = start
+	else
+		bus_scan = 0
+	end if
+end function
+
+'Принятая порция обычно содержит запрос и быстрый ответ вместе: делим её на кадры.
+'Если жадное деление оставило хвост без верной суммы, пробуем пропустить одну из первых границ:
+'так отсеивается случайное совпадение суммы посреди кадра.
+sub bus_proc_data()
+	dim s as string
+	dim k, tail, n as byte
+
+	ser.num = CFG_RS485_PORT
+	s = carry + ser.getdata(250 - len(carry))
+	carry = ""
+	n = len(s)
+	if n = 0 then exit sub
+	quiet_s = 0
+	bus_alive = YES
+	silence_reported = NO
+
+	k = 0
+	tail = bus_scan(s, 0, NO)
+	while tail <> 0 and k < 3
+		k = k + 1
+		tail = bus_scan(s, k, NO)
+	wend
+	if tail <> 0 then k = 0
+	tail = bus_scan(s, k, YES)
+	if tail = 0 then exit sub
+
+	'хвост без верной суммы
+	ser.num = CFG_RS485_PORT
+	if ser.rxlen > 0 and n - tail + 1 <= 120 then
+		carry = mid(s, tail, n - tail + 1)        'порция оборвана посреди кадра, продолжение уже в буфере
+		exit sub
+	end if
+	ring_add(mid(s, tail, n - tail + 1), n - tail + 1, FL_CRC_BAD)   'помеха, обрыв кадра или не Modbus RTU
+	cnt_crc = cnt_crc + 1
+#if CFG_TRIG_CRC
+	bus_trigger(SNAP_CRC)
+#endif
+end sub
+
+sub ring_add(byref d as string, total as byte, fl as byte)
+	ring(ring_head).t = sys.timercountms
+	ring(ring_head).n = total
+	ring(ring_head).fl = fl
+	ring(ring_head).d = left(d, FRAME_KEEP)
+	ring_head = ring_head + 1
+	if ring_head >= RING_SIZE then ring_head = 0
+	if ring_count < RING_SIZE then ring_count = ring_count + 1
+	if (fl and FL_SILENCE) = 0 then cnt_frames = cnt_frames + 1
+end sub
+
+sub addr_note(a as byte, is_exc as no_yes)
+	dim i as byte
+	i = 0
+	while i < addr_count
+		if addr_id(i) = a then goto hit
+		i = i + 1
+	wend
+	if addr_count >= ADDR_MAX then exit sub
+	i = addr_count
+	addr_id(i) = a
+	addr_frames(i) = 0
+	addr_exc(i) = 0
+	addr_count = addr_count + 1
+hit:
+	addr_frames(i) = addr_frames(i) + 1
+	if is_exc = YES then addr_exc(i) = addr_exc(i) + 1
+end sub
+
+'Раз в секунду: слежение за тишиной на линии
+sub bus_proc_second()
+#if CFG_TRIG_SILENCE_S > 0
+	if bus_alive = NO then exit sub
+	if quiet_s < 65000 then quiet_s = quiet_s + 1
+	if quiet_s >= CFG_TRIG_SILENCE_S and silence_reported = NO then
+		silence_reported = YES
+		cnt_silence = cnt_silence + 1
+		ring_add("", 0, FL_SILENCE)
+		bus_trigger(SNAP_SILENCE)
+	end if
+#endif
+end sub
+
+'Сбой: первый снимок сохраняется и не затирается, пока его не снимут на веб-странице
+sub bus_trigger(reason as snap_reasons)
+	if snap_reason <> SNAP_NONE then
+		if snap_missed < 65000 then snap_missed = snap_missed + 1
+		exit sub
+	end if
+	bus_snapshot(reason)
+	pat.play("R-R-R-R-R-", PL_PAT_CANINT)
+	dbg("snapshot, reason " + str(reason))
+end sub
+
+'Копия кольца в порядке от старого кадра к новому
+sub bus_snapshot(reason as snap_reasons)
+	dim i as byte
+	dim p as integer
+	p = ring_head
+	p = p - ring_count
+	if p < 0 then p = p + RING_SIZE
+	i = 0
+	while i < ring_count
+		snap(i).t = ring(p).t
+		snap(i).n = ring(p).n
+		snap(i).fl = ring(p).fl
+		snap(i).d = ring(p).d
+		p = p + 1
+		if p >= RING_SIZE then p = 0
+		i = i + 1
+	wend
+	snap_count = ring_count
+	snap_reason = reason
+	snap_time = sys.timercountms
+	snap_missed = 0
+end sub
+
+sub bus_snapshot_clear()
+	snap_count = 0
+	snap_reason = SNAP_NONE
+	snap_missed = 0
+	pat.play("G-G-------", PL_PAT_CANINT)
+end sub
+
+sub bus_clear_all()
+	bus_snapshot_clear()
+	ring_head = 0
+	ring_count = 0
+	cnt_frames = 0
+	cnt_crc = 0
+	cnt_exc = 0
+	cnt_silence = 0
+	cnt_overrun = 0
+	addr_count = 0
+end sub

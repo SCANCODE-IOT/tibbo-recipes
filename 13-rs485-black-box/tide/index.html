@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Чёрный ящик RS-485 · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:980px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:14px;margin:12px 0;overflow-x:auto}
+.bad{border-color:#C93A2E;background:#FCE8E5}
+table{border-collapse:collapse;width:100%}td,th{padding:5px 8px;border-bottom:1px solid #EFE9E1;font-size:14px;text-align:left;white-space:nowrap}
+td.h{font-family:Consolas,Menlo,monospace}tr.e td{color:#C93A2E}tr.q td{color:#8A6500}
+a.b{display:inline-block;padding:7px 12px;border-radius:8px;background:#2C2B28;color:#fff;text-decoration:none;margin:4px 6px 0 0;font-size:14px}
+small{color:#6F6C66}
+</style></head><body>
+<header><b>Tibbo</b> · Чёрный ящик RS-485</header>
+<main>
+<?
+include "global.tbh"
+dim s as string
+dim i as byte
+dim p as integer
+dim t0 as dword
+dim cls as string(8)
+dim note as string(40)
+
+s = "<div class=card><b>Линия</b><br>" + str(CFG_RS485_BAUD / 100) + "00 бод · кадров: " + lstr(cnt_frames) + " · ошибок CRC: " + lstr(cnt_crc) + " · исключений Modbus: " + lstr(cnt_exc)
+s = s + " · тишина: " + str(cnt_silence) + " · переполнений буфера: " + str(cnt_overrun)
+web_send(s)
+s = "<p><a class=b href='set.html?a=snap'>Сделать снимок сейчас</a><a class=b href='set.html?a=clear'>Очистить всё</a><a class=b href='index.html'>Обновить</a></p></div>"
+web_send(s)
+
+'--- снимок ---
+if snap_reason <> SNAP_NONE then
+	s = "<div class='card bad'><b>Снимок перед сбоем: " + web_reason(snap_reason) + "</b><br><small>сделан на " + lstr(snap_time / 1000) + "-й секунде работы, кадров: " + str(snap_count) + ", сбоев после него: " + str(snap_missed) + ". Время в таблице - миллисекунды до сбоя.</small>"
+	s = s + "<p><a class=b href='set.html?a=free'>Снять снимок и ждать следующий сбой</a></p><table><tr><th>мс до сбоя</th><th>байт</th><th>кадр</th><th></th></tr>"
+	web_send(s)
+	i = 0
+	while i < snap_count
+		cls = ""
+		note = ""
+		if (snap(i).fl and FL_CRC_BAD) <> 0 then
+			cls = "e"
+			note = "нет верной CRC"
+		end if
+		if (snap(i).fl and FL_EXCEPTION) <> 0 then
+			cls = "e"
+			note = "исключение Modbus"
+		end if
+		if (snap(i).fl and FL_SILENCE) <> 0 then
+			cls = "q"
+			note = "тишина на линии"
+		end if
+		s = "<tr class='" + cls + "'><td>-" + lstr(snap_time - snap(i).t) + "</td><td>" + str(snap(i).n) + "</td><td class=h>" + web_hex(snap(i).d)
+		if snap(i).n > FRAME_KEEP then s = s + "…"
+		s = s + "</td><td>" + note + "</td></tr>"
+		web_send(s)
+		i = i + 1
+	wend
+	s = "</table></div>"
+	web_send(s)
+else
+	s = "<div class=card><b>Снимка нет</b><br><small>Сбоев с момента включения или последней очистки не было. Снимок появится сам при ошибке CRC, ответе-исключении или тишине на линии.</small></div>"
+	web_send(s)
+end if
+
+'--- последние кадры ---
+s = "<div class=card><b>Последние кадры</b> <small>(новые сверху, время - секунды с включения)</small><table><tr><th>с</th><th>байт</th><th>кадр</th><th></th></tr>"
+web_send(s)
+p = ring_head
+i = 0
+while i < ring_count and i < 30
+	p = p - 1
+	if p < 0 then p = RING_SIZE - 1
+	cls = ""
+	note = ""
+	if (ring(p).fl and FL_CRC_BAD) <> 0 then
+		cls = "e"
+		note = "нет верной CRC"
+	end if
+	if (ring(p).fl and FL_EXCEPTION) <> 0 then
+		cls = "e"
+		note = "исключение Modbus"
+	end if
+	if (ring(p).fl and FL_SILENCE) <> 0 then
+		cls = "q"
+		note = "тишина на линии"
+	end if
+	t0 = ring(p).t
+	s = "<tr class='" + cls + "'><td>" + lstr(t0 / 1000) + "." + right("00" + lstr(t0 mod 1000), 3) + "</td><td>" + str(ring(p).n) + "</td><td class=h>" + web_hex(ring(p).d)
+	if ring(p).n > FRAME_KEEP then s = s + "…"
+	s = s + "</td><td>" + note + "</td></tr>"
+	web_send(s)
+	i = i + 1
+wend
+s = "</table></div>"
+web_send(s)
+
+'--- устройства ---
+s = "<div class=card><b>Адреса на линии</b><table><tr><th>адрес</th><th>кадров</th><th>исключений</th></tr>"
+web_send(s)
+i = 0
+while i < addr_count
+	s = "<tr><td>" + str(addr_id(i)) + "</td><td>" + lstr(addr_frames(i)) + "</td><td>" + str(addr_exc(i)) + "</td></tr>"
+	web_send(s)
+	i = i + 1
+wend
+s = "</table></div><p><small>IP " + net.ip + " · контроллер только слушает линию и ничего в неё не передаёт</small></p>"
+web_send(s)
+?>
+</main></body></html>

@@ -1,0 +1,282 @@
+include "global.tbh"
+
+'****BOARD_CONFIG****'
+'sock 11: tibbit 09 
+'sock 1: tibbit 06 name T06_S1
+'sock 2: tibbit 20 
+'sock 5: tibbit 06 name T06_S5
+'sock 6: tibbit 20 
+'sock 9: tibbit 54 name T54_S9
+'sock 10: tibbit 21 
+'sock 12: tibbit 18 
+
+
+'****GLOBAL_DIMS****'
+dim interface_ready(MAX_NUM_INTERFACES) as no_yes
+
+dim TIOS_VERSION as string(30)
+#IF PLATFORM_ID=WM2000 OR PLATFORM_ID=WS1102
+dim MAC_ADDRESS as string(20)=wln.mac
+#ELSE
+dim MAC_ADDRESS as string(20)=net.mac
+#ENDIF
+dim DEVICE_NAME as string(50)="Tibbo-recipe-12-Andon"
+
+dim current_interface as pl_sock_interfaces
+
+dim APP_TIMEZONE as en_td_timezones
+dim APP_LATITUDE as float
+dim APP_LONGITUDE as float
+
+
+dim device_net_ip as string(16)
+dim device_net_mask as string(16)
+dim device_net_gateway as string(16)
+dim net_dhcp_enabled as boolean
+dim var_poll_timer as dword
+dim state as float=0.0
+dim parts as float=0.0
+dim stops as float=0.0
+dim min_run as float=0.0
+dim min_call as float=0.0
+dim min_alarm as float=0.0
+dim NETNM as string(16)="255.255.255.0"
+dim NETGW as string(16)="192.168.1.1"
+dim TZONE as string(3)="17"
+dim NETCP as float=1.0
+dim NETIP as string(16)="192.168.1.201"
+dim WBPWD as string(32)=""
+dim lamp_green as boolean=1
+dim lamp_yellow as boolean=1
+dim lamp_red as boolean=1
+dim horn as boolean=1
+dim btn_run as boolean=1
+dim btn_call as boolean=1
+dim btn_alarm as boolean=1
+dim cycle as boolean=1
+dim LPART as float=0.0
+dim LSTOP as float=0.0
+dim LRUN as float=0.0
+dim LCALL as float=0.0
+dim LALRM as float=0.0
+
+dim SNTP_socket as byte
+dim SNTP_SERVER as string(16)
+
+
+dim crons as crontab(CRON_MAX_SCHEDULES)
+dim datetime_timer_offset as dword=0
+
+dim DNS_socket as byte
+
+dim btn_run_button_state as byte=HIGH
+
+dim btn_call_button_state as byte=HIGH
+
+dim btn_alarm_button_state as byte=HIGH
+
+dim cycle_button_state as byte=HIGH
+dim delay_has_active as boolean=false
+dim delay_mw9uwva6jclxqu4 as dword=0
+dim timer_60s_mw9uwvc4v6wv0tk_timer as dword
+
+dim timer_60s_mw9uwvc4v6wv0tk_count as dword
+
+
+sub on_sys_init()
+    boot()
+end sub
+
+'****EVENTS****'
+
+sub on_sys_timer()
+'****on_sys_timer****'
+
+dim sys_timercountms as dword = sys.timercountms
+#IF SYS_VER <> 1000 AND WATCHDOG_ENABLED
+    sys.wdreset()
+#ENDIF
+
+    dhcp_proc_timer()
+
+    if sys_timercountms >= var_poll_timer then
+        var_poll_timer = sys_timercountms + 1000
+        '****var_poll_timer_elapsed****'
+        
+            '****var_poll_timer_state_elapsed****'
+        
+            '****var_poll_timer_parts_elapsed****'
+        
+            '****var_poll_timer_stops_elapsed****'
+        
+            '****var_poll_timer_min_run_elapsed****'
+        
+            '****var_poll_timer_min_call_elapsed****'
+        
+            '****var_poll_timer_min_alarm_elapsed****'
+        
+            '****var_poll_timer_NETNM_elapsed****'
+        
+            '****var_poll_timer_NETGW_elapsed****'
+        
+            '****var_poll_timer_TZONE_elapsed****'
+        
+            '****var_poll_timer_NETCP_elapsed****'
+        
+            '****var_poll_timer_NETIP_elapsed****'
+        
+            '****var_poll_timer_WBPWD_elapsed****'
+        
+            '****var_poll_timer_lamp_green_elapsed****'
+            var_lamp_green_update()
+        
+            '****var_poll_timer_lamp_yellow_elapsed****'
+            var_lamp_yellow_update()
+        
+            '****var_poll_timer_lamp_red_elapsed****'
+            var_lamp_red_update()
+        
+            '****var_poll_timer_horn_elapsed****'
+            var_horn_update()
+        
+            '****var_poll_timer_btn_run_elapsed****'
+            var_btn_run_update()
+        
+            '****var_poll_timer_btn_call_elapsed****'
+            var_btn_call_update()
+        
+            '****var_poll_timer_btn_alarm_elapsed****'
+            var_btn_alarm_update()
+        
+            '****var_poll_timer_cycle_elapsed****'
+            var_cycle_update()
+        
+            '****var_poll_timer_LPART_elapsed****'
+        
+            '****var_poll_timer_LSTOP_elapsed****'
+        
+            '****var_poll_timer_LRUN_elapsed****'
+        
+            '****var_poll_timer_LCALL_elapsed****'
+        
+            '****var_poll_timer_LALRM_elapsed****'
+    end if
+	sntp_proc_timer()
+
+    cron_check_tabs()
+
+http_server_proc_timer()
+	dns_proc_timer()
+
+    modbus_proc_timer()
+
+delay_handler()
+
+
+    timer_60s_mw9uwvc4v6wv0tk_count = timer_60s_mw9uwvc4v6wv0tk_count + 1
+    if timer_60s_mw9uwvc4v6wv0tk_count > timer_60s_mw9uwvc4v6wv0tk_timer then
+        '****mw9uwvc4v6wv0tk_timer_tick****'
+        
+            if state = 0 then
+                '****mw9uwvcbl7zk61y_true_output****'
+                var_min_run_set(min_run + 1)
+                
+            else
+                '****mw9uwvcbl7zk61y_false_output****'
+                
+                    if state = 1 then
+                        '****mw9uwvdv5mdn6w7_true_output****'
+                        var_min_call_set(min_call + 1)
+                        
+                    else
+                        '****mw9uwvdv5mdn6w7_false_output****'
+                        var_min_alarm_set(min_alarm + 1)
+                        
+                    end if
+            end if
+        timer_60s_mw9uwvc4v6wv0tk_count = 0
+    end if
+
+end sub
+
+
+sub on_sock_data_arrival()
+'****on_sock_data_arrival****'
+    dhcp_proc_data()
+	sntp_proc_data()
+
+http_server_proc_sock_data()
+	dns_proc_data()
+
+end sub
+
+
+sub on_net_link_change()
+'****on_net_link_change****'
+
+    if net.linkstate=PL_NET_LINKSTAT_NOLINK then
+        interface_set(PL_SOCK_INTERFACE_NET,NO)
+        '****callback_net_disconnected****'
+    else
+        if net_dhcp_enabled = false then
+            interface_set(PL_SOCK_INTERFACE_NET,YES)
+        end if
+    end if
+
+end sub
+
+
+sub on_sock_event(newstate as pl_sock_state,newstatesimple as pl_sock_state_simple)
+'****on_sock_event****'
+	sntp_proc_sock_event(newstate)
+
+http_server_proc_sock_event(newstate,newstatesimple)
+
+end sub
+
+
+sub on_sock_data_sent()
+'****on_sock_data_sent****'
+
+http_server_proc_sock_data_sent()
+
+#IFDEF TBL_MAX_NUM_TABLES
+tables_web_proc_sock_data_sent()
+#ENDIF
+
+end sub
+
+
+sub on_kp(key_event as pl_kp_event_codes, key_code as byte)
+'****on_kp****'
+
+    if key_event=PL_KP_EVENT_PRESSED and key_code = btn_run_kp then
+        '****mw9uwuozkaz0lg1_on_kp****'
+        cmd_SET_RUN("")
+                    
+
+    end if
+
+    if key_event=PL_KP_EVENT_PRESSED and key_code = btn_call_kp then
+        '****mw9uwuprmw3fdpp_on_kp****'
+        cmd_SET_CALL("")
+                    
+
+    end if
+
+    if key_event=PL_KP_EVENT_PRESSED and key_code = btn_alarm_kp then
+        '****mw9uwuqjqmc3l00_on_kp****'
+        cmd_SET_ALARM("")
+                    
+
+    end if
+
+    if key_event=PL_KP_EVENT_PRESSED and key_code = cycle_kp then
+        '****mw9uwvbcqv6n46v_on_kp****'
+        var_parts_set(parts + 1)
+        
+
+    end if
+
+end sub
+

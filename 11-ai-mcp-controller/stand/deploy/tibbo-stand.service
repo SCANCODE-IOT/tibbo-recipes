@@ -1,0 +1,17 @@
+[Unit]
+Description=Tibbo stand: MCP server, panel and local AI bridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/tibbo-stand
+ExecStart=/usr/bin/python3 -m tibbo_mcp --config /opt/tibbo-stand/config.json
+Restart=always
+RestartSec=3
+# реле выключаются при остановке (SIGTERM)
+KillSignal=SIGTERM
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

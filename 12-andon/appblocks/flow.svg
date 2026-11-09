@@ -1,0 +1,635 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2680 2750" font-family="Inter,Segoe UI,Helvetica,Arial,sans-serif">
+<rect width="2680" height="2750" fill="#F7F8FA"/>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker></defs>
+<text x="20" y="40" font-size="22" font-weight="800" fill="#222">Tibbo-recipe-12-Andon — логика AppBlocks (65 узлов, 52 связей)</text>
+<rect x="20" y="70" width="540" height="124" rx="10" fill="#fff" stroke="#D5D9DE"/>
+<text x="34" y="94" font-size="15" font-weight="700" fill="#556">Группа: без группы</text>
+<rect x="20" y="234" width="1440" height="974" rx="10" fill="#fff" stroke="#D5D9DE"/>
+<text x="34" y="258" font-size="15" font-weight="700" fill="#556">Группа: Buttons and states</text>
+<rect x="20" y="1248" width="1140" height="484" rx="10" fill="#fff" stroke="#D5D9DE"/>
+<text x="34" y="1272" font-size="15" font-weight="700" fill="#556">Группа: Counters</text>
+<rect x="20" y="1772" width="1740" height="474" rx="10" fill="#fff" stroke="#D5D9DE"/>
+<text x="34" y="1796" font-size="15" font-weight="700" fill="#556">Группа: Shift</text>
+<rect x="20" y="2286" width="2640" height="404" rx="10" fill="#fff" stroke="#D5D9DE"/>
+<text x="34" y="2310" font-size="15" font-weight="700" fill="#556">Группа: Stack light</text>
+<path d="M240,142.0 C290.0,142.0 290.0,142.0 340,142.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="137" font-size="9.5" fill="#777">boot</text>
+<path d="M240,306.0 C290.0,306.0 290.0,306.0 340,306.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="301" font-size="9.5" fill="#777">on_kp</text>
+<path d="M240,426.0 C290.0,426.0 290.0,426.0 340,426.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="421" font-size="9.5" fill="#777">on_kp</text>
+<path d="M240,546.0 C290.0,546.0 290.0,546.0 340,546.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="541" font-size="9.5" fill="#777">on_kp</text>
+<path d="M240,726.0 C290.0,726.0 290.0,726.0 340,726.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="721" font-size="9.5" fill="#777">on_command_triggered</text>
+<path d="M540,726.0 C590.0,726.0 590.0,726.0 640,726.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="721" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M240,866.0 C290.0,866.0 290.0,866.0 340,866.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="861" font-size="9.5" fill="#777">on_command_triggered</text>
+<path d="M540,866.0 C590.0,866.0 590.0,866.0 640,866.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="861" font-size="9.5" fill="#777">true_output</text>
+<path d="M840,866.0 C890.0,866.0 890.0,866.0 940,866.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="861" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1140,866.0 C1190.0,866.0 1190.0,866.0 1240,866.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1160" y="861" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M540,866.0 C590.0,866.0 590.0,956.0 640,956.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="881" font-size="9.5" fill="#777">false_output</text>
+<path d="M840,956.0 C890.0,956.0 890.0,956.0 940,956.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="951" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M240,1066.0 C290.0,1066.0 290.0,1066.0 340,1066.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="1061" font-size="9.5" fill="#777">on_command_triggered</text>
+<path d="M540,1066.0 C590.0,1066.0 590.0,1066.0 640,1066.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="1061" font-size="9.5" fill="#777">true_output</text>
+<path d="M840,1066.0 C890.0,1066.0 890.0,1066.0 940,1066.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="1061" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1140,1066.0 C1190.0,1066.0 1190.0,1066.0 1240,1066.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1160" y="1061" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M540,1066.0 C590.0,1066.0 590.0,1156.0 640,1156.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="1081" font-size="9.5" fill="#777">false_output</text>
+<path d="M840,1156.0 C890.0,1156.0 890.0,1156.0 940,1156.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="1151" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M240,2358.0 C290.0,2358.0 290.0,2358.0 340,2358.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="2353" font-size="9.5" fill="#777">on_command_triggered</text>
+<path d="M840,2358.0 C890.0,2358.0 890.0,2358.0 940,2358.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="2353" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1140,2358.0 C1190.0,2358.0 1190.0,2358.0 1240,2358.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1160" y="2353" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1440,2358.0 C1490.0,2358.0 1490.0,2358.0 1540,2358.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1460" y="2353" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M540,2358.0 C590.0,2358.0 590.0,2358.0 640,2358.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="2353" font-size="9.5" fill="#777">true_output</text>
+<path d="M540,2358.0 C590.0,2358.0 590.0,2498.0 640,2498.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="2384" font-size="9.5" fill="#777">false_output</text>
+<path d="M1140,2498.0 C1190.0,2498.0 1190.0,2498.0 1240,2498.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1160" y="2493" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1440,2498.0 C1490.0,2498.0 1490.0,2498.0 1540,2498.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1460" y="2493" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1740,2498.0 C1790.0,2498.0 1790.0,2498.0 1840,2498.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1760" y="2493" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M840,2498.0 C890.0,2498.0 890.0,2498.0 940,2498.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="2493" font-size="9.5" fill="#777">true_output</text>
+<path d="M1140,2638.0 C1190.0,2638.0 1190.0,2638.0 1240,2638.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1160" y="2633" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1440,2638.0 C1490.0,2638.0 1490.0,2638.0 1540,2638.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1460" y="2633" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1740,2638.0 C1790.0,2638.0 1790.0,2638.0 1840,2638.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1760" y="2633" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M840,2498.0 C890.0,2498.0 890.0,2638.0 940,2638.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="2524" font-size="9.5" fill="#777">false_output</text>
+<path d="M2040,2638.0 C2090.0,2638.0 2090.0,2638.0 2140,2638.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="2060" y="2633" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M2340,2638.0 C2390.0,2638.0 2390.0,2638.0 2440,2638.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="2360" y="2633" font-size="9.5" fill="#777">delay_elapsed</text>
+<path d="M240,1320.0 C290.0,1320.0 290.0,1320.0 340,1320.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="1315" font-size="9.5" fill="#777">on_kp</text>
+<path d="M240,1460.0 C290.0,1460.0 290.0,1460.0 340,1460.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="1455" font-size="9.5" fill="#777">timer_tick</text>
+<path d="M540,1460.0 C590.0,1460.0 590.0,1460.0 640,1460.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="1455" font-size="9.5" fill="#777">true_output</text>
+<path d="M540,1460.0 C590.0,1460.0 590.0,1570.0 640,1570.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="1479" font-size="9.5" fill="#777">false_output</text>
+<path d="M840,1570.0 C890.0,1570.0 890.0,1570.0 940,1570.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="1565" font-size="9.5" fill="#777">true_output</text>
+<path d="M840,1570.0 C890.0,1570.0 890.0,1680.0 940,1680.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="1589" font-size="9.5" fill="#777">false_output</text>
+<path d="M240,1844.0 C290.0,1844.0 290.0,1844.0 340,1844.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="1839" font-size="9.5" fill="#777">cron_expired</text>
+<path d="M240,1954.0 C290.0,1954.0 290.0,1954.0 340,1954.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="1949" font-size="9.5" fill="#777">cron_expired</text>
+<path d="M240,2084.0 C290.0,2084.0 290.0,2084.0 340,2084.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="260" y="2079" font-size="9.5" fill="#777">on_command_triggered</text>
+<path d="M540,2084.0 C590.0,2084.0 590.0,2084.0 640,2084.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="2079" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M840,2084.0 C890.0,2084.0 890.0,2084.0 940,2084.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="2079" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1140,2084.0 C1190.0,2084.0 1190.0,2084.0 1240,2084.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1160" y="2079" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1440,2084.0 C1490.0,2084.0 1490.0,2084.0 1540,2084.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1460" y="2079" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1740,2084.0 C2440.0,2084.0 -360.0,2194.0 340,2194.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1580" y="2103" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M540,2194.0 C590.0,2194.0 590.0,2194.0 640,2194.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="560" y="2189" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M840,2194.0 C890.0,2194.0 890.0,2194.0 940,2194.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="860" y="2189" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1140,2194.0 C1190.0,2194.0 1190.0,2194.0 1240,2194.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1160" y="2189" font-size="9.5" fill="#777">variable_set_done</text>
+<path d="M1440,2194.0 C1490.0,2194.0 1490.0,2194.0 1540,2194.0" fill="none" stroke="#888" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="1460" y="2189" font-size="9.5" fill="#777">variable_set_done</text>
+<g><title>node_system
+</title>
+<rect x="40" y="110" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="110" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="132" font-size="13" font-weight="700" fill="#222">system</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="340" y="110" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="340" y="110" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="356" y="132" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="356" y="150" font-size="11" fill="#444">APPLY</text>
+<text x="356" y="166" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_keypad
+</title>
+<rect x="40" y="274" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="274" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="296" font-size="13" font-weight="700" fill="#222">keypad</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="340" y="274" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="340" y="274" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="356" y="296" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="356" y="314" font-size="11" fill="#444">SET_RUN</text>
+<text x="356" y="330" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_keypad
+</title>
+<rect x="40" y="394" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="394" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="416" font-size="13" font-weight="700" fill="#222">keypad</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="340" y="394" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="340" y="394" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="356" y="416" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="356" y="434" font-size="11" fill="#444">SET_CALL</text>
+<text x="356" y="450" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_keypad
+</title>
+<rect x="40" y="514" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="514" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="536" font-size="13" font-weight="700" fill="#222">keypad</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="340" y="514" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="340" y="514" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="356" y="536" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="356" y="554" font-size="11" fill="#444">SET_ALARM</text>
+<text x="356" y="570" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_command_triggered
+</title>
+<rect x="40" y="694" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="694" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="716" font-size="13" font-weight="700" fill="#222">command_triggered</text>
+<text x="56" y="734" font-size="11" fill="#444">SET_RUN</text>
+</g>
+<g><title>node_variable_set
+value = 0</title>
+<rect x="340" y="694" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="340" y="694" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="356" y="716" font-size="13" font-weight="700" fill="#222">state = run</text>
+<text x="356" y="734" font-size="11" fill="#444">state</text>
+<text x="356" y="750" font-size="10" fill="#777">value=0</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="640" y="694" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="640" y="694" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="656" y="716" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="656" y="734" font-size="11" fill="#444">APPLY</text>
+<text x="656" y="750" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_command_triggered
+</title>
+<rect x="40" y="834" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="834" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="856" font-size="13" font-weight="700" fill="#222">command_triggered</text>
+<text x="56" y="874" font-size="11" fill="#444">SET_CALL</text>
+</g>
+<g><title>node_comparison
+operand1 = {state}
+operator = =
+operand2 = 0</title>
+<rect x="340" y="834" width="200" height="64" rx="8" fill="#fff" stroke="#9B59B6" stroke-width="2"/>
+<rect x="340" y="834" width="8" height="64" rx="4" fill="#9B59B6"/>
+<text x="356" y="856" font-size="13" font-weight="700" fill="#222">was running?</text>
+<text x="356" y="874" font-size="11" fill="#444">{state} = 0</text>
+<text x="356" y="890" font-size="10" fill="#777">operand1={state}</text>
+</g>
+<g><title>node_variable_set
+value = {stops} + 1</title>
+<rect x="640" y="834" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="640" y="834" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="656" y="856" font-size="13" font-weight="700" fill="#222">one more stop</text>
+<text x="656" y="874" font-size="11" fill="#444">stops</text>
+<text x="656" y="890" font-size="10" fill="#777">value={stops} + 1</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="940" y="834" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="940" y="834" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="956" y="856" font-size="13" font-weight="700" fill="#222">state = waiting</text>
+<text x="956" y="874" font-size="11" fill="#444">state</text>
+<text x="956" y="890" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="1240" y="834" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="1240" y="834" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="1256" y="856" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="1256" y="874" font-size="11" fill="#444">APPLY</text>
+<text x="1256" y="890" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="640" y="924" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="640" y="924" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="656" y="946" font-size="13" font-weight="700" fill="#222">state = waiting</text>
+<text x="656" y="964" font-size="11" fill="#444">state</text>
+<text x="656" y="980" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="940" y="924" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="940" y="924" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="956" y="946" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="956" y="964" font-size="11" fill="#444">APPLY</text>
+<text x="956" y="980" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_command_triggered
+</title>
+<rect x="40" y="1034" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="1034" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="1056" font-size="13" font-weight="700" fill="#222">command_triggered</text>
+<text x="56" y="1074" font-size="11" fill="#444">SET_ALARM</text>
+</g>
+<g><title>node_comparison
+operand1 = {state}
+operator = =
+operand2 = 0</title>
+<rect x="340" y="1034" width="200" height="64" rx="8" fill="#fff" stroke="#9B59B6" stroke-width="2"/>
+<rect x="340" y="1034" width="8" height="64" rx="4" fill="#9B59B6"/>
+<text x="356" y="1056" font-size="13" font-weight="700" fill="#222">was running?</text>
+<text x="356" y="1074" font-size="11" fill="#444">{state} = 0</text>
+<text x="356" y="1090" font-size="10" fill="#777">operand1={state}</text>
+</g>
+<g><title>node_variable_set
+value = {stops} + 1</title>
+<rect x="640" y="1034" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="640" y="1034" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="656" y="1056" font-size="13" font-weight="700" fill="#222">one more stop</text>
+<text x="656" y="1074" font-size="11" fill="#444">stops</text>
+<text x="656" y="1090" font-size="10" fill="#777">value={stops} + 1</text>
+</g>
+<g><title>node_variable_set
+value = 2</title>
+<rect x="940" y="1034" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="940" y="1034" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="956" y="1056" font-size="13" font-weight="700" fill="#222">state = alarm</text>
+<text x="956" y="1074" font-size="11" fill="#444">state</text>
+<text x="956" y="1090" font-size="10" fill="#777">value=2</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="1240" y="1034" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="1240" y="1034" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="1256" y="1056" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="1256" y="1074" font-size="11" fill="#444">APPLY</text>
+<text x="1256" y="1090" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_variable_set
+value = 2</title>
+<rect x="640" y="1124" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="640" y="1124" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="656" y="1146" font-size="13" font-weight="700" fill="#222">state = alarm</text>
+<text x="656" y="1164" font-size="11" fill="#444">state</text>
+<text x="656" y="1180" font-size="10" fill="#777">value=2</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="940" y="1124" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="940" y="1124" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="956" y="1146" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="956" y="1164" font-size="11" fill="#444">APPLY</text>
+<text x="956" y="1180" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_command_triggered
+</title>
+<rect x="40" y="2326" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="2326" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="2348" font-size="13" font-weight="700" fill="#222">command_triggered</text>
+<text x="56" y="2366" font-size="11" fill="#444">APPLY</text>
+</g>
+<g><title>node_comparison
+operand1 = {state}
+operator = =
+operand2 = 0</title>
+<rect x="340" y="2326" width="200" height="64" rx="8" fill="#fff" stroke="#9B59B6" stroke-width="2"/>
+<rect x="340" y="2326" width="8" height="64" rx="4" fill="#9B59B6"/>
+<text x="356" y="2348" font-size="13" font-weight="700" fill="#222">run?</text>
+<text x="356" y="2366" font-size="11" fill="#444">{state} = 0</text>
+<text x="356" y="2382" font-size="10" fill="#777">operand1={state}</text>
+</g>
+<g><title>node_variable_set
+value = 0</title>
+<rect x="640" y="2326" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="640" y="2326" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="656" y="2348" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="656" y="2366" font-size="11" fill="#444">lamp_green</text>
+<text x="656" y="2382" font-size="10" fill="#777">value=0</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="940" y="2326" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="940" y="2326" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="956" y="2348" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="956" y="2366" font-size="11" fill="#444">lamp_yellow</text>
+<text x="956" y="2382" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="1240" y="2326" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1240" y="2326" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1256" y="2348" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1256" y="2366" font-size="11" fill="#444">lamp_red</text>
+<text x="1256" y="2382" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="1540" y="2326" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1540" y="2326" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1556" y="2348" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1556" y="2366" font-size="11" fill="#444">horn</text>
+<text x="1556" y="2382" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_comparison
+operand1 = {state}
+operator = =
+operand2 = 1</title>
+<rect x="640" y="2466" width="200" height="64" rx="8" fill="#fff" stroke="#9B59B6" stroke-width="2"/>
+<rect x="640" y="2466" width="8" height="64" rx="4" fill="#9B59B6"/>
+<text x="656" y="2488" font-size="13" font-weight="700" fill="#222">waiting?</text>
+<text x="656" y="2506" font-size="11" fill="#444">{state} = 1</text>
+<text x="656" y="2522" font-size="10" fill="#777">operand1={state}</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="940" y="2466" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="940" y="2466" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="956" y="2488" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="956" y="2506" font-size="11" fill="#444">lamp_green</text>
+<text x="956" y="2522" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_variable_set
+value = 0</title>
+<rect x="1240" y="2466" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1240" y="2466" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1256" y="2488" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1256" y="2506" font-size="11" fill="#444">lamp_yellow</text>
+<text x="1256" y="2522" font-size="10" fill="#777">value=0</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="1540" y="2466" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1540" y="2466" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1556" y="2488" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1556" y="2506" font-size="11" fill="#444">lamp_red</text>
+<text x="1556" y="2522" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="1840" y="2466" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1840" y="2466" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1856" y="2488" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1856" y="2506" font-size="11" fill="#444">horn</text>
+<text x="1856" y="2522" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="940" y="2606" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="940" y="2606" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="956" y="2628" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="956" y="2646" font-size="11" fill="#444">lamp_green</text>
+<text x="956" y="2662" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="1240" y="2606" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1240" y="2606" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1256" y="2628" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1256" y="2646" font-size="11" fill="#444">lamp_yellow</text>
+<text x="1256" y="2662" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_variable_set
+value = 0</title>
+<rect x="1540" y="2606" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1540" y="2606" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1556" y="2628" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1556" y="2646" font-size="11" fill="#444">lamp_red</text>
+<text x="1556" y="2662" font-size="10" fill="#777">value=0</text>
+</g>
+<g><title>node_variable_set
+value = 0</title>
+<rect x="1840" y="2606" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1840" y="2606" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1856" y="2628" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1856" y="2646" font-size="11" fill="#444">horn</text>
+<text x="1856" y="2662" font-size="10" fill="#777">value=0</text>
+</g>
+<g><title>node_time_delay
+</title>
+<rect x="2140" y="2606" width="200" height="64" rx="8" fill="#fff" stroke="#9B59B6" stroke-width="2"/>
+<rect x="2140" y="2606" width="8" height="64" rx="4" fill="#9B59B6"/>
+<text x="2156" y="2628" font-size="13" font-weight="700" fill="#222">time_delay</text>
+<text x="2156" y="2646" font-size="11" fill="#444">10 s</text>
+</g>
+<g><title>node_variable_set
+value = 1</title>
+<rect x="2440" y="2606" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="2440" y="2606" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="2456" y="2628" font-size="13" font-weight="700" fill="#222">horn off after 10 s</text>
+<text x="2456" y="2646" font-size="11" fill="#444">horn</text>
+<text x="2456" y="2662" font-size="10" fill="#777">value=1</text>
+</g>
+<g><title>node_keypad
+</title>
+<rect x="40" y="1288" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="1288" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="1310" font-size="13" font-weight="700" fill="#222">keypad</text>
+</g>
+<g><title>node_variable_set
+value = {parts} + 1</title>
+<rect x="340" y="1288" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="340" y="1288" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="356" y="1310" font-size="13" font-weight="700" fill="#222">part done</text>
+<text x="356" y="1328" font-size="11" fill="#444">parts</text>
+<text x="356" y="1344" font-size="10" fill="#777">value={parts} + 1</text>
+</g>
+<g><title>node_time_interval
+</title>
+<rect x="40" y="1428" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="1428" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="1450" font-size="13" font-weight="700" fill="#222">time_interval</text>
+</g>
+<g><title>node_comparison
+operand1 = {state}
+operator = =
+operand2 = 0</title>
+<rect x="340" y="1428" width="200" height="64" rx="8" fill="#fff" stroke="#9B59B6" stroke-width="2"/>
+<rect x="340" y="1428" width="8" height="64" rx="4" fill="#9B59B6"/>
+<text x="356" y="1450" font-size="13" font-weight="700" fill="#222">comparison</text>
+<text x="356" y="1468" font-size="11" fill="#444">{state} = 0</text>
+<text x="356" y="1484" font-size="10" fill="#777">operand1={state}</text>
+</g>
+<g><title>node_variable_set
+value = {min_run} + 1</title>
+<rect x="640" y="1428" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="640" y="1428" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="656" y="1450" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="656" y="1468" font-size="11" fill="#444">min_run</text>
+<text x="656" y="1484" font-size="10" fill="#777">value={min_run} + 1</text>
+</g>
+<g><title>node_comparison
+operand1 = {state}
+operator = =
+operand2 = 1</title>
+<rect x="640" y="1538" width="200" height="64" rx="8" fill="#fff" stroke="#9B59B6" stroke-width="2"/>
+<rect x="640" y="1538" width="8" height="64" rx="4" fill="#9B59B6"/>
+<text x="656" y="1560" font-size="13" font-weight="700" fill="#222">comparison</text>
+<text x="656" y="1578" font-size="11" fill="#444">{state} = 1</text>
+<text x="656" y="1594" font-size="10" fill="#777">operand1={state}</text>
+</g>
+<g><title>node_variable_set
+value = {min_call} + 1</title>
+<rect x="940" y="1538" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="940" y="1538" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="956" y="1560" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="956" y="1578" font-size="11" fill="#444">min_call</text>
+<text x="956" y="1594" font-size="10" fill="#777">value={min_call} + 1</text>
+</g>
+<g><title>node_variable_set
+value = {min_alarm} + 1</title>
+<rect x="940" y="1648" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="940" y="1648" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="956" y="1670" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="956" y="1688" font-size="11" fill="#444">min_alarm</text>
+<text x="956" y="1704" font-size="10" fill="#777">value={min_alarm} + 1</text>
+</g>
+<g><title>node_cron_event
+</title>
+<rect x="40" y="1812" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="1812" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="1834" font-size="13" font-weight="700" fill="#222">cron_event</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="340" y="1812" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="340" y="1812" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="356" y="1834" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="356" y="1852" font-size="11" fill="#444">NEW_SHIFT</text>
+<text x="356" y="1868" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_cron_event
+</title>
+<rect x="40" y="1922" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="1922" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="1944" font-size="13" font-weight="700" fill="#222">cron_event</text>
+</g>
+<g><title>node_command_trigger
+data = </title>
+<rect x="340" y="1922" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="340" y="1922" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="356" y="1944" font-size="13" font-weight="700" fill="#222">command_trigger</text>
+<text x="356" y="1962" font-size="11" fill="#444">NEW_SHIFT</text>
+<text x="356" y="1978" font-size="10" fill="#777">data=</text>
+</g>
+<g><title>node_command_triggered
+</title>
+<rect x="40" y="2052" width="200" height="64" rx="8" fill="#fff" stroke="#2F8FE3" stroke-width="2"/>
+<rect x="40" y="2052" width="8" height="64" rx="4" fill="#2F8FE3"/>
+<text x="56" y="2074" font-size="13" font-weight="700" fill="#222">command_triggered</text>
+<text x="56" y="2092" font-size="11" fill="#444">NEW_SHIFT</text>
+</g>
+<g><title>node_variable_set
+value = {parts}</title>
+<rect x="340" y="2052" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="340" y="2052" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="356" y="2074" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="356" y="2092" font-size="11" fill="#444">LPART</text>
+<text x="356" y="2108" font-size="10" fill="#777">value={parts}</text>
+</g>
+<g><title>node_variable_set
+value = {stops}</title>
+<rect x="640" y="2052" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="640" y="2052" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="656" y="2074" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="656" y="2092" font-size="11" fill="#444">LSTOP</text>
+<text x="656" y="2108" font-size="10" fill="#777">value={stops}</text>
+</g>
+<g><title>node_variable_set
+value = {min_run}</title>
+<rect x="940" y="2052" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="940" y="2052" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="956" y="2074" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="956" y="2092" font-size="11" fill="#444">LRUN</text>
+<text x="956" y="2108" font-size="10" fill="#777">value={min_run}</text>
+</g>
+<g><title>node_variable_set
+value = {min_call}</title>
+<rect x="1240" y="2052" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1240" y="2052" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1256" y="2074" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1256" y="2092" font-size="11" fill="#444">LCALL</text>
+<text x="1256" y="2108" font-size="10" fill="#777">value={min_call}</text>
+</g>
+<g><title>node_variable_set
+value = {min_alarm}</title>
+<rect x="1540" y="2052" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1540" y="2052" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1556" y="2074" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1556" y="2092" font-size="11" fill="#444">LALRM</text>
+<text x="1556" y="2108" font-size="10" fill="#777">value={min_alarm}</text>
+</g>
+<g><title>node_variable_set
+value = 0</title>
+<rect x="340" y="2162" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="340" y="2162" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="356" y="2184" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="356" y="2202" font-size="11" fill="#444">parts</text>
+<text x="356" y="2218" font-size="10" fill="#777">value=0</text>
+</g>
+<g><title>node_variable_set
+value = 0</title>
+<rect x="640" y="2162" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="640" y="2162" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="656" y="2184" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="656" y="2202" font-size="11" fill="#444">stops</text>
+<text x="656" y="2218" font-size="10" fill="#777">value=0</text>
+</g>
+<g><title>node_variable_set
+value = 0</title>
+<rect x="940" y="2162" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="940" y="2162" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="956" y="2184" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="956" y="2202" font-size="11" fill="#444">min_run</text>
+<text x="956" y="2218" font-size="10" fill="#777">value=0</text>
+</g>
+<g><title>node_variable_set
+value = 0</title>
+<rect x="1240" y="2162" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1240" y="2162" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1256" y="2184" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1256" y="2202" font-size="11" fill="#444">min_call</text>
+<text x="1256" y="2218" font-size="10" fill="#777">value=0</text>
+</g>
+<g><title>node_variable_set
+value = 0</title>
+<rect x="1540" y="2162" width="200" height="64" rx="8" fill="#fff" stroke="#16A085" stroke-width="2"/>
+<rect x="1540" y="2162" width="8" height="64" rx="4" fill="#16A085"/>
+<text x="1556" y="2184" font-size="13" font-weight="700" fill="#222">variable_set</text>
+<text x="1556" y="2202" font-size="11" fill="#444">min_alarm</text>
+<text x="1556" y="2218" font-size="10" fill="#777">value=0</text>
+</g>
+<rect x="2120" y="28" width="12" height="12" fill="#2F8FE3"/><text x="2137" y="39" font-size="12" fill="#333">события</text>
+<rect x="2212" y="28" width="12" height="12" fill="#9B59B6"/><text x="2229" y="39" font-size="12" fill="#333">логика</text>
+<rect x="2304" y="28" width="12" height="12" fill="#16A085"/><text x="2321" y="39" font-size="12" fill="#333">данные</text>
+<rect x="2396" y="28" width="12" height="12" fill="#C0392B"/><text x="2413" y="39" font-size="12" fill="#333">связь</text>
+<rect x="2488" y="28" width="12" height="12" fill="#E67E22"/><text x="2505" y="39" font-size="12" fill="#333">индикация</text>
+<rect x="2580" y="28" width="12" height="12" fill="#5B6770"/><text x="2597" y="39" font-size="12" fill="#333">система</text>
+</svg>

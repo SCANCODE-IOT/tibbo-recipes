@@ -1,0 +1,229 @@
+include "global.tbh"
+
+'****BOOT_DIMS****'
+
+sub boot()
+'****boot****'
+
+    'Fd(flash disk) setup
+    '================================================================
+    if fd.mount<>PL_FD_STATUS_OK then
+        dim fd_size as dword = fd.availableflashspace/4*3
+        if fd.formatj(fd_size,32,100)<>PL_FD_STATUS_OK then
+            sys.debugprint("fd.formatj failed")
+            sys.halt
+        end if
+    
+        if fd.mount<>PL_FD_STATUS_OK then
+            sys.debugprint("fd.mount failed")
+            sys.halt
+        end if
+        if fd.totalsize < fd_size then
+            sys.debugprint("fd.mount failed")
+            sys.halt
+        end if
+    end if
+    '-----------------------------------------------------------------
+
+    'Setting Library Initialization
+    '================================================================
+    dim stg_init_code as en_stg_status_codes
+    dim stg_name as string(STG_MAX_SETTING_NAME_LEN)
+    if stg_start()<>EN_STG_STATUS_OK then 
+        pat.play("R-R-~",PL_PAT_CANINT)
+        sys.debugprint("stg_start failed")
+        sys.halt
+    end if
+    stg_init_code=stg_check_all(stg_name)
+    select case stg_init_code
+    case EN_STG_STATUS_OK:
+    '--- all good ---
+    case EN_STG_STATUS_INVALID, EN_STG_STATUS_FAILURE:
+        sys.debugprint("Settings initialization failed, restoring default values")
+        if stg_restore_multiple(EN_STG_INIT_MODE_NORMAL)<>EN_STG_STATUS_OK then 
+            pat.play("R-R-~",PL_PAT_CANINT)
+            sys.debugprint("stg_restore_multiple failed")
+            sys.halt
+        end if
+    case else:
+        'some other trouble
+        pat.play("R-R-~",PL_PAT_CANINT)
+        sys.debugprint("stg_check_all failed")
+        sys.halt
+    end select
+    '-----------------------------------------------------------------
+NETNM=stg_get("NETNM",0)
+NETGW=stg_get("NETGW",0)
+TZONE=stg_get("TZONE",0)
+NETCP=string_to_float(stg_get("NETCP",0))
+NETIP=stg_get("NETIP",0)
+WBPWD=stg_get("WBPWD",0)
+LPART=string_to_float(stg_get("LPART",0))
+LSTOP=string_to_float(stg_get("LSTOP",0))
+LRUN=string_to_float(stg_get("LRUN",0))
+LCALL=string_to_float(stg_get("LCALL",0))
+LALRM=string_to_float(stg_get("LALRM",0))
+
+    ' Set the timezone to UTC+03:00
+    APP_TIMEZONE=TZONE
+    datetime_tz_offset=APP_TIMEZONE
+    APP_LATITUDE=0
+    datetime_lat=APP_LATITUDE
+    APP_LONGITUDE=0
+    datetime_lng=APP_LONGITUDE
+current_interface = PL_SOCK_INTERFACE_NULL
+    sys.onsystimerperiod=1
+    #IF SYS_VER <> 1000 AND WATCHDOG_ENABLED
+        sys.wdenabled=YES
+        sys.wdautoreset=DISABLED
+        sys.wdperiod=1000
+    #ENDIF
+
+    dim f as byte
+    for f=0 to MAX_NUM_INTERFACES-1
+        interface_ready(f)=NO
+    next f
+
+    beep.divider = 11111
+
+#if SIGNAL_STRENGTH_INDICATION
+    signal_strength_indication_init()
+    signal_strength_set(0) 'this will turn all 5 LEDs OFF
+#endif
+
+    'Ethernet setup
+    '================================================================
+    device_net_ip = NETIP
+    device_net_mask = NETNM
+    device_net_gateway = NETGW
+    
+    dim dhcp_enabled as string(1) = NETCP
+
+    if dhcp_enabled = "1" then
+        net_dhcp_enabled = true
+    else
+        net_dhcp_enabled = false
+    end if
+    
+
+    if net_dhcp_enabled = false then
+        net.ip=device_net_ip
+        net.netmask=device_net_mask
+        net.gatewayip=device_net_gateway
+    else
+        'ethernet dhcp
+        dhcp_start(PL_SOCK_INTERFACE_NET,device_net_ip,"")
+    end if
+    '-----------------------------------------------------------------
+	var_poll_timer = 1000
+
+    'SNTP setup
+    '================================================================
+    SNTP_socket=sock_get("NTP")
+    sntp_init()
+    SNTP_SERVER="162.159.200.1"
+    '-----------------------------------------------------------------
+
+    crons(0).next_timestamp=0 'initialize to not set
+    crons(0).minute=0
+    crons(0).hour=0
+    crons(0).day=8
+    crons(0).month=255
+    crons(0).day_of_week=255
+    crons(0).astro=255
+
+    crons(1).next_timestamp=0 'initialize to not set
+    crons(1).minute=0
+    crons(1).hour=0
+    crons(1).day=20
+    crons(1).month=255
+    crons(1).day_of_week=255
+    crons(1).astro=255
+
+    datetime_timer_offset=datetime_current_timestamp() - sys.timercountms/1000
+
+    'DNS setup
+    '================================================================
+    DNS_socket=sock_get("DNS")
+    dns_start(DNS_socket)
+    'Making a DNS query:
+    'dns_connect(PL_SOCK_INTERFACE_NET, "8.8.4.4",0)
+    'dns_query("google.com")
+    'get the response in callback_dns_answer_acquired
+    '-----------------------------------------------------------------
+
+http_server_password = WBPWD
+
+    'Modbus Setup
+    '==================================
+    modbus_initialize()
+    '****modbus_setup****'
+    '----------------------------------
+                        
+    
+    'Tibbit Tibbit 06 setup on socket 1
+    io.num=lamp_green_num
+    io.enabled=YES
+    io.state=HIGH
+                        
+    
+    io.num=lamp_yellow_num
+    io.enabled=YES
+    io.state=HIGH
+                        
+    
+    'Tibbit Tibbit 06 setup on socket 5
+    io.num=lamp_red_num
+    io.enabled=YES
+    io.state=HIGH
+                        
+    
+    io.num=horn_num
+    io.enabled=YES
+    io.state=HIGH
+
+    'Tibbit 54 with tibbit button input mode on socket 10
+    io.num=S9_btn_run_Button
+    io.enabled=NO
+
+    'Tibbit 54 with tibbit button input mode on socket 10
+    io.num=S9_btn_call_Button
+    io.enabled=NO
+
+    'Tibbit 54 with tibbit button input mode on socket 10
+    io.num=S9_btn_alarm_Button
+    io.enabled=NO
+
+    'Tibbit 54 with tibbit button input mode on socket 10
+    io.num=S9_cycle_Button
+    io.enabled=NO
+	timer_60s_mw9uwvc4v6wv0tk_timer = 60 * 1000 / sys.onsystimerperiod / 10
+
+'****boot_complete****'
+
+TIOS_VERSION=mid(sys.version, 2,len(sys.version) - 2)
+
+
+#IF SYS_VER <> 1000 AND PLATFORM_ID<>EM510W
+if sys.extresettype=PL_SYS_EXT_RESET_TYPE_WATCHDOG then
+    sys.debugprint("System reset by watchdog\r\n")
+else if sys.extresettype=PL_SYS_EXT_RESET_TYPE_BROWNOUT then
+    sys.debugprint("System reset by brownout\r\n")
+end if
+#ENDIF
+
+
+    pat.play("B-B-B-",PL_PAT_CANINT)
+
+if net.linkstate<>PL_NET_LINKSTAT_NOLINK AND net_dhcp_enabled = false then
+    interface_set(PL_SOCK_INTERFACE_NET,YES)
+end if
+
+    kp.returnlinesmapping="32,33,4,20"
+    kp.releasedelay=3
+    kp.enabled=YES
+'****mruc1kwub9esrimd9d_boot****'
+cmd_APPLY("")
+            
+
+end sub

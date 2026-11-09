@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Стенд Tibbo - ИИ без интернета</title>
+<style>
+:root{--bg:#0F1410;--panel:#171E19;--panel2:#1D2620;--line:#2A352E;--ink:#F3EFE6;--ink2:#B9C3BC;--muted:#7F8E85;
+--brand:#EC6C2E;--brand2:#FF9A62;--ok:#4ED38A;--warn:#F2B544;--bad:#FF6B5E;--blue:#4D8DFF;--r:14px;
+--f:"IBM Plex Sans","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--m:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--f)}
+body{min-height:100vh;display:flex;flex-direction:column;
+background:radial-gradient(900px 500px at 100% -10%,#ec6c2e2a,transparent 70%),radial-gradient(700px 500px at -10% 110%,#4d8dff14,transparent 70%),var(--bg)}
+button,input,textarea{font:inherit;color:inherit}
+header{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:16px 24px;border-bottom:1px solid var(--line)}
+.logo{font-weight:700;font-size:22px;letter-spacing:-.01em}.logo b{color:var(--brand)}
+.sub{color:var(--ink2);font-size:14px}
+.pills{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border:1px solid var(--line);border-radius:99px;font-size:13px;color:var(--ink2);background:var(--panel)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}.dot.ok{background:var(--ok);box-shadow:0 0 10px var(--ok)}.dot.bad{background:var(--bad)}.dot.warn{background:var(--warn)}
+main{flex:1;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(360px,1fr);gap:18px;padding:18px 24px 24px;min-height:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+/* чат */
+.chat{display:flex;flex-direction:column;min-height:560px;max-height:calc(100vh - 110px)}
+.chat-h{display:flex;align-items:baseline;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.chat-h h1{font-size:20px;margin:0}.chat-h span{color:var(--muted);font-size:13px}
+.msgs{flex:1;overflow:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+.msg{max-width:86%;padding:11px 15px;border-radius:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.u{align-self:flex-end;background:var(--brand);color:#fff;border-bottom-right-radius:4px}
+.msg.a{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px;font-size:17px}
+.msg.e{align-self:flex-start;background:#3a1d1a;border:1px solid #6b2d27;color:#ffd2cc}
+.msg small{display:block;margin-top:6px;color:var(--muted);font-size:12px}
+.tool{min-width:0;flex-wrap:wrap;align-self:flex-start;display:flex;gap:8px;align-items:center;font:13px/1.4 var(--m);color:var(--ink2);padding:6px 10px;border:1px dashed var(--line);border-radius:9px;max-width:92%}
+.tool b{color:var(--brand2);font-weight:600}.tool.err b{color:var(--bad)}
+.tool .r{color:var(--ok);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.tool.err .r{color:var(--bad)}
+.think{align-self:flex-start;color:var(--muted);font-size:14px;display:flex;gap:8px;align-items:center}
+.think i{width:7px;height:7px;border-radius:50%;background:var(--brand);animation:b 1s infinite alternate}.think i:nth-child(2){animation-delay:.2s}.think i:nth-child(3){animation-delay:.4s}
+@keyframes b{to{opacity:.2;transform:translateY(-3px)}}
+.board-pic{align-self:stretch;background:#fff;border-radius:12px;padding:10px}.board-pic img{width:100%;height:auto;display:block}
+.sugg{display:flex;gap:8px;padding:2px 20px 12px;overflow-x:auto;scrollbar-width:thin}
+.sugg button{flex:0 0 auto;white-space:nowrap;background:transparent;border:1px solid var(--line);color:var(--ink2);padding:7px 12px;border-radius:99px;font-size:14px;cursor:pointer;text-align:left}
+.sugg button:hover{border-color:var(--brand);color:var(--ink)}
+form{display:flex;gap:10px;padding:14px 20px 18px;border-top:1px solid var(--line)}
+textarea{flex:1;resize:none;min-height:52px;max-height:160px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px 15px;outline:none}
+textarea:focus{border-color:var(--brand)}
+.send{background:var(--brand);border:0;border-radius:12px;padding:0 22px;font-weight:600;color:#fff;cursor:pointer;min-width:120px}
+.send:disabled{opacity:.45;cursor:default}
+/* правая колонка */
+.side{display:flex;flex-direction:column;gap:18px;min-height:0;max-height:calc(100vh - 110px);overflow:auto}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px}
+.tile{min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-height:96px;position:relative;overflow:hidden}
+.tile .k{font:12px var(--m);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tile .v{font-size:30px;font-weight:700;letter-spacing:-.02em;margin-top:4px;line-height:1.15}
+.tile .v small{font-size:15px;color:var(--ink2);font-weight:500;margin-left:3px}
+.tile .n{font-size:12px;color:var(--muted);margin-top:2px}
+.tile.flash{animation:fl 1s}@keyframes fl{from{border-color:var(--brand);box-shadow:0 0 0 3px #ec6c2e55}}
+.tile.wide{grid-column:1/-1}
+.states{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.st{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;border-radius:9px;background:var(--bg);border:1px solid var(--line);font-size:14px}
+.st.on{border-color:#2f6b49;color:#c9f5dc}.st.on .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.leds{display:flex;gap:10px;margin-top:10px}
+.led{width:26px;height:26px;border-radius:50%;background:#18233a;border:1px solid #2a3a5c}
+.led.on{background:radial-gradient(circle at 40% 35%,#cfe0ff,#4d8dff 45%,#1f4fbf);box-shadow:0 0 16px #4d8dffcc;border-color:#7fb0ff}
+canvas{width:100%;height:46px;display:block;margin-top:6px}
+.sec-h{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0}
+.sec-h h2{font-size:15px;margin:0;color:var(--ink2);font-weight:600}
+.log{list-style:none;margin:0;padding:10px 16px 16px;display:flex;flex-direction:column;gap:6px;font:13px/1.45 var(--m)}
+.log li{display:grid;grid-template-columns:62px 1fr;gap:8px;padding:6px 0;border-bottom:1px solid #222b25}
+.log .t{color:var(--muted)}.log .nm{color:var(--brand2)}.log .src{color:var(--muted)}.log .res{color:var(--ink2);overflow-wrap:anywhere}
+.log li.err .res{color:var(--bad)}.log li.ev .nm{color:var(--blue)}
+.empty{color:var(--muted);font:14px var(--f);padding:6px 0}
+.staff{padding:12px 16px 16px;display:flex;gap:8px;flex-wrap:wrap}
+.staff button{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 11px;cursor:pointer;font-size:14px}
+.staff button:hover{border-color:var(--brand)}
+.staff .on{border-color:var(--warn);color:var(--warn)}
+.banner{display:none;margin:0 24px;padding:10px 14px;border-radius:10px;background:#3a2a10;border:1px solid #7a5a1c;color:#ffe2a8;font-size:14px}
+.banner.show{display:block}
+@media (max-width:980px){main{grid-template-columns:minmax(0,1fr);padding:12px}.chat,.side{max-height:none}.chat{min-height:70vh}header{padding:12px}.pills{margin-left:0}.banner{margin:0 12px}}
+@media (max-width:520px){.chat-h{flex-direction:column;gap:2px}.tiles{grid-template-columns:1fr}.msg{max-width:94%}.send{min-width:0;padding:0 16px}.tile .v{font-size:26px}}
+@media (min-width:2000px){html,body{font-size:18px}.msg.a{font-size:20px}.tile .v{font-size:38px}main{grid-template-columns:minmax(0,1.5fr) minmax(460px,1fr)}}
+</style>
+</head>
+<body>
+<header>
+  <div><div class="logo"><b>Tibbo</b> · Сканкод</div><div class="sub">Linux-контроллер LTPP3(G2), которым управляет ИИ</div></div>
+  <div class="pills">
+    <span class="pill"><span class="dot" id="d-llm"></span><span id="p-llm">Нейросеть…</span></span>
+    <span class="pill"><span class="dot ok" id="d-board"></span><span id="p-board">Плата…</span></span>
+    <span class="pill" id="p-net"><span class="dot ok"></span><span>Интернет не нужен</span></span>
+  </div>
+</header>
+<div class="banner" id="banner"></div>
+<main>
+  <section class="card chat">
+    <div class="chat-h"><h1>Спросите стенд</h1><span>нейросеть сама вызывает датчики и реле на плате</span></div>
+    <div class="msgs" id="msgs">
+      <div class="msg a">Здравствуйте! Я ИИ этого стенда и управляю настоящим контроллером Tibbo. Спросите про температуру в шкафу, попросите включить лампу, задайте правило «если …, то …» или дайте проверить вашу плату Tibbo.</div>
+    </div>
+    <div class="sugg" id="sugg">
+      <button>Какая сейчас температура и влажность?</button>
+      <button>Включи лампу на 30 секунд и скажи, насколько стало светлее</button>
+      <button>Покажи на светодиодах, насколько светло вокруг</button>
+      <button>По коробке стучали? Что вообще происходило на стенде?</button>
+      <button>Проверь плату: TPP3W(G2), в S1 источник #10, в S2 разъём #18, питание 24 В</button>
+      <button>Проверь код: sub on_sys_init() sock.conect end sub</button>
+      <button>Если дверь шкафа открыта дольше 10 секунд - включай лампу на минуту</button>
+    </div>
+    <form id="f"><textarea id="q" placeholder="Напишите вопрос…" rows="1"></textarea><button class="send" id="send">Спросить</button></form>
+  </section>
+  <aside class="side">
+    <section class="card">
+      <div class="sec-h"><h2>Плата сейчас</h2><span class="sub" id="upd"></span></div>
+      <div class="tiles">
+        <div class="tile" id="t-temp"><div class="k">Температура · #30</div><div class="v" id="v-temp">-</div><div class="n" id="v-hum">влажность -</div></div>
+        <div class="tile" id="t-light"><div class="k">Свет · #28</div><div class="v" id="v-light">-</div><div class="n">примерно, по даташиту</div></div>
+        <div class="tile wide" id="t-motion"><div class="k">Удары и наклон · #36</div><div class="n" id="v-motion">-</div><canvas id="spark" width="600" height="92"></canvas></div>
+        <div class="tile" id="t-relays"><div class="k">Реле · #03</div><div class="states" id="v-relays"></div></div>
+        <div class="tile" id="t-inputs"><div class="k">Входы · #54</div><div class="states" id="v-inputs"></div></div>
+        <div class="tile wide" id="t-leds"><div class="k">Синие светодиоды платы</div><div class="leds" id="v-leds"></div><div class="n" id="v-sys"></div></div>
+      </div>
+    </section>
+    <section class="card">
+      <div class="sec-h"><h2>Правила платы</h2><span class="sub">выполняются без нейросети</span></div>
+      <ul class="log" id="rules"><li class="empty" style="display:block;border:0">Правил нет. Скажите ИИ: «если …, то …».</li></ul>
+    </section>
+    <section class="card">
+      <div class="sec-h"><h2>Что делает ИИ</h2><span class="sub">вызовы инструментов MCP</span></div>
+      <ul class="log" id="log"><li class="empty" style="display:block;border:0">Пока тихо. Задайте вопрос - здесь появятся вызовы.</li></ul>
+    </section>
+    <section class="card" id="staffbox" hidden>
+      <div class="sec-h"><h2 id="staff-h">Управление стендом</h2></div>
+      <div class="staff" id="staff"></div>
+    </section>
+  </aside>
+</main>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const params=new URLSearchParams(location.search);const staff=params.has('staff');
+let history=[],busy=false,thinkEl=null,thinkT=0,meta={relays:[],inputs:[]},board='',spark=[];
+const msgs=$('#msgs'),q=$('#q'),send=$('#send');
+const scroll=()=>{msgs.scrollTop=msgs.scrollHeight};
+function add(cls,html){const d=document.createElement('div');d.className=cls;d.innerHTML=html;msgs.appendChild(d);scroll();return d}
+function thinking(on){if(on&&!thinkEl){thinkT=Date.now();thinkEl=add('think','<i></i><i></i><i></i><span>Нейросеть думает…</span>');}
+ else if(!on&&thinkEl){thinkEl.remove();thinkEl=null}}
+function setBusy(b){busy=b;send.disabled=b;q.disabled=b;thinking(b)}
+const TN={stand_status:'состояние стенда',read_climate:'температура',read_light:'свет',read_motion:'акселерометр',read_inputs:'входы',
+ recent_events:'события',set_relay:'реле',set_leds:'светодиоды',check_tps_config:'проверка платы',find_tibbit:'поиск Tibbit',lint_tibbo_code:'проверка кода',
+ create_rule:'новое правило',list_rules:'правила',delete_rule:'удалить правило',fleet_status:'флот: сводка',fleet_call:'флот: вызов'};
+let curBackend=null;
+function short(o){if(o==null)return'';if(typeof o!=='object')return String(o);
+ if(o.error)return o.error;if(o.message)return o.message;
+ if('temperature_c'in o)return o.temperature_c+' °C, '+o.humidity_pct+' %';
+ if('approx_lux'in o)return'≈'+o.approx_lux+' лк';
+ if('tilt_deg'in o)return'наклон '+o.tilt_deg+'°, пик '+o.peak_since_last_read_g+' g';
+ if('findings'in o&&'errors'in o)return o.errors?('ошибок: '+o.errors):'ошибок нет';
+ if('findings'in o)return(o.ok?'ошибок нет':'найдены ошибки: '+o.findings.filter(f=>f.level==='error').length);
+ if('leds'in o)return o.leds;if(o.events)return o.events.length+' событий';
+ if(o.rule)return'правило №'+o.rule.id+': '+o.rule.name;if(o.rules)return o.rules.length+' правил';if(o.boards)return o.boards.filter(b=>b.online).length+' из '+o.boards.length+' площадок на связи';
+ if(o.board&&o.tool)return o.board+' → '+short(o.result);
+ const s=JSON.stringify(o);return s.length>90?s.slice(0,90)+'…':s}
+function args(a){if(!a||!Object.keys(a).length)return'';const s=JSON.stringify(a);return s.length>70?s.slice(0,70)+'…':s}
+function tm(t){const d=new Date(t*1000);return d.toTimeString().slice(0,8)}
+function logItem(cls,t,name,src,res){const ul=$('#log');const e=ul.querySelector('.empty');if(e)e.remove();
+ const li=document.createElement('li');li.className=cls;li.innerHTML='<span class="t">'+tm(t)+'</span><span><span class="nm">'+esc(name)+'</span> <span class="src">'+esc(src)+'</span><br><span class="res">'+esc(res)+'</span></span>';
+ ul.insertBefore(li,ul.firstChild);while(ul.children.length>40)ul.lastChild.remove()}
+function flash(id){const el=document.getElementById(id);if(!el)return;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}
+const TILE={read_climate:'t-temp',read_light:'t-light',read_motion:'t-motion',read_inputs:'t-inputs',set_relay:'t-relays',set_leds:'t-leds'};
+// --- чат
+function onChat(m){const k=m.kind,d=m.data;
+ if(k==='backend'){curBackend=d;if(thinkEl)thinkEl.querySelector('span').textContent=(d.local?'Локальная нейросеть ':'Облачная нейросеть ')+d.model+' думает…';return}
+ if(k==='user'){add('msg u',esc(d.text));history.push({role:'user',content:d.text});setBusy(true)}
+ else if(k==='call'){thinking(false);add('tool','<span>⚙</span><b>'+esc(TN[d.tool]||d.tool)+'</b><span>'+esc(args(d.args))+'</span>');thinking(true);flash(TILE[d.tool])}
+ else if(k==='result'){thinking(false);const last=[...msgs.querySelectorAll('.tool')].pop();if(last){last.classList.toggle('err',!!d.error);last.insertAdjacentHTML('beforeend','<span class="r">→ '+esc(short(d.result))+'</span>')}thinking(true)}
+ else if(k==='text'){setBusy(false);add('msg a',esc(d.text)+'<small>ответ за '+d.seconds+' с · '+esc(d.model||'')+(d.local?' · локально, без интернета':' · облако')+'</small>');history.push({role:'assistant',content:d.text})}
+ else if(k==='error'){setBusy(false);add('msg e',esc(d.error))}}
+async function ask(text){text=text.trim();if(!text||busy)return;q.value='';autosize();
+ const h=history.concat([{role:'user',content:text}]);
+ try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({history:h})});
+  if(!r.ok){const j=await r.json().catch(()=>({}));add('msg e',esc(j.error||('ошибка '+r.status)));return}
+  const rd=r.body.getReader();while(true){const x=await rd.read();if(x.done)break}
+ }catch(e){add('msg e','Нет связи с платой: '+esc(e.message));setBusy(false)}}
+$('#f').addEventListener('submit',e=>{e.preventDefault();ask(q.value)});
+q.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask(q.value)}});
+function autosize(){q.style.height='auto';q.style.height=Math.min(160,q.scrollHeight)+'px'}q.addEventListener('input',autosize);
+$('#sugg').addEventListener('click',e=>{if(e.target.tagName==='BUTTON')ask(e.target.textContent)});
+// --- состояние
+function draw(){const c=$('#spark'),x=c.getContext('2d');const w=c.width,h=c.height;x.clearRect(0,0,w,h);
+ x.strokeStyle='#2A352E';x.beginPath();x.moveTo(0,h-1);x.lineTo(w,h-1);x.stroke();
+ if(spark.length<2)return;const mx=Math.max(1.5,...spark);x.strokeStyle='#FF9A62';x.lineWidth=2.5;x.beginPath();
+ spark.forEach((v,i)=>{const px=i*(w/(120-1)),py=h-4-(v/mx)*(h-10);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke()}
+function onState(s){if(!s||!s.t)return;
+ if(s.climate){$('#v-temp').innerHTML=s.climate.temperature_c.toFixed(1)+'<small>°C</small>';$('#v-hum').textContent='влажность '+s.climate.humidity_pct.toFixed(0)+' %'}
+ if(s.light){$('#v-light').innerHTML=Math.round(s.light.raw/1.2)+'<small>лк</small>'}
+ if(s.accel){const a=s.accel,g=Math.sqrt(a.x_mg**2+a.y_mg**2+a.z_mg**2);const dev=Math.abs(g-1000)/1000;spark.push(dev);if(spark.length>120)spark.shift();
+  const tilt=Math.acos(Math.max(-1,Math.min(1,a.z_mg/(g||1))))*180/Math.PI;$('#v-motion').textContent='наклон '+tilt.toFixed(0)+'° · встряска '+dev.toFixed(2)+' g';draw()}
+ if(s.relays){$('#v-relays').innerHTML=meta.relays.map(r=>'<span class="st'+(s.relays[r.name]?' on':'')+'"><span class="dot"></span>'+esc(r.title)+'</span>').join('')||'<span class="n">не настроены</span>'}
+ if(s.inputs){$('#v-inputs').innerHTML=meta.inputs.map(r=>'<span class="st'+(s.inputs[r.name]?' on':'')+'"><span class="dot"></span>'+esc(r.title)+'</span>').join('')||'<span class="n">не настроены</span>'}
+ if(s.leds){$('#v-leds').innerHTML=s.leds.map(l=>'<span class="led'+(l?' on':'')+'"></span>').join('')}
+ if(s.system){const y=s.system;$('#v-sys').textContent='процессор '+(y.cpu_temp_c!=null?y.cpu_temp_c+' °C':'-')+(y.uptime_s!=null?' · работает '+Math.floor(y.uptime_s/3600)+' ч '+Math.floor(y.uptime_s%3600/60)+' мин':'')}
+ const ban=$('#banner');const notes=[];if(s.estop)notes.push('Нажата аварийная кнопка: нагрузка отключена.');if(s.read_only)notes.push('Режим «только чтение»: ИИ видит датчики, но не включает нагрузку.');
+ const errs=Object.entries(s.errors||{});if(errs.length&&staff)notes.push('Проблемы железа: '+errs.map(e=>e[0]+' - '+e[1]).join('; '));
+ ban.textContent=notes.join(' ');ban.classList.toggle('show',notes.length>0);
+ $('#upd').textContent='обновлено '+tm(s.t);renderStaff(s)}
+function renderStaff(s){if(!staff&&board!=='sim')return;const box=$('#staffbox');box.hidden=false;
+ const b=[];if(board==='sim'){$('#staff-h').textContent=staff?'Управление стендом и эмулятор':'Эмулятор платы';
+  b.push('<button data-sim="knock" data-v="2.5">Постучать по коробке</button>');
+  meta.inputs.forEach(i=>b.push('<button data-sim="'+esc(i.name)+'" data-v="'+(s.inputs&&s.inputs[i.name]?0:1)+'" class="'+(s.inputs&&s.inputs[i.name]?'on':'')+'">'+esc(i.title)+(s.inputs&&s.inputs[i.name]?': отпустить':': нажать / открыть')+'</button>'));
+  b.push('<button data-sim="estop" data-v="'+(s.estop?0:1)+'" class="'+(s.estop?'on':'')+'">Аварийная кнопка</button>')}
+ if(staff){b.push('<button data-ro="'+(s.read_only?0:1)+'" class="'+(s.read_only?'on':'')+'">Только чтение: '+(s.read_only?'вкл':'выкл')+'</button>');
+  meta.relays.forEach(r=>b.push('<button data-relay="'+esc(r.name)+'" data-v="'+(s.relays&&s.relays[r.name]?0:1)+'">'+esc(r.title)+': '+(s.relays&&s.relays[r.name]?'выключить':'включить на 30 с')+'</button>'))}
+ const html=b.join('');if($('#staff').innerHTML!==html)$('#staff').innerHTML=html}
+$('#staff').addEventListener('click',async e=>{const t=e.target.closest('button');if(!t)return;let url,body;
+ if(t.dataset.sim){url='/api/sim';body={what:t.dataset.sim,value:+t.dataset.v}}
+ else if(t.dataset.ro){url='/api/safety';body={read_only:t.dataset.ro==='1'}}
+ else if(t.dataset.relay){url='/api/relay';body={name:t.dataset.relay,on:t.dataset.v==='1',duration_s:30}}
+ const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+ if(!r.ok){const j=await r.json().catch(()=>({}));alertBox(j.error||'ошибка')}});
+function renderRules(list){const ul=$('#rules');if(!list||!list.length){ul.innerHTML='<li class="empty" style="display:block;border:0">Правил нет. Скажите ИИ: «если …, то …».</li>';return}
+ ul.innerHTML=list.map(r=>{const w=r.when;const acts=r.then.map(a=>a.do==='relay'?(a.name+(a.on===false?' выкл':' на '+a.duration_s+' с')):a.do==='leds'?('светодиоды '+(a.pattern||a.level)):('«'+a.text+'»')).join(', ');
+  return '<li><span class="t">№'+r.id+'</span><span><span class="nm">'+esc(r.name)+'</span><br><span class="res">если '+esc(w.signal+' '+w.op+' '+w.value)+(w.for_s?' дольше '+w.for_s+' с':'')+' → '+esc(acts)+' · сработало '+(r.fired_count||0)+'</span></span></li>'}).join('')}
+async function loadRules(){try{renderRules((await (await fetch('/api/rules')).json()).rules)}catch(e){}}
+function alertBox(t){const ban=$('#banner');ban.textContent=t;ban.classList.add('show');setTimeout(()=>ban.classList.remove('show'),4000)}
+function onSvg(d){if(!d||!d.svg)return;const url=URL.createObjectURL(new Blob([d.svg],{type:'image/svg+xml'}));
+ thinking(false);const pic=add('board-pic','<img alt="Плата TPS после проверки" src="'+url+'">');pic.querySelector('img').onload=scroll;if(busy)thinking(true)}
+async function init(){try{const s=await (await fetch('/api/state')).json();meta={relays:s.relays_meta||[],inputs:s.inputs_meta||[]};board=s.board;
+  $('#p-board').textContent=board==='sim'?'Плата: эмулятор':'Плата: LTPP3(G2)';$('#d-board').className='dot '+(board==='sim'?'warn':'ok');onState(s)}catch(e){}
+ health();setInterval(health,20000);loadRules();
+ const es=new EventSource('/api/events');
+ es.addEventListener('state',e=>onState(JSON.parse(e.data)));
+ es.addEventListener('chat',e=>onChat(JSON.parse(e.data)));
+ es.addEventListener('rules',e=>renderRules(JSON.parse(e.data)));
+ es.addEventListener('svg',e=>onSvg(JSON.parse(e.data)));
+ es.addEventListener('call',e=>{const c=JSON.parse(e.data);logItem(c.error?'err':'',c.t,TN[c.tool]||c.tool,c.source.indexOf('llm:')===0?'· нейросеть стенда':(c.source==='mcp-internet'?'· клиент из интернета':'· внешний MCP-клиент'),short(c.result))});
+ es.addEventListener('event',e=>{const v=JSON.parse(e.data);logItem('ev',v.t,'событие','',v.text);if(v.kind==='rule')loadRules();if(v.kind==='shock')flash('t-motion');if(v.kind==='input')flash('t-inputs')});
+ es.onerror=()=>{$('#d-board').className='dot bad'}; es.onopen=()=>{$('#d-board').className='dot '+(board==='sim'?'warn':'ok')}}
+async function health(){try{const h=await (await fetch('/api/health')).json();const l=h.llm;
+  $('#p-llm').textContent='Нейросеть: '+l.model+(l.local?' (локально)':' (облако)')+(l.ok?(l.available?'':' - не готова'):' - нет связи')+((l.chain||[]).length>1?' + запасная':'');
+  $('#p-net span:last-child').textContent=l.local?'Интернет не нужен':((l.chain||[]).some(x=>x.local)?'Пропал интернет - ответит локальная модель':'Нужен интернет');
+  $('#d-llm').className='dot '+(l.ok&&l.available?'ok':(l.ok?'warn':'bad'))}catch(e){$('#d-llm').className='dot bad'}}
+init();
+})();
+</script>
+</body>
+</html>

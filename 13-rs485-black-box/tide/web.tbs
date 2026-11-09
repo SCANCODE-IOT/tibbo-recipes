@@ -1,0 +1,57 @@
+'=====================================================================
+' Веб: разбор запроса, вывод по частям, шестнадцатеричный вид кадра
+'=====================================================================
+include "global.tbh"
+
+function web_arg(byref rq as string, byref argname as string) as string
+	dim key as string(16)
+	dim i, j as byte
+	web_arg = ""
+	key = "?" + argname + "="
+	i = instr(1, rq, key, 1)
+	if i = 0 then
+		key = "&" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
+	if i = 0 then exit function
+	i = i + len(key)
+	j = i
+	while j <= len(rq)
+		dim c as string(1) = mid(rq, j, 1)
+		if c = "&" or c = " " then goto done
+		j = j + 1
+	wend
+done:
+	web_arg = mid(rq, i, j - i)
+end function
+
+sub web_send(byref s as string)
+	while sock.txfree < len(s)
+		sock.send()
+		doevents
+	wend
+	sock.setdata(s)
+	sock.send()
+end sub
+
+'Байты кадра в виде "01 03 00 00 00 02 C4 0B"
+function web_hex(byref d as string) as string
+	dim i, b as byte
+	dim r as string(80)
+	r = ""
+	for i = 1 to len(d)
+		b = asc(mid(d, i, 1))
+		r = r + mid("0123456789ABCDEF", b / 16 + 1, 1) + mid("0123456789ABCDEF", (b and 15) + 1, 1) + " "
+	next i
+	web_hex = r
+end function
+
+function web_reason(r as snap_reasons) as string
+	select case r
+	case SNAP_CRC: web_reason = "ошибка контрольной суммы"
+	case SNAP_EXCEPTION: web_reason = "ответ-исключение Modbus"
+	case SNAP_SILENCE: web_reason = "тишина на линии"
+	case SNAP_MANUAL: web_reason = "снимок вручную"
+	case else: web_reason = "нет"
+	end select
+end function

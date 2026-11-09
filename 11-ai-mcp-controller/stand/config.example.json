@@ -1,0 +1,89 @@
+{
+  "board": "sim",
+  "listen": "0.0.0.0:8080",
+  "token": "",
+  "skills_dir": "../tibbo-ai-skills/skills",
+  "rules_file": "rules.json",
+  "mcp": {
+    "secret_path": "",
+    "lan_write": true,
+    "internet_write": false,
+    "panel_internet": false
+  },
+  "llm": {
+    "api": "ollama",
+    "url": "http://192.168.10.2:11434",
+    "model": "qwen3:14b",
+    "think": false,
+    "timeout_s": 180,
+    "max_steps": 6,
+    "options": {
+      "temperature": 0.3
+    }
+  },
+  "hardware": {
+    "pins_ini": "/opt/tps-shared/hwini/pins.ini",
+    "climate": {
+      "tibbit": "30",
+      "socket": "S4",
+      "i2c_bus": 1
+    },
+    "light": {
+      "tibbit": "28",
+      "socket": "S6",
+      "i2c_bus": 2
+    },
+    "accel": {
+      "tibbit": "36",
+      "socket": "S8",
+      "i2c_bus": 3
+    },
+    "relays": [
+      {
+        "name": "lamp",
+        "title": "Лампа",
+        "line": "S9A",
+        "active": "high",
+        "max_on_s": 600
+      },
+      {
+        "name": "fan",
+        "title": "Вентилятор",
+        "line": "S9B",
+        "active": "high",
+        "max_on_s": 600
+      }
+    ],
+    "inputs": [
+      {
+        "name": "button",
+        "title": "Кнопка",
+        "line": "S11A",
+        "active": "low",
+        "on_text": "нажата",
+        "off_text": "отпущена"
+      },
+      {
+        "name": "door",
+        "title": "Дверь шкафа",
+        "line": "S11B",
+        "active": "low",
+        "on_text": "открыта",
+        "off_text": "закрыта"
+      }
+    ],
+    "estop": {
+      "line": "S11C",
+      "active": "low"
+    }
+  },
+  "safety": {
+    "read_only": false,
+    "relay_max_on_s": 600,
+    "relay_min_interval_s": 2,
+    "relay_max_switch_per_min": 20,
+    "shock_threshold_mg": 600
+  },
+  "poll_fast_s": 0.2,
+  "poll_slow_s": 2.0
+}

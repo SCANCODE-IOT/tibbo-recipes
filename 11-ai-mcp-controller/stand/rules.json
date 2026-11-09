@@ -1,0 +1,109 @@
+{
+ "rules": [
+  {
+   "name": "жарко",
+   "when": {
+    "signal": "temperature_c",
+    "op": ">",
+    "value": 0,
+    "for_s": 0.0
+   },
+   "then": [
+    {
+     "do": "relay",
+     "name": "fan",
+     "on": true,
+     "duration_s": 10
+    }
+   ],
+   "cooldown_s": 30.0,
+   "enabled": true,
+   "id": 1,
+   "created": 1793964316
+  },
+  {
+   "name": "жарко",
+   "when": {
+    "signal": "temperature_c",
+    "op": ">",
+    "value": 0,
+    "for_s": 0.0
+   },
+   "then": [
+    {
+     "do": "relay",
+     "name": "fan",
+     "on": true,
+     "duration_s": 10
+    }
+   ],
+   "cooldown_s": 30.0,
+   "enabled": true,
+   "id": 2,
+   "created": 1793964330
+  },
+  {
+   "name": "жарко",
+   "when": {
+    "signal": "temperature_c",
+    "op": ">",
+    "value": 0,
+    "for_s": 0.0
+   },
+   "then": [
+    {
+     "do": "relay",
+     "name": "fan",
+     "on": true,
+     "duration_s": 10
+    }
+   ],
+   "cooldown_s": 30.0,
+   "enabled": true,
+   "id": 3,
+   "created": 1793964713
+  },
+  {
+   "name": "жарко",
+   "when": {
+    "signal": "temperature_c",
+    "op": ">",
+    "value": 0,
+    "for_s": 0.0
+   },
+   "then": [
+    {
+     "do": "relay",
+     "name": "fan",
+     "on": true,
+     "duration_s": 10
+    }
+   ],
+   "cooldown_s": 30.0,
+   "enabled": true,
+   "id": 4,
+   "created": 1794265161
+  },
+  {
+   "name": "жарко",
+   "when": {
+    "signal": "temperature_c",
+    "op": ">",
+    "value": 0,
+    "for_s": 0.0
+   },
+   "then": [
+    {
+     "do": "relay",
+     "name": "fan",
+     "on": true,
+     "duration_s": 10
+    }
+   ],
+   "cooldown_s": 30.0,
+   "enabled": true,
+   "id": 5,
+   "created": 1794265170
+  }
+ ]
+}

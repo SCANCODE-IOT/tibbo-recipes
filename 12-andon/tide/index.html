@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+</head>
+
+<body>
+    <div id="root">
+        <span id="loading">Loading</span><span id="loader"></span>
+    </div>
+    <!-- <link rel="stylesheet" href="./Main.css"> -->
+    <script>
+        // Load the console bundle with automatic retry. On a flaky device
+        // connection the script fetch can fail (or stall), and a plain <script>
+        // tag gives up on the first failure, leaving the page stuck on
+        // "Loading..." with no recovery. Re-inject the script until it loads.
+        (function () {
+            var attempt = 0;
+            var LOAD_TIMEOUT_MS = 20000;
+            function loadMain() {
+                attempt += 1;
+                var settled = false;
+                var timer;
+                // Not type="module": the bundle is a self-contained IIFE, and a
+                // classic script is re-fetched on every re-injection, whereas a
+                // module script is cached by URL, so a failed module load would
+                // never actually retry.
+                var script = document.createElement('script');
+                function retry() {
+                    if (settled) { return; }
+                    settled = true;
+                    clearTimeout(timer);
+                    if (script.parentNode) {
+                        script.parentNode.removeChild(script);
+                    }
+                    // Back off on repeated failures (capped at 5s) and keep
+                    // trying so the console recovers once the device responds.
+                    var delay = Math.min(1000 * attempt, 5000);
+                    setTimeout(loadMain, delay);
+                }
+                script.src = './console_Main.js';
+                script.onload = function () {
+                    settled = true;
+                    clearTimeout(timer);
+                };
+                script.onerror = retry;
+                // A stalled connection may never fire onerror (the socket just
+                // hangs), so guard with a watchdog: if the bundle has not loaded
+                // in time, drop it and retry.
+                timer = setTimeout(retry, LOAD_TIMEOUT_MS);
+                document.body.appendChild(script);
+            }
+            loadMain();
+        })();
+    </script>
+    <script>
+		var loadingText = "";
+		function setLoading() {
+			try {
+				var contents = document.getElementById("loading").innerText;
+				if (contents != "Loading") {
+					clearInterval(loader);
+				} else {
+					loadingText = loadingText + ".";
+					if (loadingText.length == 5) {
+						loadingText = ".";
+					}
+					document.getElementById("loader").innerText = loadingText;
+				}
+			} catch(ex) {
+				clearInterval(loader);
+			}
+		}
+		var loader = setInterval(setLoading, 300);
+    </script>
+</body>
+</html>

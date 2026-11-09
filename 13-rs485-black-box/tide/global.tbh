@@ -1,0 +1,70 @@
+'=====================================================================
+' Рецепт 13 «Чёрный ящик RS-485» · общий заголовок
+' Плата TPP2(G2): #05 (RS-485) в S1 с клеммами #21 в S2, #09 (питание 12 В) в S11 с #18 в S12.
+'=====================================================================
+include "config.tbh"
+
+#define DHCP_DEBUG_PRINT 0
+include "libraries/sock/sock.tbh"
+include "libraries/dhcp/dhcp.tbh"
+
+#define RING_SIZE 150                       'сколько последних кадров хранить
+#define FRAME_KEEP 24                       'сколько первых байт кадра хранить (длина кадра хранится полностью)
+#define ADDR_MAX 16                         'сколько разных адресов устройств запоминать
+
+'признаки кадра
+#define FL_CRC_BAD 1
+#define FL_EXCEPTION 2
+#define FL_SILENCE 4                        'служебная запись «тишина на линии»
+
+'причина снимка
+enum snap_reasons
+	SNAP_NONE,
+	SNAP_CRC,
+	SNAP_EXCEPTION,
+	SNAP_SILENCE,
+	SNAP_MANUAL
+end enum
+
+type frame_rec
+	t as dword                              'время, мс с включения
+	n as byte                               'длина кадра, байт
+	fl as byte                              'признаки FL_*
+	d as string(FRAME_KEEP)                 'первые байты кадра
+end type
+
+declare function wln_check_association() as pl_wln_association_states
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+
+'--- bus.tbs ---
+declare sub bus_init()
+declare sub bus_proc_data()
+declare sub bus_proc_second()
+declare sub bus_snapshot(reason as snap_reasons)
+declare sub bus_snapshot_clear()
+declare sub bus_clear_all()
+declare ring(RING_SIZE) as frame_rec
+declare ring_head as byte
+declare ring_count as byte
+declare snap(RING_SIZE) as frame_rec
+declare snap_count as byte
+declare snap_reason as snap_reasons
+declare snap_time as dword
+declare snap_missed as word
+declare cnt_frames as dword
+declare cnt_crc as dword
+declare cnt_exc as dword
+declare cnt_silence as word
+declare cnt_overrun as word
+declare addr_id(ADDR_MAX) as byte
+declare addr_frames(ADDR_MAX) as dword
+declare addr_exc(ADDR_MAX) as word
+declare addr_count as byte
+
+'--- web.tbs ---
+declare function web_arg(byref rq as string, byref argname as string) as string
+declare sub web_send(byref s as string)
+declare function web_hex(byref d as string) as string
+declare function web_reason(r as snap_reasons) as string

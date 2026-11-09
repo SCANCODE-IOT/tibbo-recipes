@@ -1,0 +1,335 @@
+'DEFINES-------------------------------------------------------------
+'****GLOBAL_DEFINES****'
+
+#define INTERFACE_SWITCHING 1
+#define DEFAULT_INTERFACE PL_SOCK_INTERFACE_NULL
+
+#define WLN_AVAILABLE 0
+
+#define INT_EDGE_LOW 1
+#define INT_EDGE_HIGH 2
+#define INT_EDGE_BOTH 3
+#define SOCK_MAX_SIGNATURE_LEN 10
+#define SSI_MAX_SIGNATURE_LEN 32
+#define SI2C_MAX_SIGNATURE_LEN 32
+#define SSPI_MAX_SIGNATURE_LEN 32
+#define SUPPORTS_TLS 1
+#define DHCP_DEBUG_PRINT 1
+#define DHCP_POST_FAIL_DELAY 30
+#define DHCP_WAIT_TIME 8
+#define CRON_MAX_SCHEDULES 2
+#define HTTP_SERVER_COUNT 2
+
+
+
+'****GLOBAL_CONSTS****'
+
+const FIRMWARE_VERSION="{Tibbo-recipe-12-Andon 1.0.0}"
+
+const MAX_NUM_INTERFACES=4
+
+const APP_VERSION="1.0.0"
+const APP_ID="undefined"
+
+const btn_run_kp=0
+                
+
+const btn_call_kp=1
+                
+
+const btn_alarm_kp=2
+                
+
+const cycle_kp=3
+                
+
+const lamp_green_num = PL_IO_NUM_9_TX0
+
+const lamp_yellow_num = PL_IO_NUM_8_RX0
+
+const lamp_red_num = PL_IO_NUM_13_TX2
+
+const horn_num = PL_IO_NUM_12_RX2
+
+const S9_btn_run_Button = PL_IO_NUM_32
+
+const btn_run_num = PL_IO_NUM_32
+
+const S9_btn_call_Button = PL_IO_NUM_33
+
+const btn_call_num = PL_IO_NUM_33
+
+const S9_btn_alarm_Button = PL_IO_NUM_4
+
+const btn_alarm_num = PL_IO_NUM_4
+
+const S9_cycle_Button = PL_IO_NUM_20_INT4
+
+const cycle_num = PL_IO_NUM_20_INT4
+
+
+
+'INCLUDES------------------------------------------------------------
+'****GLOBAL_FILES****'
+includepp "filenum.xtxt"
+includepp "settings.xtxt"
+
+
+'****GLOBAL_INCLUDES****'
+include "libraries/filenum/filenum.tbh"
+include "libraries/settings/settings.tbh"
+include "libraries/time/time.tbh"
+include "libraries/time/datetime.tbh"
+include "libraries/utils/utils.tbh"
+include "libraries/sock/sock.tbh"
+include "libraries/dhcp/dhcp.tbh"
+include "libraries/sntp/sntp.tbh"
+include "libraries/http_server/http_server.tbh"
+include "libraries/stgcmd/stgcmd.tbh"
+include "libraries/dns/dns.tbh"
+include "libraries/modbus/modbus.tbh"
+
+
+'DECLARATIONS--------------------------------------------------------
+'****GLOBAL_DECLARATIONS****'
+
+declare function datetime_timestamp_seconds(timestamp as dword) as float            
+declare function datetime_timestamp_mins(timestamp as dword) as dword
+declare function datetime_mins_to_timestamp(mins as word) as dword
+
+
+declare sub interface_set(interface as pl_sock_interfaces, state as no_yes)
+declare sub callback_system_error(byref tag as string, byref message as string)
+
+declare interface_ready(MAX_NUM_INTERFACES) as no_yes
+
+declare DEVICE_NAME as string(50)
+
+declare TIOS_VERSION as string(30)
+declare MAC_ADDRESS as string(20)
+
+declare APP_TIMEZONE as en_td_timezones
+declare APP_LATITUDE as float
+declare APP_LONGITUDE as float
+
+
+
+declare current_interface as pl_sock_interfaces
+
+declare sub change_current_interface(new_interface as pl_sock_interfaces)
+declare sub close_interface_sockets(interface as pl_sock_interfaces)
+
+#define SIGNAL_STRENGTH_INDICATION 1
+
+#if SIGNAL_STRENGTH_INDICATION
+declare sub signal_strength_set(strength as byte)
+declare sub signal_strength_indication_init()
+#endif
+
+declare device_net_ip as string(16)
+declare device_net_mask as string(16)
+declare device_net_gateway as string(16)
+declare net_dhcp_enabled as boolean
+declare var_poll_timer as dword
+declare state as float
+
+declare sub var_state_update()
+declare sub var_state_set(value as float)
+declare sub var_state_update_completed(value as float)
+declare sub var_state_changed(value_old as float)
+declare parts as float
+
+declare sub var_parts_update()
+declare sub var_parts_set(value as float)
+declare sub var_parts_update_completed(value as float)
+declare sub var_parts_changed(value_old as float)
+declare stops as float
+
+declare sub var_stops_update()
+declare sub var_stops_set(value as float)
+declare sub var_stops_update_completed(value as float)
+declare sub var_stops_changed(value_old as float)
+declare min_run as float
+
+declare sub var_min_run_update()
+declare sub var_min_run_set(value as float)
+declare sub var_min_run_update_completed(value as float)
+declare sub var_min_run_changed(value_old as float)
+declare min_call as float
+
+declare sub var_min_call_update()
+declare sub var_min_call_set(value as float)
+declare sub var_min_call_update_completed(value as float)
+declare sub var_min_call_changed(value_old as float)
+declare min_alarm as float
+
+declare sub var_min_alarm_update()
+declare sub var_min_alarm_set(value as float)
+declare sub var_min_alarm_update_completed(value as float)
+declare sub var_min_alarm_changed(value_old as float)
+declare NETNM as string(16)
+
+declare sub var_NETNM_update()
+declare sub var_NETNM_set(byref value as string)
+declare sub var_NETNM_update_completed(byref value as string)
+
+declare NETGW as string(16)
+
+declare sub var_NETGW_update()
+declare sub var_NETGW_set(byref value as string)
+declare sub var_NETGW_update_completed(byref value as string)
+
+declare TZONE as string(3)
+
+declare sub var_TZONE_update()
+declare sub var_TZONE_set(byref value as string)
+declare sub var_TZONE_update_completed(byref value as string)
+
+declare NETCP as float
+
+declare sub var_NETCP_update()
+declare sub var_NETCP_set(value as float)
+declare sub var_NETCP_update_completed(value as float)
+
+declare NETIP as string(16)
+
+declare sub var_NETIP_update()
+declare sub var_NETIP_set(byref value as string)
+declare sub var_NETIP_update_completed(byref value as string)
+
+declare WBPWD as string(32)
+
+declare sub var_WBPWD_update()
+declare sub var_WBPWD_set(byref value as string)
+declare sub var_WBPWD_update_completed(byref value as string)
+
+declare lamp_green as boolean
+
+declare sub var_lamp_green_update()
+declare sub var_lamp_green_set(value as boolean)
+declare sub var_lamp_green_update_completed(value as boolean)
+
+declare lamp_yellow as boolean
+
+declare sub var_lamp_yellow_update()
+declare sub var_lamp_yellow_set(value as boolean)
+declare sub var_lamp_yellow_update_completed(value as boolean)
+
+declare lamp_red as boolean
+
+declare sub var_lamp_red_update()
+declare sub var_lamp_red_set(value as boolean)
+declare sub var_lamp_red_update_completed(value as boolean)
+
+declare horn as boolean
+
+declare sub var_horn_update()
+declare sub var_horn_set(value as boolean)
+declare sub var_horn_update_completed(value as boolean)
+
+declare btn_run as boolean
+
+declare sub var_btn_run_update()
+declare sub var_btn_run_set(value as boolean)
+declare sub var_btn_run_update_completed(value as boolean)
+
+declare btn_call as boolean
+
+declare sub var_btn_call_update()
+declare sub var_btn_call_set(value as boolean)
+declare sub var_btn_call_update_completed(value as boolean)
+
+declare btn_alarm as boolean
+
+declare sub var_btn_alarm_update()
+declare sub var_btn_alarm_set(value as boolean)
+declare sub var_btn_alarm_update_completed(value as boolean)
+
+declare cycle as boolean
+
+declare sub var_cycle_update()
+declare sub var_cycle_set(value as boolean)
+declare sub var_cycle_update_completed(value as boolean)
+
+declare LPART as float
+
+declare sub var_LPART_update()
+declare sub var_LPART_set(value as float)
+declare sub var_LPART_update_completed(value as float)
+declare sub var_LPART_changed(value_old as float)
+declare LSTOP as float
+
+declare sub var_LSTOP_update()
+declare sub var_LSTOP_set(value as float)
+declare sub var_LSTOP_update_completed(value as float)
+declare sub var_LSTOP_changed(value_old as float)
+declare LRUN as float
+
+declare sub var_LRUN_update()
+declare sub var_LRUN_set(value as float)
+declare sub var_LRUN_update_completed(value as float)
+declare sub var_LRUN_changed(value_old as float)
+declare LCALL as float
+
+declare sub var_LCALL_update()
+declare sub var_LCALL_set(value as float)
+declare sub var_LCALL_update_completed(value as float)
+declare sub var_LCALL_changed(value_old as float)
+declare LALRM as float
+
+declare sub var_LALRM_update()
+declare sub var_LALRM_set(value as float)
+declare sub var_LALRM_update_completed(value as float)
+declare sub var_LALRM_changed(value_old as float)
+
+declare sub cmd_SET_RUN(byref data as string)
+
+declare sub cmd_SET_CALL(byref data as string)
+
+declare sub cmd_SET_ALARM(byref data as string)
+
+declare sub cmd_APPLY(byref data as string)
+
+declare sub cmd_NEW_SHIFT(byref data as string)
+
+declare SNTP_socket as byte
+declare SNTP_SERVER as string(16)
+
+
+declare crons as crontab(CRON_MAX_SCHEDULES)
+declare datetime_timer_offset as dword
+declare sub cron_check_tabs()
+declare sub callback_cron_expired(index as byte)
+
+declare sub cron_expired_shift_day()
+
+declare sub cron_expired_shift_night()
+declare sub callback_stgcmd_buzz_command()
+
+declare DNS_socket as byte
+
+#IFDEF TBL_MAX_NUM_TABLES
+declare sub tables_web_proc_sock_data_sent()
+#ENDIF
+        
+
+declare function modbus_create_data(func_type as modbusFunc, data as string) as string
+
+declare btn_run_button_state as byte
+
+declare btn_call_button_state as byte
+
+declare btn_alarm_button_state as byte
+
+declare cycle_button_state as byte
+
+declare delay_has_active as boolean
+declare sub delay_handler()
+
+
+declare delay_mw9uwva6jclxqu4 as dword
+
+declare timer_60s_mw9uwvc4v6wv0tk_timer as dword
+
+
+declare sub boot()

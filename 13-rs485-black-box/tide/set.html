@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=index.html"></head><body>
+<?
+include "global.tbh"
+dim rq as string
+rq = sock.httprqstring
+dim a as string(8)
+a = web_arg(rq, "a")
+if a = "snap" then
+	bus_snapshot_clear()
+	bus_snapshot(SNAP_MANUAL)
+end if
+if a = "free" then bus_snapshot_clear()
+if a = "clear" then bus_clear_all()
+?>
+OK
+</body></html>
