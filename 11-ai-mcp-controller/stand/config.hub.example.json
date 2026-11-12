@@ -90,14 +90,14 @@
   "fleet": [
     {
       "name": "moscow-showroom",
-      "title": "Шоурум, Москва",
+      "title": "Шоурум",
       "url": "http://192.168.10.3:8080/mcp",
       "token": ""
     },
     {
       "name": "plant-boiler",
       "title": "Котельная завода",
-      "url": "https://plant.example.ru/mcp",
+      "url": "https://plant.example.com/mcp",
       "token": "ТОКЕН-ПЛОЩАДКИ"
     }
   ],

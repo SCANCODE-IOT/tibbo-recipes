@@ -98,4 +98,4 @@ sh deploy/install.sh             # ставит в /opt/tibbo-stand и запу�
 - «Переведи панель на английский»
 
 ---
-Рецепт подготовил Сканкод, официальный дистрибьютор Tibbo Technology в России и СНГ. Вопросы: iot@scancode.ru, https://tibbo.ru/contacts
+Рецепт подготовил Сканкод, официальный дистрибьютор Tibbo Technology. Вопросы: iot@scancode.ru, https://tibbo.ru/contacts

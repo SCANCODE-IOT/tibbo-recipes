@@ -212,6 +212,6 @@ tests/                python3 -m unittest discover -s tests
 
 ## Лицензия
 
-MIT © 2026 [Сканкод](https://tibbo.ru) - официальный дистрибьютор Tibbo в России и СНГ.
+MIT © 2026 [Сканкод](https://tibbo.ru) - официальный дистрибьютор Tibbo.
 Tibbo, Tibbit, TiOS и AppBlocks - товарные знаки Tibbo Technology Inc. Это проект сообщества, а не
 официальный продукт Tibbo. Названия моделей и сервисов принадлежат их владельцам.

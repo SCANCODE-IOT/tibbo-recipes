@@ -6,7 +6,7 @@
 '=====================================================================
 
 '--- Сотовая сеть (модем Tibbit #45 в S1-S4) ------------------------------
-const CFG_APN = "internet"                  'APN оператора: МТС internet.mts.ru, МегаФон internet, Билайн internet.beeline.ru, Tele2 internet.tele2.ru
+const CFG_APN = "internet"                  'APN вашего оператора связи (часто просто internet)
 const CFG_APN_USER = ""
 const CFG_APN_PASSWORD = ""
 const CFG_SIM_PIN = "?"                     '"?" - PIN не нужен

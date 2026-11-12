@@ -69,4 +69,4 @@ Every project builds in TIDE (libraries 2_01_05) with no errors or warnings, and
 
 ## License
 
-MIT - see [LICENSE](LICENSE). Prepared by Scancode (OOO SK-Trade), official Tibbo Technology distributor in Russia and CIS. Contact: iot@scancode.ru, https://tibbo.ru/contacts
+MIT - see [LICENSE](LICENSE). Prepared by Scancode (OOO SK-Trade), official Tibbo Technology distributor. Contact: iot@scancode.ru, https://tibbo.ru/contacts

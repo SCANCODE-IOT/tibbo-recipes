@@ -125,4 +125,4 @@ mosquitto_pub -h 192.168.1.10 -t 'tibbo/002477517F17/room/setpoint/set' -m 22.5
 Скилл подберёт Tibbit, проверит питание и напишет код под эту структуру проекта.
 
 ---
-Рецепт подготовил Сканкод, официальный дистрибьютор Tibbo Technology в России и СНГ. Вопросы: iot@scancode.ru, https://tibbo.ru/contacts
+Рецепт подготовил Сканкод, официальный дистрибьютор Tibbo Technology. Вопросы: iot@scancode.ru, https://tibbo.ru/contacts

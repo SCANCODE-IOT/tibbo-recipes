@@ -84,4 +84,4 @@ AppBlocks не поддерживает устройство DS1100, поэто�
 Скилл подберёт Tibbit, проверит питание и напишет код под эту структуру проекта.
 
 ---
-Рецепт подготовил Сканкод, официальный дистрибьютор Tibbo Technology в России и СНГ. Вопросы: iot@scancode.ru, https://tibbo.ru/contacts
+Рецепт подготовил Сканкод, официальный дистрибьютор Tibbo Technology. Вопросы: iot@scancode.ru, https://tibbo.ru/contacts

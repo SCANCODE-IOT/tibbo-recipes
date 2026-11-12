@@ -5,7 +5,7 @@
 > It has **not yet run on a real Tibbo LTPP3(G2)**. That last step needs someone with the board on the desk,
 > and that person may be **you**.
 >
-> 🇷🇺 [Русская версия](README.ru.md) · 📊 Presentation: [EN](docs/presentation-en.pdf) · [RU](docs/presentation-ru.pdf)
+> [Русская версия](README.ru.md) · 📊 Presentation: [EN](docs/presentation-en.pdf) · [RU](docs/presentation-ru.pdf)
 
 ![Stand panel](docs/panel.png)
 
@@ -199,6 +199,6 @@ tests/                python3 -m unittest discover -s tests
 
 ## License and credits
 
-MIT © 2026 [Scancode](https://tibbo.ru), the official Tibbo distributor in Russia and the CIS.
+MIT © 2026 [Scancode](https://tibbo.ru), the official Tibbo distributor.
 Tibbo, Tibbit, TiOS and AppBlocks are trademarks of Tibbo Technology Inc. This is a community project and is
 not an official Tibbo product. Model and service names belong to their owners.
