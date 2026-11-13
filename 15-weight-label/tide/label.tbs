@@ -44,6 +44,7 @@ dim log_ok(LOG_SIZE) as byte
 #define ERR_SEND 102
 #define ERR_NO_WEIGHT 103
 #define ERR_BUSY 104
+#define ERR_TOO_HEAVY 105
 
 declare sub prn_start()
 declare sub prn_send_label()
@@ -140,12 +141,16 @@ sub label_tick()
 	case PRN_SEND:
 		prn_finish(ERR_SEND)
 	case else:
+		'соединение не закрылось вовремя - сбросить, иначе следующий connect не сработает
+		sock.num = prn_sock
+		sock.discard()
 		prn_state = PRN_IDLE
 	end select
 end sub
 
 'запрос печати: 0 - принято, иначе код причины
 function label_request(byref why as string) as byte
+	dim keep_sock as byte = sock.num        'вызывают и из веб-страницы: её сокет нужно вернуть
 	dim g as long = label_weight_g()
 	if prn_state <> PRN_IDLE then
 		label_request = ERR_BUSY
@@ -153,6 +158,10 @@ function label_request(byref why as string) as byte
 	end if
 	if scale_age > 4 or scale_stable = NO or g < CFG_MIN_G then
 		label_request = ERR_NO_WEIGHT
+		exit function
+	end if
+	if g > 99999 then
+		label_request = ERR_TOO_HEAVY       'в весовой EAN-13 помещается до 99,999 кг
 		exit function
 	end if
 	job_g = g
@@ -166,6 +175,7 @@ function label_request(byref why as string) as byte
 	lbl_armed = NO                          'следующая автопечать - после того, как товар снимут
 	dbg("Print (" + why + "): " + lstr(g) + " g")
 	prn_start()
+	sock.num = keep_sock
 	label_request = 0
 end function
 
@@ -173,6 +183,7 @@ sub prn_start()
 	prn_reply = ""
 	prn_err = 0
 	sock.num = prn_sock
+	if sock.statesimple <> PL_SSTS_CLOSED then sock.discard()   'прошлое соединение не закрылось - сбросить
 	sock.targetip = CFG_PRN_IP
 	sock.targetport = CFG_PRN_PORT
 	sock.connect()
@@ -211,6 +222,10 @@ sub label_sock_data()
 	while i <= len(prn_reply) and (mid(prn_reply, i, 1) < "0" or mid(prn_reply, i, 1) > "9")
 		i = i + 1
 	wend
+	if i > len(prn_reply) then
+		prn_finish(ERR_NO_STATUS)           'в ответе нет кода состояния
+		exit sub
+	end if
 	dim code as byte = val(mid(prn_reply, i, 2))
 	if code = 0 or code = 50 or code = 60 then
 		prn_send_label()                    'готов, печатает или принимает данные - этикетка встанет в очередь
@@ -252,16 +267,16 @@ sub prn_send_label()
 		sock.setdata(s)
 	end if
 	'весовой EAN-13: префикс, артикул, вес в граммах; контрольную цифру считает принтер
-	s = "BE," + dots(2) + "," + dots(26) + ",2,4," + dots(8) + ",0,1," + ean + CR
+	s = "BE," + dots(3) + "," + dots(26) + "," + str(CFG_DOTS_MM / 4) + "," + str(CFG_DOTS_MM / 2) + "," + dots(8) + ",0,1," + ean + CR
 	sock.setdata(s)
-	'QR: артикул; вес, г; дата; номер этикетки
-	t = p_plu + ";" + lstr(job_g) + ";"
+	'QR в буквенно-цифровом режиме (цифры, A-Z, пробел, $%*+-./:): артикул:граммы:дата:номер этикетки
+	t = p_plu + ":" + lstr(job_g) + ":"
 	if job_day > 0 then t = t + label_date_str(job_day)
-	t = t + ";" + str(lbl_count + 1)
-	s = "W" + dots(44) + "," + dots(19) + ",3,2,M,8,3," + str(len(t)) + ",0" + CR + t + CR + "E" + CR
+	t = t + ":" + str(lbl_count + 1)
+	s = "W" + dots(44) + "," + dots(19) + ",2,2,M,8,3," + str(len(t)) + ",0" + CR + t + CR + "E" + CR
 	sock.setdata(s)
-	sock.notifysent(1)                      'on_sock_data_sent - когда всё уйдёт
 	sock.send()
+	sock.notifysent(1)                      'on_sock_data_sent - когда всё уйдёт
 	prn_state = PRN_SEND
 	prn_wait = 6
 end sub
@@ -321,9 +336,9 @@ function label_prn_text() as string
 	case 0:
 		label_prn_text = "готов"
 	case 2:
-		label_prn_text = "кончились этикетки"
+		label_prn_text = "нет этикеток или они замялись"
 	case 3:
-		label_prn_text = "замялись этикетки"
+		label_prn_text = "нет этикеток или они замялись"
 	case 4:
 		label_prn_text = "кончилась лента"
 	case 5:
@@ -346,6 +361,8 @@ function label_prn_text() as string
 		label_prn_text = "нет стабильного веса"
 	case ERR_BUSY:
 		label_prn_text = "принтер занят"
+	case ERR_TOO_HEAVY:
+		label_prn_text = "вес больше 99,999 кг"
 	case else:
 		label_prn_text = "код принтера " + str(prn_err - 1)
 	end select

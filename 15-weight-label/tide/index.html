@@ -48,7 +48,7 @@ web_send("<span></span><button class=sb>Сохранить</button></form><small
 <div class=card><b>Последние этикетки</b> <small>· <a href="labels.csv">labels.csv</a></small>
 <div class=sc><table id=lg><tr><th>Дата</th><th>Время</th><th>Артикул</th><th>Вес, кг</th><th></th></tr></table></div></div>
 <div class=card><small>Часы ставятся по SNTP. Нет интернета - <a href="#" onclick="clk();return false">взять время с этого устройства</a>.<br>
-Печать из учётной системы: <code>GET http://<? sock.setdata(net.ip) ?>/print.html</code> - ответ OK или причина.</small></div>
+Печать из учётной системы: <code>GET http://<? web_send(net.ip) ?>/print.html</code> - ответ OK или причина.</small></div>
 </main>
 <script>
 function $(i){return document.getElementById(i)}

@@ -5,11 +5,17 @@
 include "global.tbh"
 
 function web_arg(byref rq as string, byref argname as string) as string
-	dim key as string(8)
-	dim i, j as byte
+	dim key as string(16)
+	dim i, j as word
 	web_arg = ""
-	key = "?" + argname + "="
-	i = instr(1, rq, key, 1)
+	'в строке запроса TiOS нет "?": она начинается с первого параметра, например "t=...&x=... HTTP/1.1"
+	key = argname + "="
+	if left(rq, len(key)) = key then
+		i = 1
+	else
+		key = "?" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
 	if i = 0 then
 		key = "&" + argname + "="
 		i = instr(1, rq, key, 1)
@@ -44,6 +50,24 @@ function web_decode(byref s as string) as string
 	wend
 end function
 
+'обрезать до n байт, не разрезая букву UTF-8; управляющие символы и ; (разделитель CSV) убрать
+function web_clean(byref s as string, n as byte) as string
+	dim i as byte
+	dim c as string(1)
+	web_clean = ""
+	for i = 1 to len(s)
+		c = mid(s, i, 1)
+		if asc(c) >= 32 and c <> ";" then web_clean = web_clean + c
+	next i
+	if len(web_clean) <= n then exit function
+	i = n + 1
+	'байты 0x80-0xBF - продолжение буквы: отступаем до её начала
+	while i > 1 and asc(mid(web_clean, i, 1)) >= &h80 and asc(mid(web_clean, i, 1)) < &hC0
+		i = i - 1
+	wend
+	web_clean = left(web_clean, i - 1)
+end function
+
 'экранирование для вывода в HTML
 function web_html(byref s as string) as string
 	dim i as byte
@@ -67,9 +91,11 @@ end function
 
 'вывод части страницы: ждём место в буфере сокета
 sub web_send(byref s as string)
+	dim hs as byte = sock.num
 	while sock.txfree < len(s)
 		sock.send()
 		doevents
+		sock.num = hs                       'за время doevents другой код мог выбрать другой сокет
 	wend
 	sock.setdata(s)
 	sock.send()
@@ -96,5 +122,8 @@ sub web_handle_clock(byref rq as string)
 	dim mo as byte = val(mid(t, 6, 2))
 	dim dd as byte = val(mid(t, 9, 2))
 	dim tm as string(8) = mid(t, 12, 8)
-	if y > 0 and mo > 0 and mo < 13 and dd > 0 and dd < 32 then pick_set_clock(daycount(y, mo, dd), web_parse_hhmm(tm), 0)
+	if y > 0 and mo > 0 and mo < 13 and dd > 0 and dd < 32 then
+		dim d as word = daycount(y, mo, dd)
+		if date(d) = dd then pick_set_clock(d, web_parse_hhmm(tm), 0)     '31.02 и подобные - не ставим
+	end if
 end sub

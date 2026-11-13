@@ -16,8 +16,8 @@ small,code{color:#6F6C66}
 <div class=card><small>Строка весов: <code id=l></code></small></div>
 <div class=card><small>
 Вес для учётной системы: <code>http://<? include "global.tbh"
-sock.setdata(net.ip) ?>/weight.txt</code> (вес;единица;1 - стабильный)<br>
-Виртуальный COM-порт: TCP <? sock.setdata(str(CFG_RAW_PORT)) ?> · Modbus TCP: порт <? sock.setdata(str(CFG_MODBUS_PORT)) ?>, регистры 0-1 вес x1000, 2 стабильность
+web_send(net.ip) ?>/weight.txt</code> (вес;единица;1 - стабильный)<br>
+Виртуальный COM-порт: TCP <? web_send(str(CFG_RAW_PORT)) ?> · Modbus TCP: порт <? web_send(str(CFG_MODBUS_PORT)) ?>, регистры 0-1 вес x1000, 2 стабильность
 </small></div>
 </main>
 <script>

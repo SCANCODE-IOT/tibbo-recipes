@@ -6,7 +6,7 @@
 include "global.tbh"
 
 dim ln_count as byte = 0
-dim ln_code(MAX_LINES) as string(24)
+dim ln_code(MAX_LINES) as string(32)
 dim ln_cell(MAX_LINES) as byte
 dim ln_qty(MAX_LINES) as word
 dim ln_name(MAX_LINES) as string(32)
@@ -17,8 +17,8 @@ dim event_no as word = 0
 dim log_n as byte = 0
 dim log_min(LOG_SIZE) as word
 dim log_cell(LOG_SIZE) as byte
-dim log_code(LOG_SIZE) as string(24)
-dim log_what(LOG_SIZE) as string(24)
+dim log_code(LOG_SIZE) as string(32)
+dim log_what(LOG_SIZE) as string(40)
 
 dim lamp_io(CFG_CELLS) as pl_io_num
 dim btn_io(CFG_CELLS) as pl_io_num
@@ -107,6 +107,7 @@ end sub
 function pick_scan(byref code as string) as string
 	dim i as byte
 	dim found_done as byte = NO_LINE
+	dim busy_cell as byte = NO_LINE
 	i = 0
 	while i < ln_count
 		if ln_code(i) = code then
@@ -116,8 +117,8 @@ function pick_scan(byref code as string) as string
 			else if ln_state(i) = LN_WAIT then
 				dim c as byte = ln_cell(i)
 				if cell_line(c) <> NO_LINE then
-					pick_scan = "BUSY;" + str(c + 1)
-					exit function
+					busy_cell = c                   'ячейка занята - ищем ту же позицию в другой ячейке
+					goto next_line
 				end if
 				ln_state(i) = LN_LIT
 				cell_line(c) = i
@@ -130,9 +131,12 @@ function pick_scan(byref code as string) as string
 				found_done = i
 			end if
 		end if
+next_line:
 		i = i + 1
 	wend
-	if found_done <> NO_LINE then
+	if busy_cell <> NO_LINE then
+		pick_scan = "BUSY;" + str(busy_cell + 1)
+	else if found_done <> NO_LINE then
 		pick_scan = "DONE;" + str(ln_cell(found_done) + 1)
 	else
 		pick_scan = "NF"

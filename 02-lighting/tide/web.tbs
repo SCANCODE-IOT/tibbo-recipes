@@ -9,10 +9,16 @@ include "global.tbh"
 'значение параметра из строки запроса: "GET /set.html?c=1&a=on HTTP/1.1"
 function web_arg(byref rq as string, byref argname as string) as string
 	dim key as string(16)
-	dim i, j as byte
+	dim i, j as word
 	web_arg = ""
-	key = "?" + argname + "="
-	i = instr(1, rq, key, 1)
+	'в строке запроса TiOS нет "?": она начинается с первого параметра, например "t=...&x=... HTTP/1.1"
+	key = argname + "="
+	if left(rq, len(key)) = key then
+		i = 1
+	else
+		key = "?" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
 	if i = 0 then
 		key = "&" + argname + "="
 		i = instr(1, rq, key, 1)

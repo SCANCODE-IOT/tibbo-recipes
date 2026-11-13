@@ -14,8 +14,8 @@ form{display:flex;flex-wrap:wrap;gap:6px}input{padding:7px;font-size:15px}button
 <main>
 <div class=card><b>Добавить строку</b>
 <form id=f style="margin-top:8px"><input id=c placeholder="Код товара" required><input id=n type=number min=1 max=<? include "global.tbh"
-sock.setdata(str(CFG_CELLS)) ?> placeholder="Ячейка" required style="width:90px"><input id=q type=number min=1 value=1 style="width:80px"><input id=t placeholder="Название"><button>Добавить</button></form>
-<p><small>Из учётной системы: <code>GET http://<? sock.setdata(net.ip) ?>/add.html?c=КОД&amp;n=ЯЧЕЙКА&amp;q=КОЛ-ВО&amp;t=НАЗВАНИЕ</code></small></p></div>
+web_send(str(CFG_CELLS)) ?> placeholder="Ячейка" required style="width:90px"><input id=q type=number min=1 value=1 style="width:80px"><input id=t placeholder="Название" maxlength=16><button>Добавить</button></form>
+<p><small>Из учётной системы: <code>GET http://<? web_send(net.ip) ?>/add.html?c=КОД&amp;n=ЯЧЕЙКА&amp;q=КОЛ-ВО&amp;t=НАЗВАНИЕ</code></small></p></div>
 <div class=card><b>Задание</b> <small>· <a href="task.csv">task.csv</a> · <a href="log.csv">log.csv</a></small>
 <div class=sc><table id=tb><tr><th>Код</th><th>Ячейка</th><th>Кол-во</th><th>Название</th><th>Состояние</th><th></th></tr></table></div>
 <p><button onclick="cmd('a=test')">Проверить лампы</button> <button onclick="if(confirm('Очистить задание?'))cmd('a=clear')">Очистить задание</button></p></div>
@@ -27,7 +27,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 var ST=['<span class=w>ждёт</span>','<span class=l>горит</span>','<span class=d>собрано</span>'];
 function load(){fetch('task.csv?'+Date.now()).then(r=>r.text()).then(t=>{var tb=$('tb');while(tb.rows.length>1)tb.deleteRow(1);
 t.trim().split(/\r?\n/).slice(1).forEach(l=>{if(!l)return;var f=l.split(';');var r=tb.insertRow();
-r.innerHTML='<td>'+esc(f[0])+'</td><td>'+f[1]+'</td><td>'+f[2]+'</td><td>'+esc(f[3])+'</td><td>'+(ST[+f[4]]||'')+'</td><td>'+(f[4]==='1'?'<a href="#" onclick="cmd(\'a=cancel&n='+f[1]+'\');return false">погасить</a>':'')+'</td>'})})}
+var n=+f[1]||0;r.innerHTML='<td>'+esc(f[0])+'</td><td>'+n+'</td><td>'+(+f[2]||0)+'</td><td>'+esc(f[3])+'</td><td>'+(ST[+f[4]]||'')+'</td><td>'+(f[4]==='1'?'<a href="#" onclick="cmd(\'a=cancel&n='+n+'\');return false">погасить</a>':'')+'</td>'})})}
 function cmd(q){fetch('cmd.html?'+q+'&_='+Date.now()).then(load)}
 $('f').onsubmit=function(e){e.preventDefault();var u='add.html?c='+encodeURIComponent($('c').value)+'&n='+$('n').value+'&q='+$('q').value+'&t='+encodeURIComponent($('t').value);
 fetch(u).then(r=>r.text()).then(t=>{t=t.trim();if(t!=='OK')alert(t==='FULL'?'Задание заполнено':'Проверьте код и номер ячейки');$('c').value='';$('t').value='';$('c').focus();load()})};

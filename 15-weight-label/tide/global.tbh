@@ -70,3 +70,4 @@ declare function web_arg(byref rq as string, byref argname as string) as string
 declare function web_decode(byref s as string) as string
 declare sub web_handle_set(byref rq as string)
 declare function web_html(byref s as string) as string
+declare function web_clean(byref s as string, n as byte) as string

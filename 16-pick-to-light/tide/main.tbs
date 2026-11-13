@@ -1,7 +1,7 @@
 '=====================================================================
 ' Рецепт 16 «Подбор по свету с ТСД» · события
 ' HTTP 80: страница ТСД (index.html), scan.html, state.txt,
-' настройка задания (task.html, add.html, clear.html), task.csv, log.csv
+' настройка задания (task.html, add.html, cmd.html), task.csv, log.csv
 '=====================================================================
 include "global.tbh"
 
@@ -23,16 +23,17 @@ sub on_sys_init()
 	pick_init()                         'сначала лампы - в выключенное состояние
 
 	dim i, s as byte
-	for i = 1 to 3
+	for i = 1 to 4                      'несколько ТСД опрашивают страницу раз в секунду
 		s = sock_get("WEB")
 		sock.num = s
 		sock.protocol = PL_SOCK_PROTOCOL_TCP
 		sock.inconmode = PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
 		sock.httpmode = YES
 		sock.httpportlist = "80"
+		sock.connectiontout = 20            'зависшее соединение закрывается через 10 с
 		sock.rxbuffrq(1)
 		sock.txbuffrq(4)
-		sock.varbuffrq(1)
+		sock.varbuffrq(2)                   'запрос add.html с названием по-русски длиннее одной страницы
 	next i
 	sys.buffalloc()
 
@@ -57,7 +58,9 @@ end sub
 
 sub ntp_request()
 	ntp_timer = 0
-	sntp_start(PL_SOCK_INTERFACE_NET, CFG_NTP_SERVER, 123, ntp_sock)
+	if sntp_start(PL_SOCK_INTERFACE_NET, CFG_NTP_SERVER, 123, ntp_sock) <> SNTP_STATUS_OK then
+		ntp_timer = CFG_NTP_RESYNC_HOURS * 7200 - 1200     'запрос не ушёл - повтор через 10 минут
+	end if
 end sub
 
 sub on_sys_timer()
@@ -84,7 +87,8 @@ end sub
 
 '--- время ---
 sub callback_sntp_ok(byref w_days as word, byref w_mins as word, byref b_seconds as byte)
-	dim m as long = w_mins + CFG_TZ_MINUTES
+	dim m as long = w_mins
+	m = m + CFG_TZ_MINUTES                  'отдельно: иначе сумма считается в 16 битах
 	dim d as word = w_days
 	if m >= 1440 then
 		m = m - 1440

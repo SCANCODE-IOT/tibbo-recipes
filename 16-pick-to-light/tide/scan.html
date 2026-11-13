@@ -2,7 +2,8 @@
 include "global.tbh"
 'GET /scan.html?c=<код> - зажечь ячейку товара. Ответ: OK;ячейка;кол-во;название | DONE;ячейка | BUSY;ячейка | NF
 dim rq as string = sock.httprqstring
-dim code as string(24) = left(web_decode(web_arg(rq, "c")), 24)
+dim dc as string(200) = web_decode(web_arg(rq, "c"))
+dim code as string(32) = web_clean(dc, 32)
 dim s as string = pick_scan(code)
 web_send(s)
 ?>

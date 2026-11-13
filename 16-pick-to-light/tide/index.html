@@ -13,7 +13,7 @@ main{max-width:520px;margin:0 auto;padding:10px 12px}
 small{color:#6F6C66}a{color:#CC5314}
 </style></head><body>
 <header><span><b>Tibbo</b> · <? include "global.tbh"
-sock.setdata(CFG_RACK_NAME) ?></span><span id=pr>0 / 0</span></header>
+web_send(CFG_RACK_NAME) ?></span><span id=pr>0 / 0</span></header>
 <main>
 <form id=f autocomplete=off><input id=c inputmode=none placeholder="Сканируйте код товара" autofocus></form>
 <div id=res><span class=t>Сканируйте код. У нужной ячейки загорится лампа. Возьмите товар и нажмите кнопку ячейки.</span></div>
@@ -22,7 +22,7 @@ sock.setdata(CFG_RACK_NAME) ?></span><span id=pr>0 / 0</span></header>
 <p><small><a href="task.html">Задание и настройка</a></small></p>
 </main>
 <script>
-var N=<? sock.setdata(str(CFG_CELLS)) ?>,last=-1,cur=0;
+var N=+'<? web_send(str(CFG_CELLS)) ?>'||8,last=-1,cur=0;
 function $(i){return document.getElementById(i)}
 function show(cls,html){var r=$('res');r.className=cls;r.innerHTML=html}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
@@ -37,7 +37,7 @@ document.addEventListener('click',function(e){if(e.target.tagName!=='A')$('c').f
 function upd(){fetch('state.txt?'+Date.now()).then(r=>r.text()).then(t=>{var p=t.split(';');var h='';
 for(var i=0;i<N;i++)h+='<div class="cell'+(p[0][i]==='1'?' on':'')+'">'+(i+1)+'</div>';$('cells').innerHTML=h;
 $('pr').textContent=p[1]+' / '+p[2];
-if(last>=0&&+p[3]!==last){$('ev').textContent=p[5]+' '+p[4];if(p[4].indexOf('собрано')>0&&p[4].indexOf('Ячейка '+cur+':')===0){show('done','<div class=q>Собрано ✓</div><div class=t>Сканируйте следующий товар</div>');buzz(150)}}
+if(last>=0&&+p[3]!==last){$('ev').textContent=p[5]+' '+p[4];if(p[4].indexOf('собрано')>0&&p[4].indexOf('Ячейка '+cur+':')===0){cur=0;show('done','<div class=q>Собрано ✓</div><div class=t>Сканируйте следующий товар</div>');buzz(150)}}
 last=+p[3]}).catch(()=>{})}
 upd();setInterval(upd,1000);
 </script>

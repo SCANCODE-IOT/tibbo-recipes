@@ -37,7 +37,7 @@ declare function pick_clock_str() as string
 declare sub pick_set_clock(days as word, mins as word, secs as byte)
 declare function pick_hhmm(m as word) as string
 declare ln_count as byte
-declare ln_code(MAX_LINES) as string(24)
+declare ln_code(MAX_LINES) as string(32)
 declare ln_cell(MAX_LINES) as byte
 declare ln_qty(MAX_LINES) as word
 declare ln_name(MAX_LINES) as string(32)
@@ -48,8 +48,8 @@ declare event_no as word
 declare log_n as byte
 declare log_min(LOG_SIZE) as word
 declare log_cell(LOG_SIZE) as byte
-declare log_code(LOG_SIZE) as string(24)
-declare log_what(LOG_SIZE) as string(24)
+declare log_code(LOG_SIZE) as string(32)
+declare log_what(LOG_SIZE) as string(40)
 
 '--- main.tbs ---
 declare sub dbg(byref s as string)
@@ -59,4 +59,5 @@ declare sub web_send(byref s as string)
 declare function web_arg(byref rq as string, byref argname as string) as string
 declare function web_decode(byref s as string) as string
 declare function web_html(byref s as string) as string
+declare function web_clean(byref s as string, n as byte) as string
 declare sub web_handle_clock(byref rq as string)
