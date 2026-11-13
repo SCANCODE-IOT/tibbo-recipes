@@ -40,6 +40,7 @@ declare function daq_ma(ch as byte) as string
 declare function daq_name(ch as byte) as string
 declare function daq_unit(ch as byte) as string
 declare function daq_hist(ch as byte, n as word) as string
+declare function daq_avg(ch as byte) as string
 declare daq_count as word
 declare daq_fault(CH_COUNT) as no_yes
 declare daq_minute_ready as no_yes

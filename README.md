@@ -25,7 +25,8 @@
 - **Самое доступное, что решает задачу.** По умолчанию - плата TPP2(G2) и источник #09 от 12 В; более дорогие блоки - только там, где без них нельзя, и с объяснением в README рецепта.
 - **Раскладка, которую одобряет AppBlocks.** Разъёмы выбраны так, чтобы редактор AppBlocks не отмечал сокеты жёлтыми треугольниками: источнику питания #09/#10 - #18, датчику #29 - #00-3. Если документация Tibbo допускает вариант дешевле, но редактор его не принимает, он описан в README рецепта как нишевый.
 - **Все настройки объекта в одном файле** `tide/config.tbh`: сеть, MQTT, адреса приборов, пороги.
-- **Проверка.** Каждый проект собирается в TIDE (библиотеки 2_01_05) без ошибок и предупреждений; варианты AppBlocks открываются в редакторе без ошибок и собираются облачным компилятором. На реальном оборудовании рецепты не проверялись - перед установкой на объект проверьте комплект на стенде.
+- **Проверка.** Каждый проект собирается компилятором TIDE без ошибок; варианты AppBlocks собираются компилятором Tibbo, логика изменённых в версии 1.3.0 проектов (04, 08, 10) прогнана на модели по сценариям. Что и как проверено - в строке «Проверка» каждого рецепта. На реальном оборудовании рецепты не проверялись - перед установкой на объект проверьте комплект на стенде.
+- **Два варианта - не всегда одно и то же.** Вариант AppBlocks проще варианта TIDE. В каждом рецепте есть список «Чем отличается от варианта TIDE»: прочитайте его до выбора.
 - **Рецепты 11-13 проверены иначе.** 12 - проект AppBlocks, собран компилятором Tibbo через сборщик AppBlocks; 13 - Tibbo BASIC, собран тем же компилятором, библиотеки лежат в папке проекта; 11 - программа на Python для Linux-платы, 27 автотестов на эмуляторе. Как и остальные, на настоящем железе они не запускались.
 
 ## Как начать
@@ -58,10 +59,11 @@ Thirteen automation tasks solved end to end on Tibbo hardware: a TIDE project (T
 | 12 | [Andon: stack light and machine downtime counters](12-andon/) | TPP2(G2) | yes |
 | 13 | [RS-485 black box: what was on the bus before a failure](13-rs485-black-box/) | TPP2(G2) | - |
 
-Every project builds in TIDE (libraries 2_01_05) with no errors or warnings, and AppBlocks variants open without errors and build in the cloud. Connectors are chosen so that the AppBlocks editor does not flag any socket (power Tibbits #09/#10 use #18, the #29 sensor sits next to #00-3). **Not tested on real hardware** - verify on a bench before deployment.
+Every project builds with the TIDE compiler with no errors, and AppBlocks variants build with the Tibbo cloud compiler. An AppBlocks variant is simpler than the TIDE one: each recipe lists the differences. Connectors are chosen so that the AppBlocks editor does not flag any socket (power Tibbits #09/#10 use #18, the #29 sensor sits next to #00-3). **Not tested on real hardware** - verify on a bench before deployment.
 
 ## Versions
 
+- **1.3.0** (2026-11-13): audit of all recipes against their descriptions. AppBlocks variants: 10 - long pause after several power cycles in a row (was only in TIDE); 04 - alarm code no longer flaps every second (it flooded MQTT), threshold delay, inputs 3 and 4, sensor-loss debounce; 08 - one missed sensor reply no longer switches heating off; 05 - web console password; 01, 03 - sane network defaults instead of template values. TIDE: 07 - the overheat flag now returns to 0; 09 - values above 327.67 units were clipped in the chart, CSV and MQTT. Every README now lists how the AppBlocks variant differs from the TIDE one and has a version history.
 - **1.2.0** (2026-11-10): three new recipes. 11 - an MCP server on the Linux board LTPP3(G2): an AI reads sensors, switches relays and writes rules (Python, 27 tests on a board emulator, beta). 12 - Andon, an AppBlocks project built with the Tibbo compiler through the AppBlocks builder. 13 - RS-485 black box in Tibbo BASIC, built with the same compiler; frame splitting checked on a model. None of them has run on real hardware yet.
 - **1.1.0** (2026-10-26): recipes 02-05 - inputs of #54 on #21 in S10 and the #09 supply on #18 in S12 instead of one #20 (the AppBlocks editor accepts only #18 for power Tibbits); recipe 07 - #00-3 in S11 powers the #29 sensor; recipe 09 - #12 moved to S9; exact terminal numbers in the READMEs.
 - **1.0.1**: UART divider without overflow on 16-bit DS1100 (recipe 06), library timer period in recipe 03.

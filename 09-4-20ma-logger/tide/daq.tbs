@@ -19,7 +19,10 @@ dim ua(CH_COUNT) as long                    'последний ток, мкА
 dim val_now(CH_COUNT) as long               'последнее значение, сотые
 dim sum(CH_COUNT) as long
 dim cnt(CH_COUNT) as byte
-dim hist(CH_COUNT, HIST_LEN) as integer     'средние за минуту, сотые (до +-327.67 при делителе 100)
+dim hist(CH_COUNT, HIST_LEN) as integer     'средние за минуту: сотые, делённые на hdiv канала (помещаются в 16 бит)
+dim hdiv(CH_COUNT) as byte                  '1, 10 или 100 - по диапазону канала
+dim avg_last(CH_COUNT) as long              'среднее за последнюю минуту, сотые, без огрубления
+dim avg_ok(CH_COUNT) as no_yes
 dim head as word = 0
 dim sec as byte = 0
 dim lo(CH_COUNT) as long
@@ -40,6 +43,21 @@ sub daq_init()
 	lo(3) = CFG_LO4
 	hi(3) = CFG_HI4
 	for i = 0 to CH_COUNT - 1
+		'история хранит 16-битные числа: при диапазоне шире +-327.67 единиц храним десятые, шире +-3276.7 - целые
+		dim m as long = lo(i)
+		if m < 0 then m = 0 - m
+		dim m2 as long = hi(i)
+		if m2 < 0 then m2 = 0 - m2
+		if m2 > m then m = m2
+		m = m + m / 10                          'запас: ток до 21 мА даёт значение выше верхней границы
+		if m > 327670 then
+			hdiv(i) = 100
+		else if m > 32767 then
+			hdiv(i) = 10
+		else
+			hdiv(i) = 1
+		end if
+		avg_ok(i) = NO
 		daq_fault(i) = YES
 		sum(i) = 0
 		cnt(i) = 0
@@ -79,10 +97,14 @@ sub daq_proc_second()
 	for i = 0 to CH_COUNT - 1
 		if cnt(i) > 0 then
 			dim avg as long = sum(i) / cnt(i)
+			avg_last(i) = avg
+			avg_ok(i) = YES
+			avg = avg / hdiv(i)
 			if avg > 32767 then avg = 32767
 			if avg < -32767 then avg = -32767
 			hist(i, head) = avg
 		else
+			avg_ok(i) = NO
 			hist(i, head) = NO_DATA
 		end if
 		sum(i) = 0
@@ -119,7 +141,18 @@ function daq_hist(ch as byte, n as word) as string
 	if hist(ch, i) = NO_DATA then
 		daq_hist = ""
 	else
-		daq_hist = fmt100(hist(ch, i))
+		dim v as long = hist(ch, i)
+		v = v * hdiv(ch)
+		daq_hist = fmt100(v)
+	end if
+end function
+
+'среднее за последнюю минуту (для MQTT), пусто - за минуту не было верных отсчётов
+function daq_avg(ch as byte) as string
+	if avg_ok(ch) = YES then
+		daq_avg = fmt100(avg_last(ch))
+	else
+		daq_avg = ""
 	end if
 end function
 

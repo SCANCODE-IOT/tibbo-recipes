@@ -1600,34 +1600,34 @@
       }
      }
     ],
-    "WIDGETS": [
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "1",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "Cabinet temperature, C",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvp2i08wqey5h2q",
-       "VISIBLE": "1",
-       "W": "4",
-       "ID": "mvp2i0xtn7p7n4e",
-       "X": 0,
-       "Y": 0
-      }
-     }
-    ],
+    "WIDGETS": [],
     "WIDGET_GROUPS": [
      {
       "id": "widget_group",
       "settings": {
        "ID": "mrubrq7wekb7o2fbbqa",
        "GROUPID": "group2",
-       "NAME": "Group",
-       "WIDGETS": []
+       "NAME": "Main",
+       "WIDGETS": [
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "1",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Cabinet temperature, C",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvp2i08wqey5h2q",
+          "VISIBLE": "1",
+          "W": "4",
+          "ID": "mvp2i0xtn7p7n4e",
+          "X": 0,
+          "Y": 0
+         }
+        }
+       ]
       }
      }
     ],

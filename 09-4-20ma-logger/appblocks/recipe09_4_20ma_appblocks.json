@@ -2119,105 +2119,105 @@
       }
      }
     ],
-    "WIDGETS": [
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "2",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "pressure",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvp2i6n95feu5rz",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvp2i7iobolrrkl",
-       "X": 0,
-       "Y": 0
-      }
-     },
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "2",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "level",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvp2i6qiz37u10m",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvp2i7j1ou1801e",
-       "X": 3,
-       "Y": 0
-      }
-     },
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "2",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "flow",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvp2i6trwijbok6",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvp2i7jeuba1f5i",
-       "X": 6,
-       "Y": 0
-      }
-     },
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "2",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "ch4",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvp2i6x0n1a881h",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvp2i7jr2h1zc61",
-       "X": 9,
-       "Y": 0
-      }
-     },
-     {
-      "id": "chart_widget",
-      "settings": {
-       "GROUPING": "0",
-       "H": "6",
-       "LABEL": "Measurements",
-       "LABEL_FONT_SIZE": "16",
-       "TABLE": "mvp2i6xdn3mctsh",
-       "TEXT_COLOR": "#000000",
-       "TIME_FRAME": "86400",
-       "VISIBLE": "1",
-       "W": "12",
-       "ID": "mvp2i7k4lgv085u",
-       "X": 0,
-       "Y": 3
-      }
-     }
-    ],
+    "WIDGETS": [],
     "WIDGET_GROUPS": [
      {
       "id": "widget_group",
       "settings": {
        "ID": "mrubrq7wekb7o2fbbqa",
        "GROUPID": "group2",
-       "NAME": "Group",
-       "WIDGETS": []
+       "NAME": "Main",
+       "WIDGETS": [
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "2",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "pressure",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvp2i6n95feu5rz",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvp2i7iobolrrkl",
+          "X": 0,
+          "Y": 0
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "2",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "level",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvp2i6qiz37u10m",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvp2i7j1ou1801e",
+          "X": 3,
+          "Y": 0
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "2",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "flow",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvp2i6trwijbok6",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvp2i7jeuba1f5i",
+          "X": 6,
+          "Y": 0
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "2",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "ch4",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvp2i6x0n1a881h",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvp2i7jr2h1zc61",
+          "X": 9,
+          "Y": 0
+         }
+        },
+        {
+         "id": "chart_widget",
+         "settings": {
+          "GROUPING": "0",
+          "H": "6",
+          "LABEL": "Measurements",
+          "LABEL_FONT_SIZE": "16",
+          "TABLE": "mvp2i6xdn3mctsh",
+          "TEXT_COLOR": "#000000",
+          "TIME_FRAME": "86400",
+          "VISIBLE": "1",
+          "W": "12",
+          "ID": "mvp2i7k4lgv085u",
+          "X": 0,
+          "Y": 3
+         }
+        }
+       ]
       }
      }
     ],

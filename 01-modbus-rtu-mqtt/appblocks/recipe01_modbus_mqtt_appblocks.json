@@ -42,7 +42,7 @@
    "settings": {
     "ID": "mquecbkttwt2hgq703",
     "DEVICE_NAME": "Device_Name_1",
-    "FIRMWAREVERSION": "1.0.0",
+    "FIRMWAREVERSION": "1.2.0",
     "TIMEZONE": "27",
     "LATITUDE": "0",
     "LONGITUDE": "0",
@@ -339,7 +339,7 @@
        "FEATURE_SETTING": "SETTINGID",
        "MINIMUM": "0",
        "MAXIMUM": 16,
-       "DEFAULT": "1.0.0.1",
+       "DEFAULT": "192.168.1.1",
        "POLL_INTERVAL": ""
       }
      },
@@ -429,7 +429,7 @@
        "FEATURE_SETTING": "SETTINGID",
        "MINIMUM": "0",
        "MAXIMUM": 50,
-       "DEFAULT": "Password",
+       "DEFAULT": "",
        "POLL_INTERVAL": ""
       }
      },
@@ -519,7 +519,7 @@
        "FEATURE_SETTING": "SETTINGID",
        "MINIMUM": 0,
        "MAXIMUM": 1,
-       "DEFAULT": "0",
+       "DEFAULT": "1",
        "POLL_INTERVAL": ""
       }
      },
@@ -561,10 +561,10 @@
    "settings": {
     "ID": "mquecbkt7eahgszzc6g",
     "ENABLED": "1",
-    "DHCP": "0",
+    "DHCP": "1",
     "IP": "192.168.1.40",
     "NM": "255.255.255.0",
-    "GI": "1.0.0.1"
+    "GI": "192.168.1.1"
    }
   },
   {
@@ -849,7 +849,7 @@
        "MIN": "",
        "MAX": 16,
        "INITIALIZE": "A",
-       "DEFAULT": "1.0.0.1"
+       "DEFAULT": "192.168.1.1"
       }
      },
      {
@@ -934,7 +934,7 @@
        "MIN": "",
        "MAX": 50,
        "INITIALIZE": "A",
-       "DEFAULT": "Password"
+       "DEFAULT": ""
       }
      },
      {
@@ -1019,7 +1019,7 @@
        "MIN": 0,
        "MAX": 1,
        "INITIALIZE": "A",
-       "DEFAULT": "0"
+       "DEFAULT": "1"
       }
      },
      {
@@ -1355,7 +1355,7 @@
     "ENABLED": "1",
     "MQTT_APP_CLIENT_ID": "Client_ID_1",
     "MQTT_NAME": "MQTT_Name_1",
-    "MQTT_PASSWORD": "Password",
+    "MQTT_PASSWORD": "",
     "MQTT_SERVER_HOST": "1.0.0.1",
     "MQTT_DESTINATION_PORT": "1883",
     "MQTT_TLS": "0",

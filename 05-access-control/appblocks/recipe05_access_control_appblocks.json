@@ -39,7 +39,7 @@
     "ID": "lclnkmknbjjih47stcs",
     "LEDPAT": "1",
     "DEVICE_NAME": "Device_Name_1",
-    "FIRMWAREVERSION": "1.0.0",
+    "FIRMWAREVERSION": "1.2.0",
     "INTERFACE_SWITCHING": "1",
     "TIMEZONE": "17",
     "LOGGING": "sys.debugprint",
@@ -250,6 +250,21 @@
        "MINIMUM": 0,
        "MAXIMUM": 1,
        "DEFAULT": "1"
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mwewq47tfdlmfv3",
+       "VARNAME": "WBPWD",
+       "DATATYPE": "string",
+       "NAME": "Web Admin Password",
+       "FEATURE": "mwewq47m1fklm07",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 32,
+       "DEFAULT": "tibbo1234",
+       "POLL_INTERVAL": ""
       }
      }
     ]
@@ -520,6 +535,23 @@
        "INITIALIZE": "A",
        "DEFAULT": "10"
       }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mwewq47m1fklm07",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "WBPWD",
+       "NAME": "Web Admin Password",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 32,
+       "INITIALIZE": "A",
+       "DEFAULT": "tibbo1234"
+      }
      }
     ]
    }
@@ -692,38 +724,7 @@
     "WIDGETENABLED": "1",
     "INTERVAL": "1",
     "DASHBOARD_TITLE": "Access control",
-    "WIDGETS": [
-     {
-      "id": "button_widget",
-      "settings": {
-       "ID": "li2tvbwlpu5we5a1rh",
-       "X": 0,
-       "Y": 0,
-       "W": 3,
-       "H": 4,
-       "VISIBLE": "1",
-       "VARIABLE": "lh8r5ppokuuzhvk8hbh",
-       "LABEL": "Disable Alarm",
-       "BUTTON_LABEL": "Send",
-       "HAS_INPUT": "0"
-      }
-     },
-     {
-      "id": "button_widget",
-      "settings": {
-       "ID": "mvp2hujeu3g8q49",
-       "X": 3,
-       "Y": 0,
-       "W": 3,
-       "H": 4,
-       "VISIBLE": "1",
-       "VARIABLE": "mvp2huj1n1sf44t",
-       "LABEL": "Door",
-       "BUTTON_LABEL": "Open",
-       "HAS_INPUT": "0"
-      }
-     }
-    ],
+    "WIDGETS": [],
     "USER": "admin",
     "PASSWORD": "",
     "GROUPS": [
@@ -817,6 +818,30 @@
           "STATUS": "",
           "READONLY": "0"
          }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mwewq480e53or8g",
+          "SETTINGID": "mwewq47m1fklm07",
+          "NAME": "Web Admin Password",
+          "CONTROL": "PASSWORD",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mwewq4873fbnc6t",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
         }
        ]
       }
@@ -832,6 +857,48 @@
        "ID": "m8floy7bkn4ni6vecd",
        "TABLE": "lh8oa2ptq2s688s8ko",
        "NAME": ""
+      }
+     }
+    ],
+    "WIDGET_GROUPS": [
+     {
+      "id": "widget_group",
+      "settings": {
+       "ID": "mwewq48llddfsuo",
+       "GROUPID": "group1",
+       "NAME": "Main",
+       "WIDGETS": [
+        {
+         "id": "button_widget",
+         "settings": {
+          "ID": "li2tvbwlpu5we5a1rh",
+          "X": 0,
+          "Y": 0,
+          "W": 3,
+          "H": 4,
+          "VISIBLE": "1",
+          "VARIABLE": "lh8r5ppokuuzhvk8hbh",
+          "LABEL": "Disable Alarm",
+          "BUTTON_LABEL": "Send",
+          "HAS_INPUT": "0"
+         }
+        },
+        {
+         "id": "button_widget",
+         "settings": {
+          "ID": "mvp2hujeu3g8q49",
+          "X": 3,
+          "Y": 0,
+          "W": 3,
+          "H": 4,
+          "VISIBLE": "1",
+          "VARIABLE": "mvp2huj1n1sf44t",
+          "LABEL": "Door",
+          "BUTTON_LABEL": "Open",
+          "HAS_INPUT": "0"
+         }
+        }
+       ]
       }
      }
     ]
@@ -2956,6 +3023,15 @@
     "TARGET_FEATURE": "mvp2hujrm1y0h9n",
     "TARGET_PORT": "comp",
     "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mwewq48e00xgpw7",
+    "SETTINGID": "PASSWORD",
+    "LINKEDSETTING": "mwewq47m1fklm07",
+    "FEATURE": "lclnnu48a9h45sekzvp"
    }
   }
  ]

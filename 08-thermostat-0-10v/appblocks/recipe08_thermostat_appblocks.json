@@ -30,7 +30,7 @@
    "settings": {
     "ID": "mquecbkttwt2hgq703",
     "DEVICE_NAME": "Device_Name_1",
-    "FIRMWAREVERSION": "1.0.0",
+    "FIRMWAREVERSION": "1.2.0",
     "TIMEZONE": "17",
     "LATITUDE": "0",
     "LONGITUDE": "0",
@@ -79,6 +79,21 @@
       "settings": {
        "ID": "mvl0htq431ao933",
        "VARNAME": "sensor_ok",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mwewunh3xb7bqub",
+       "VARNAME": "sensor_fail",
        "DATATYPE": "float",
        "NAME": "",
        "FEATURE": "",
@@ -2341,92 +2356,92 @@
       }
      }
     ],
-    "WIDGETS": [
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "1",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "Temperature, C",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvl0htpeypcbrs1",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvl0hv6h0j7emtt",
-       "X": 0,
-       "Y": 0
-      }
-     },
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "1",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "Humidity, %",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvl0htpry99thhr",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvl0hv6upfq87o2",
-       "X": 3,
-       "Y": 0
-      }
-     },
-     {
-      "id": "gauge_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "1",
-       "FONT_SIZE": "16",
-       "H": "3",
-       "LABEL": "Fan, V",
-       "LABEL_FONT_SIZE": "16",
-       "MAX": "10",
-       "MIN": "0",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvl0htbolq578ln",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvl0hv77shho06d",
-       "X": 6,
-       "Y": 0
-      }
-     },
-     {
-      "id": "gauge_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "1",
-       "FONT_SIZE": "16",
-       "H": "3",
-       "LABEL": "Valve, V",
-       "LABEL_FONT_SIZE": "16",
-       "MAX": "10",
-       "MIN": "0",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvl0htc12kx9zgk",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvl0hv7k6p8dwtp",
-       "X": 9,
-       "Y": 0
-      }
-     }
-    ],
+    "WIDGETS": [],
     "WIDGET_GROUPS": [
      {
       "id": "widget_group",
       "settings": {
        "ID": "mrubrq7wekb7o2fbbqa",
        "GROUPID": "group2",
-       "NAME": "Group",
-       "WIDGETS": []
+       "NAME": "Main",
+       "WIDGETS": [
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "1",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Temperature, C",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvl0htpeypcbrs1",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvl0hv6h0j7emtt",
+          "X": 0,
+          "Y": 0
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "1",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Humidity, %",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvl0htpry99thhr",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvl0hv6upfq87o2",
+          "X": 3,
+          "Y": 0
+         }
+        },
+        {
+         "id": "gauge_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "1",
+          "FONT_SIZE": "16",
+          "H": "3",
+          "LABEL": "Fan, V",
+          "LABEL_FONT_SIZE": "16",
+          "MAX": "10",
+          "MIN": "0",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvl0htbolq578ln",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvl0hv77shho06d",
+          "X": 6,
+          "Y": 0
+         }
+        },
+        {
+         "id": "gauge_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "1",
+          "FONT_SIZE": "16",
+          "H": "3",
+          "LABEL": "Valve, V",
+          "LABEL_FONT_SIZE": "16",
+          "MAX": "10",
+          "MIN": "0",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvl0htc12kx9zgk",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvl0hv7k6p8dwtp",
+          "X": 9,
+          "Y": 0
+         }
+        }
+       ]
       }
      }
     ],
@@ -2912,8 +2927,8 @@
     "ID": "mvl0htu366pqw3n",
     "DISPLAY_NAME": "",
     "FEATURE": "",
-    "X": 600,
-    "Y": 450,
+    "X": 1200,
+    "Y": 560,
     "INPUTS": [],
     "OUTPUTS": [],
     "GROUP": "mvl0htqhg8qd17u",
@@ -2937,7 +2952,7 @@
     "DISPLAY_NAME": "",
     "FEATURE": "",
     "X": 1200,
-    "Y": 450,
+    "Y": 680,
     "INPUTS": [],
     "OUTPUTS": [],
     "GROUP": "mvl0htqhg8qd17u",
@@ -3027,7 +3042,7 @@
     "SOURCE_FEATURE": "mvl0htr75pehmxs",
     "SOURCE_PORT": "modbus_timeout",
     "TARGET": "",
-    "TARGET_FEATURE": "mvl0htu366pqw3n",
+    "TARGET_FEATURE": "mwewunhvxd16b9l",
     "TARGET_PORT": "set_value",
     "ARGUMENTS": []
    }
@@ -3040,7 +3055,7 @@
     "SOURCE_FEATURE": "mvl0htsawlpth6o",
     "SOURCE_PORT": "modbus_timeout",
     "TARGET": "",
-    "TARGET_FEATURE": "mvl0htutgq79hsr",
+    "TARGET_FEATURE": "mwewunjfdn5cvuv",
     "TARGET_PORT": "set_value",
     "ARGUMENTS": []
    }
@@ -4423,6 +4438,221 @@
     "TARGET": "",
     "TARGET_FEATURE": "mvl0hv4bot7kqwj",
     "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewunhajoa34jq",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1800,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewunhhce0acna",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mwewunh3xb7bqub"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewunhohzxhfz5",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0httdpnjixe7",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewunhajoa34jq",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewunhvxd16b9l",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 560,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewuni2dsap02t",
+       "ARGVALUE": "{{$mwewunh3xb7bqub}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mwewunh3xb7bqub"
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mwewuni93d8sxed",
+    "DISPLAY_NAME": "no answer for 30 s?",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 560,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewunig0bz4l1w",
+       "ARGVALUE": "{{$mwewunh3xb7bqub}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewunince7f1dn",
+       "ARGVALUE": ">=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewuniux88t60w",
+       "ARGVALUE": "15",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewunj1pt0qrry",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewunhvxd16b9l",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewuni93d8sxed",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewunj8b9pjd23",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewuni93d8sxed",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0htu366pqw3n",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewunjfdn5cvuv",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 680,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewunjmy3sq35o",
+       "ARGVALUE": "{{$mwewunh3xb7bqub}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mwewunh3xb7bqub"
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mwewunjtnkg1fr5",
+    "DISPLAY_NAME": "no answer for 30 s?",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 680,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0htqhg8qd17u",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewunk0sfjf6l4",
+       "ARGVALUE": "{{$mwewunh3xb7bqub}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewunk7ojxn7zu",
+       "ARGVALUE": ">=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewunkeiqhhwla",
+       "ARGVALUE": "15",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewunkl556s11x",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewunjfdn5cvuv",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewunjtnkg1fr5",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewunkscrrhjeo",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewunjtnkg1fr5",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0htutgq79hsr",
+    "TARGET_PORT": "set_value",
     "ARGUMENTS": []
    }
   }

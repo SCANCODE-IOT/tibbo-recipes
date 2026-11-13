@@ -75,7 +75,7 @@ sub on_sys_timer()
 				dim t as string(96)
 				for i = 0 to CH_COUNT - 1
 					t = topic_base + daq_name(i)
-					if daq_hist(i, daq_count - 1) <> "" then mqtt_publish(t, daq_hist(i, daq_count - 1), QOS_AT_MOST_ONCE)
+					if daq_avg(i) <> "" then mqtt_publish(t, daq_avg(i), QOS_AT_MOST_ONCE)
 					t = t + "/fault"
 					if daq_fault(i) = YES then
 						mqtt_publish(t, "1", QOS_AT_MOST_ONCE)

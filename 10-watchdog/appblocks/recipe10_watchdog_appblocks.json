@@ -2,7 +2,7 @@
  "id": "6a7027cef9549288e8b5f72b",
  "name": "Tibbo-recipe-10-Watchdog",
  "device": "TPP2W(G2)",
- "description": "Recipe 10 from tibbo.ru: network watchdog on TPP2(G2): HTTP checks of two devices, power cycle through NC contacts of Tibbit #06 relays.",
+ "description": "Recipe 10 from tibbo.ru: network watchdog on TPP2(G2): HTTP checks of two devices, power cycle through NC contacts of Tibbit #06 relays, long pause after several power cycles in a row.",
  "shortDescription": "",
  "version": "0.1.19",
  "runtime": "tios",
@@ -30,7 +30,7 @@
    "settings": {
     "ID": "mquecbkttwt2hgq703",
     "DEVICE_NAME": "Device_Name_1",
-    "FIRMWAREVERSION": "1.0.0",
+    "FIRMWAREVERSION": "1.2.0",
     "TIMEZONE": "17",
     "LATITUDE": "0",
     "LONGITUDE": "0",
@@ -131,6 +131,36 @@
        "MINIMUM": "",
        "MAXIMUM": "",
        "DEFAULT": "3",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mwewnd4wqbo8mek",
+       "VARNAME": "series1",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mwewnd8lpca1utr",
+       "VARNAME": "series2",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
        "POLL_INTERVAL": ""
       }
      }
@@ -418,6 +448,36 @@
        "MINIMUM": "0",
        "MAXIMUM": "100",
        "DEFAULT": "6",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mwewnd3j6hh0rs1",
+       "VARNAME": "MAX_REBOOTS",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mwewnd3chihr861",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "1",
+       "MAXIMUM": "20",
+       "DEFAULT": "3",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mwewnd4bf8galt2",
+       "VARNAME": "PAUSE_CHECKS",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mwewnd44wvaxbs1",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "1",
+       "MAXIMUM": "2880",
+       "DEFAULT": "120",
        "POLL_INTERVAL": ""
       }
      }
@@ -873,6 +933,40 @@
        "INITIALIZE": "I",
        "DEFAULT": "6"
       }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mwewnd3chihr861",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MAX_REBOOTS",
+       "NAME": "Power cycles in a row before long pause",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "1",
+       "MAX": "20",
+       "INITIALIZE": "I",
+       "DEFAULT": "3"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mwewnd44wvaxbs1",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "PAUSE_CHECKS",
+       "NAME": "Long pause, in checks (120 = 60 min)",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "1",
+       "MAX": "2880",
+       "INITIALIZE": "I",
+       "DEFAULT": "120"
+      }
      }
     ]
    }
@@ -1281,6 +1375,54 @@
             "id": "luis_item_option",
             "settings": {
              "ID": "mvl0k12vyzqwura",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mwewnd3qd0hbl7r",
+          "SETTINGID": "mwewnd3chihr861",
+          "NAME": "Power cycles in a row before long pause",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mwewnd3xxxc2v0r",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mwewnd4iofse3yd",
+          "SETTINGID": "mwewnd44wvaxbs1",
+          "NAME": "Long pause, in checks (120 = 60 min)",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mwewnd4pcxmnfe2",
              "LABEL": "OPTION_LABEL",
              "VALUE": "0"
             }
@@ -1887,126 +2029,162 @@
       }
      }
     ],
-    "WIDGETS": [
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "0",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "Channel 1: failed checks",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvl0k13ltu4r451",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvl0k1n3l63y1hh",
-       "X": 0,
-       "Y": 0
-      }
-     },
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "0",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "Channel 1: power cycles",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvl0k14bjskby5e",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvl0k1nglbi572j",
-       "X": 3,
-       "Y": 0
-      }
-     },
-     {
-      "id": "button_widget",
-      "settings": {
-       "BUTTON_LABEL": "Power cycle now",
-       "COLOR": "#1976d2",
-       "FONT_SIZE": "16",
-       "H": "2",
-       "HAS_INPUT": "0",
-       "LABEL": "Channel 1",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvl0k15rd120y41",
-       "VISIBLE": "1",
-       "W": "6",
-       "ID": "mvl0k1ntb0a5cvc",
-       "X": 0,
-       "Y": 3
-      }
-     },
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "0",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "Channel 2: failed checks",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvl0k13y6kpnxo3",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvl0k24s6i2dg25",
-       "X": 6,
-       "Y": 0
-      }
-     },
-     {
-      "id": "card_widget",
-      "settings": {
-       "COLOR": "#1976d2",
-       "DECIMAL_PLACES": "0",
-       "FONT_SIZE": "60",
-       "H": "3",
-       "LABEL": "Channel 2: power cycles",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvl0k14ofldxlu7",
-       "VISIBLE": "1",
-       "W": "3",
-       "ID": "mvl0k25534f6rph",
-       "X": 9,
-       "Y": 0
-      }
-     },
-     {
-      "id": "button_widget",
-      "settings": {
-       "BUTTON_LABEL": "Power cycle now",
-       "COLOR": "#1976d2",
-       "FONT_SIZE": "16",
-       "H": "2",
-       "HAS_INPUT": "0",
-       "LABEL": "Channel 2",
-       "LABEL_FONT_SIZE": "16",
-       "TEXT_COLOR": "#000000",
-       "VARIABLE": "mvl0k1647gjbbx2",
-       "VISIBLE": "1",
-       "W": "6",
-       "ID": "mvl0k25idwdn0a6",
-       "X": 6,
-       "Y": 3
-      }
-     }
-    ],
+    "WIDGETS": [],
     "WIDGET_GROUPS": [
      {
       "id": "widget_group",
       "settings": {
        "ID": "mrubrq7wekb7o2fbbqa",
        "GROUPID": "group2",
-       "NAME": "Group",
-       "WIDGETS": []
+       "NAME": "Main",
+       "WIDGETS": [
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Channel 1: failed checks",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvl0k13ltu4r451",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvl0k1n3l63y1hh",
+          "X": 0,
+          "Y": 0
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Channel 1: power cycles",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvl0k14bjskby5e",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvl0k1nglbi572j",
+          "X": 3,
+          "Y": 0
+         }
+        },
+        {
+         "id": "button_widget",
+         "settings": {
+          "BUTTON_LABEL": "Power cycle now",
+          "COLOR": "#1976d2",
+          "FONT_SIZE": "16",
+          "H": "2",
+          "HAS_INPUT": "0",
+          "LABEL": "Channel 1",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvl0k15rd120y41",
+          "VISIBLE": "1",
+          "W": "6",
+          "ID": "mvl0k1ntb0a5cvc",
+          "X": 0,
+          "Y": 3
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Channel 2: failed checks",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvl0k13y6kpnxo3",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvl0k24s6i2dg25",
+          "X": 6,
+          "Y": 0
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Channel 2: power cycles",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvl0k14ofldxlu7",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mvl0k25534f6rph",
+          "X": 9,
+          "Y": 0
+         }
+        },
+        {
+         "id": "button_widget",
+         "settings": {
+          "BUTTON_LABEL": "Power cycle now",
+          "COLOR": "#1976d2",
+          "FONT_SIZE": "16",
+          "H": "2",
+          "HAS_INPUT": "0",
+          "LABEL": "Channel 2",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mvl0k1647gjbbx2",
+          "VISIBLE": "1",
+          "W": "6",
+          "ID": "mvl0k25idwdn0a6",
+          "X": 6,
+          "Y": 3
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Channel 1: power cycles in a row",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mwewnd4wqbo8mek",
+          "VISIBLE": "1",
+          "W": "6",
+          "ID": "mwewndcaoi7qpx3",
+          "X": 0,
+          "Y": 5
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Channel 2: power cycles in a row",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mwewnd8lpca1utr",
+          "VISIBLE": "1",
+          "W": "6",
+          "ID": "mwewndch46gx4oz",
+          "X": 6,
+          "Y": 5
+         }
+        }
+       ]
       }
      }
     ],
@@ -2602,7 +2780,7 @@
     "ID": "mvl0k1g8vz85xrj",
     "DISPLAY_NAME": "",
     "FEATURE": "",
-    "X": 600,
+    "X": 1200,
     "Y": 450,
     "INPUTS": [],
     "OUTPUTS": [],
@@ -2630,19 +2808,6 @@
     "TARGET": "",
     "TARGET_FEATURE": "mvl0k1es0ihokvv",
     "TARGET_PORT": "comp",
-    "ARGUMENTS": []
-   }
-  },
-  {
-   "id": "node_link",
-   "settings": {
-    "ID": "mvl0k1hb2msdwfm",
-    "SOURCE": "",
-    "SOURCE_FEATURE": "mvl0k1es0ihokvv",
-    "SOURCE_PORT": "true_output",
-    "TARGET": "",
-    "TARGET_FEATURE": "mvl0k1g8vz85xrj",
-    "TARGET_PORT": "command_trigger",
     "ARGUMENTS": []
    }
   },
@@ -3166,7 +3331,7 @@
     "ID": "mvl0k1xx3f0kbau",
     "DISPLAY_NAME": "",
     "FEATURE": "",
-    "X": 600,
+    "X": 1200,
     "Y": 1150,
     "INPUTS": [],
     "OUTPUTS": [],
@@ -3194,19 +3359,6 @@
     "TARGET": "",
     "TARGET_FEATURE": "mvl0k1wheg0246y",
     "TARGET_PORT": "comp",
-    "ARGUMENTS": []
-   }
-  },
-  {
-   "id": "node_link",
-   "settings": {
-    "ID": "mvl0k1z0nbfalzv",
-    "SOURCE": "",
-    "SOURCE_FEATURE": "mvl0k1wheg0246y",
-    "SOURCE_PORT": "true_output",
-    "TARGET": "",
-    "TARGET_FEATURE": "mvl0k1xx3f0kbau",
-    "TARGET_PORT": "command_trigger",
     "ARGUMENTS": []
    }
   },
@@ -3397,6 +3549,432 @@
     "SOURCE_PORT": "delay_elapsed",
     "TARGET": "",
     "TARGET_FEATURE": "mvl0k229kk1emrh",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mwewnd53t6kjhnc",
+    "DISPLAY_NAME": "too many power cycles in a row?",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0k16hx2y9cer",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd5aozqx6g0",
+       "ARGVALUE": "{{$mwewnd4wqbo8mek}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd5hk2p0fg1",
+       "ARGVALUE": ">=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd5o2ob0kct",
+       "ARGVALUE": "{{$mwewnd3j6hh0rs1}}",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewnd5vtr5pyru",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0k1es0ihokvv",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewnd53t6kjhnc",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewnd62q8oy4rb",
+    "DISPLAY_NAME": "long pause",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 340,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0k16hx2y9cer",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd69skwti9o",
+       "ARGVALUE": "{{$mwewnd4bf8galt2}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0k151xx7nct7"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewnd6ggacm2ca",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 340,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0k16hx2y9cer",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd6n9u1nnit",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mwewnd4wqbo8mek"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewnd6u1mx7bnh",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewnd53t6kjhnc",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewnd62q8oy4rb",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewnd71g5z2dih",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewnd62q8oy4rb",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewnd6ggacm2ca",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewnd78o7hw04w",
+    "DISPLAY_NAME": "one more in a row",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0k16hx2y9cer",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd7fu7g9wt8",
+       "ARGVALUE": "{{$mwewnd4wqbo8mek}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mwewnd4wqbo8mek"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewnd7mntl4r4j",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewnd53t6kjhnc",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewnd78o7hw04w",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewnd7t41ge68e",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewnd78o7hw04w",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0k1g8vz85xrj",
+    "TARGET_PORT": "command_trigger",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewnd8039ghyoq",
+    "DISPLAY_NAME": "device answered",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0k16hx2y9cer",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd87oio70oz",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mwewnd4wqbo8mek"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewnd8evsswf21",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0k1bjxie7rb1",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewnd8039ghyoq",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mwewnd8s8kvb2or",
+    "DISPLAY_NAME": "too many power cycles in a row?",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 1150,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0k1o6bsatlhy",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd8z8juipyx",
+       "ARGVALUE": "{{$mwewnd8lpca1utr}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd96stmtpjy",
+       "ARGVALUE": ">=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd9dhkedtan",
+       "ARGVALUE": "{{$mwewnd3j6hh0rs1}}",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewnd9ke053mog",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0k1wheg0246y",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewnd8s8kvb2or",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewnd9rewzdntu",
+    "DISPLAY_NAME": "long pause",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 1040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0k1o6bsatlhy",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewnd9yz7xis2j",
+       "ARGVALUE": "{{$mwewnd4bf8galt2}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mvl0k15eag0wc2v"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewnda5hynfrex",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 1040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0k1o6bsatlhy",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewndacoe4fxcp",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mwewnd8lpca1utr"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewndaj539x4q1",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewnd8s8kvb2or",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewnd9rewzdntu",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewndaql18qkxi",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewnd9rewzdntu",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewnda5hynfrex",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewndaxvj1b9g0",
+    "DISPLAY_NAME": "one more in a row",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 1150,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0k1o6bsatlhy",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewndb49o9g5c0",
+       "ARGVALUE": "{{$mwewnd8lpca1utr}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mwewnd8lpca1utr"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewndbbujvnrw0",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewnd8s8kvb2or",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewndaxvj1b9g0",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewndbi3atz7bv",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mwewndaxvj1b9g0",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mvl0k1xx3f0kbau",
+    "TARGET_PORT": "command_trigger",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mwewndbpoqmyc0i",
+    "DISPLAY_NAME": "device answered",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 1000,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mvl0k1o6bsatlhy",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mwewndbwurf5u1m",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mwewnd8lpca1utr"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mwewndc3ncrla1g",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mvl0k1t8zjd4tzr",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mwewndbpoqmyc0i",
     "TARGET_PORT": "set_value",
     "ARGUMENTS": []
    }
