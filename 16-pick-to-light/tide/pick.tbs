@@ -1,0 +1,279 @@
+'=====================================================================
+' Задание, лампы и кнопки ячеек
+' Скан кода -> лампа ячейки горит -> кнопка ячейки -> строка собрана.
+' Лампа: выход #11, LOW - горит. Кнопка: вход #04-8, LOW - нажата.
+'=====================================================================
+include "global.tbh"
+
+dim ln_count as byte = 0
+dim ln_code(MAX_LINES) as string(24)
+dim ln_cell(MAX_LINES) as byte
+dim ln_qty(MAX_LINES) as word
+dim ln_name(MAX_LINES) as string(32)
+dim ln_state(MAX_LINES) as byte
+dim ln_done as byte = 0
+dim last_event as string(64) = ""
+dim event_no as word = 0
+dim log_n as byte = 0
+dim log_min(LOG_SIZE) as word
+dim log_cell(LOG_SIZE) as byte
+dim log_code(LOG_SIZE) as string(24)
+dim log_what(LOG_SIZE) as string(24)
+
+dim lamp_io(CFG_CELLS) as pl_io_num
+dim btn_io(CFG_CELLS) as pl_io_num
+dim cell_line(CFG_CELLS) as byte            'какая строка задания горит в ячейке, NO_LINE - никакая
+dim btn_cnt(CFG_CELLS) as byte
+dim btn_down(CFG_CELLS) as no_yes
+dim blink(CFG_CELLS) as byte                'короткое мигание лампы, такты по 20 мс
+dim time_ok as no_yes = NO
+
+declare sub lamp(c as byte, on as no_yes)
+declare sub button_pressed(c as byte)
+declare sub log_add(c as byte, byref code as string, byref what as string)
+
+sub pick_init()
+	dim i as byte
+	lamp_io(0) = PL_IO_NUM_9_TX0            'S1 #11: лампы 1-4
+	lamp_io(1) = PL_IO_NUM_8_RX0
+	lamp_io(2) = PL_IO_NUM_0
+	lamp_io(3) = PL_IO_NUM_16_INT0
+	lamp_io(4) = PL_IO_NUM_11_TX1           'S3 #11: лампы 5-8
+	lamp_io(5) = PL_IO_NUM_10_RX1
+	lamp_io(6) = PL_IO_NUM_1
+	lamp_io(7) = PL_IO_NUM_17_INT1
+	btn_io(0) = PL_IO_NUM_13_TX2            'S5 #04-8: кнопки 1-4
+	btn_io(1) = PL_IO_NUM_12_RX2
+	btn_io(2) = PL_IO_NUM_2
+	btn_io(3) = PL_IO_NUM_18_INT2
+	btn_io(4) = PL_IO_NUM_15_TX3            'S7 #04-8: кнопки 5-8
+	btn_io(5) = PL_IO_NUM_14_RX3
+	btn_io(6) = PL_IO_NUM_3
+	btn_io(7) = PL_IO_NUM_19_INT3
+	for i = 0 to CFG_CELLS - 1
+		'выход сначала включаем, потом пишем уровень; HIGH - лампа погашена
+		io.num = lamp_io(i)
+		io.enabled = YES
+		io.state = HIGH
+		io.num = btn_io(i)
+		io.enabled = NO
+		cell_line(i) = NO_LINE
+		btn_cnt(i) = 0
+		btn_down(i) = NO
+		blink(i) = 0
+	next i
+end sub
+
+sub lamp(c as byte, on as no_yes)
+	io.num = lamp_io(c)
+	if on = YES then
+		io.state = LOW
+	else
+		io.state = HIGH
+	end if
+end sub
+
+'каждые 20 мс: кнопки с защитой от дребезга, мигание
+sub pick_tick()
+	dim i as byte
+	for i = 0 to CFG_CELLS - 1
+		io.num = btn_io(i)
+		if io.state = LOW then
+			if btn_cnt(i) < CFG_DEBOUNCE then
+				btn_cnt(i) = btn_cnt(i) + 1
+				if btn_cnt(i) = CFG_DEBOUNCE and btn_down(i) = NO then
+					btn_down(i) = YES
+					button_pressed(i)
+				end if
+			end if
+		else
+			if btn_cnt(i) > 0 then btn_cnt(i) = btn_cnt(i) - 1
+			if btn_cnt(i) = 0 then btn_down(i) = NO
+		end if
+		if blink(i) > 0 then
+			blink(i) = blink(i) - 1
+			if cell_line(i) = NO_LINE then
+				if (blink(i) / 10) mod 2 = 1 then
+					lamp(i, YES)
+				else
+					lamp(i, NO)
+				end if
+			end if
+		end if
+	next i
+end sub
+
+'скан с ТСД. Ответ странице: OK;ячейка;кол-во;название | DONE;ячейка | BUSY;ячейка | NF
+function pick_scan(byref code as string) as string
+	dim i as byte
+	dim found_done as byte = NO_LINE
+	i = 0
+	while i < ln_count
+		if ln_code(i) = code then
+			if ln_state(i) = LN_LIT then
+				pick_scan = "OK;" + str(ln_cell(i) + 1) + ";" + str(ln_qty(i)) + ";" + ln_name(i)
+				exit function
+			else if ln_state(i) = LN_WAIT then
+				dim c as byte = ln_cell(i)
+				if cell_line(c) <> NO_LINE then
+					pick_scan = "BUSY;" + str(c + 1)
+					exit function
+				end if
+				ln_state(i) = LN_LIT
+				cell_line(c) = i
+				blink(c) = 0
+				lamp(c, YES)
+				log_add(c, code, "скан")
+				pick_scan = "OK;" + str(c + 1) + ";" + str(ln_qty(i)) + ";" + ln_name(i)
+				exit function
+			else
+				found_done = i
+			end if
+		end if
+		i = i + 1
+	wend
+	if found_done <> NO_LINE then
+		pick_scan = "DONE;" + str(ln_cell(found_done) + 1)
+	else
+		pick_scan = "NF"
+		log_add(NO_LINE, code, "нет в задании")
+	end if
+end function
+
+sub button_pressed(c as byte)
+	dim i as byte = cell_line(c)
+	if i = NO_LINE then
+#if CFG_WRONG_BLINK
+		blink(c) = 60                       'три вспышки
+#endif
+		log_add(c, "", "кнопка без задания")
+		last_event = "Ячейка " + str(c + 1) + ": кнопка без задания"
+		event_no = event_no + 1
+		exit sub
+	end if
+	ln_state(i) = LN_DONE
+	ln_done = ln_done + 1
+	cell_line(c) = NO_LINE
+	lamp(c, NO)
+	log_add(c, ln_code(i), "собрано")
+	last_event = "Ячейка " + str(c + 1) + ": собрано"
+	event_no = event_no + 1
+end sub
+
+'строка задания от учётной системы или со страницы настройки
+function pick_add(byref code as string, cell as byte, qty as word, byref pname as string) as string
+	if code = "" or cell < 1 or cell > CFG_CELLS then
+		pick_add = "ERR"
+		exit function
+	end if
+	if ln_count >= MAX_LINES then
+		pick_add = "FULL"
+		exit function
+	end if
+	ln_code(ln_count) = code
+	ln_cell(ln_count) = cell - 1
+	ln_qty(ln_count) = qty
+	ln_name(ln_count) = pname
+	ln_state(ln_count) = LN_WAIT
+	ln_count = ln_count + 1
+	pick_add = "OK"
+end function
+
+sub pick_clear()
+	dim i as byte
+	for i = 0 to CFG_CELLS - 1
+		cell_line(i) = NO_LINE
+		blink(i) = 0
+		lamp(i, NO)
+	next i
+	ln_count = 0
+	ln_done = 0
+	log_add(NO_LINE, "", "задание очищено")
+end sub
+
+'отменить горящую ячейку: строка снова ждёт скана
+sub pick_cancel(cell as byte)
+	if cell < 1 or cell > CFG_CELLS then exit sub
+	dim c as byte = cell - 1
+	dim i as byte = cell_line(c)
+	if i = NO_LINE then exit sub
+	ln_state(i) = LN_WAIT
+	cell_line(c) = NO_LINE
+	lamp(c, NO)
+	log_add(c, ln_code(i), "отменено")
+end sub
+
+'проверка ламп: все мигают 2 секунды (только свободные ячейки)
+sub pick_test()
+	dim i as byte
+	for i = 0 to CFG_CELLS - 1
+		if cell_line(i) = NO_LINE then blink(i) = 100
+	next i
+end sub
+
+'"10100000": 1 - лампа ячейки горит
+function pick_lit_str() as string
+	dim i as byte
+	pick_lit_str = ""
+	for i = 0 to CFG_CELLS - 1
+		if cell_line(i) = NO_LINE then
+			pick_lit_str = pick_lit_str + "0"
+		else
+			pick_lit_str = pick_lit_str + "1"
+		end if
+	next i
+end function
+
+sub log_add(c as byte, byref code as string, byref what as string)
+	dim d, m as word
+	dim s as byte
+	dim i as byte
+	if log_n < LOG_SIZE then log_n = log_n + 1
+	i = log_n - 1
+	while i > 0
+		log_min(i) = log_min(i - 1)
+		log_cell(i) = log_cell(i - 1)
+		log_code(i) = log_code(i - 1)
+		log_what(i) = log_what(i - 1)
+		i = i - 1
+	wend
+	if time_ok = YES then
+		rtc.getdata(d, m, s)
+		log_min(0) = m
+	else
+		log_min(0) = 65535
+	end if
+	log_cell(0) = c
+	log_code(0) = code
+	log_what(0) = what
+	dbg(what + " " + code)
+end sub
+
+'--- часы ---
+sub pick_set_clock(days as word, mins as word, secs as byte)
+	rtc.setdata(days, mins, secs)
+	time_ok = YES
+end sub
+
+function pick_hhmm(m as word) as string
+	dim h as string(2) = str(m / 60)
+	dim mm as string(2) = str(m mod 60)
+	if m = 65535 then
+		pick_hhmm = "--:--"
+		exit function
+	end if
+	if len(h) < 2 then h = "0" + h
+	if len(mm) < 2 then mm = "0" + mm
+	pick_hhmm = h + ":" + mm
+end function
+
+function pick_clock_str() as string
+	dim d, m as word
+	dim s as byte
+	if time_ok = NO then
+		pick_clock_str = ""
+		exit function
+	end if
+	rtc.getdata(d, m, s)
+	pick_clock_str = pick_hhmm(m)
+end function

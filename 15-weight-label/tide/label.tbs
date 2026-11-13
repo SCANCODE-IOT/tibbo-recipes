@@ -1,0 +1,399 @@
+'=====================================================================
+' Товар, автопечать и печать этикетки на Godex (EZPL по TCP 9100)
+' Автопечать: вес стабилен CFG_STABLE_HALFSEC полусекунд и не меньше
+' CFG_MIN_G - печатаем одну этикетку; следующая - после того, как вес
+' упадёт ниже CFG_ZERO_G (товар сняли с весов).
+'=====================================================================
+include "global.tbh"
+
+'EEPROM (адреса от 1): метка, артикул, срок, режим, длина и текст названия
+#define EE_MAGIC 1
+#define EE_PLU 3
+#define EE_DAYS 8
+#define EE_MODE 11
+#define EE_NLEN 12
+#define EE_NAME 13
+#define EE_NAME_MAX 60
+const EE_SIGN = "L1"
+
+dim prn_sock as byte
+dim prn_state as prn_states = PRN_IDLE
+dim prn_err as byte = 0                     '0 - нет ошибки; 1-99 - код принтера + 1; 100+ - наши коды (см. label_prn_text)
+dim prn_wait as byte = 0                    'таймаут текущего шага, полусекунды
+dim prn_reply as string(16) = ""
+dim p_name as string(64) = "Товар"
+dim p_plu as string(5) = "00001"
+dim p_days as word = 0
+dim p_auto as no_yes = YES
+dim time_ok as no_yes = NO
+dim lbl_count as word = 0
+dim lbl_armed as no_yes = NO                'после включения сначала снимите товар: этикетка не напечатается сама от старого груза
+dim stable_cnt as byte = 0
+dim job_g as long = 0
+dim job_day as word = 0
+dim job_min as word = 0
+dim log_n as byte = 0
+dim log_day(LOG_SIZE) as word
+dim log_min(LOG_SIZE) as word
+dim log_g(LOG_SIZE) as long
+dim log_plu(LOG_SIZE) as string(5)
+dim log_ok(LOG_SIZE) as byte
+
+#define ERR_NO_CONNECT 100
+#define ERR_NO_STATUS 101
+#define ERR_SEND 102
+#define ERR_NO_WEIGHT 103
+#define ERR_BUSY 104
+
+declare sub prn_start()
+declare sub prn_send_label()
+declare sub prn_finish(code as byte)
+declare sub log_add(ok as byte)
+declare function dots(mm as word) as string
+declare function two(v as word) as string
+declare function ean_digits(g as long) as string
+
+sub label_init()
+	prn_sock = sock_get("PRN")
+	sock.num = prn_sock
+	sock.protocol = PL_SOCK_PROTOCOL_TCP
+	sock.inconmode = PL_SOCK_INCONMODE_NONE
+	sock.reconmode = PL_SOCK_RECONMODE_3
+	sock.rxbuffrq(1)
+	sock.txbuffrq(4)                        'этикетка - около 600 байт, уходит одним заданием
+
+	'товар из EEPROM; если там пусто - значения по умолчанию
+	if stor.getdata(EE_MAGIC, 2) = EE_SIGN then
+		p_plu = stor.getdata(EE_PLU, 5)
+		p_days = val(stor.getdata(EE_DAYS, 3))
+		if stor.getdata(EE_MODE, 1) = "M" then
+			p_auto = NO
+		else
+			p_auto = YES
+		end if
+		dim n as byte = asc(stor.getdata(EE_NLEN, 1))
+		if n > EE_NAME_MAX then n = EE_NAME_MAX
+		p_name = stor.getdata(EE_NAME, n)
+	end if
+end sub
+
+'сохраняем только при изменении с веб-страницы: EEPROM изнашивается от записи
+sub label_save_product(byref name as string, byref plu as string, days as word, auto as no_yes)
+	dim d as string(5)
+	p_name = left(name, EE_NAME_MAX)
+	p_plu = right("00000" + plu, 5)
+	if days > 999 then days = 999
+	p_days = days
+	p_auto = auto
+	d = right("000" + str(p_days), 3)
+	stor.setdata(p_plu, EE_PLU)
+	stor.setdata(d, EE_DAYS)
+	if p_auto = YES then
+		stor.setdata("A", EE_MODE)
+	else
+		stor.setdata("M", EE_MODE)
+	end if
+	stor.setdata(chr(len(p_name)), EE_NLEN)
+	stor.setdata(p_name, EE_NAME)
+	stor.setdata(EE_SIGN, EE_MAGIC)
+	lbl_armed = NO                          'после смены товара ждём, пока весы опустеют
+end sub
+
+'вес в граммах; весы в фунтах не поддерживаются
+function label_weight_g() as long
+	if scale_unit = "g" or scale_unit = "G" or scale_unit = "gr" or scale_unit = "GR" then
+		label_weight_g = scale_milli / 1000
+	else
+		label_weight_g = scale_milli
+	end if
+end function
+
+'раз в 0,5 с: автопечать и таймауты принтера
+sub label_tick()
+	dim g as long = label_weight_g()
+	dim fresh as no_yes = NO
+	if scale_age <= 4 then fresh = YES
+
+	'товар сняли - можно печатать следующую
+	if fresh = YES and g < CFG_ZERO_G then lbl_armed = YES
+
+	if fresh = YES and scale_stable = YES and g >= CFG_MIN_G then
+		if stable_cnt < 255 then stable_cnt = stable_cnt + 1
+	else
+		stable_cnt = 0
+	end if
+	if p_auto = YES and lbl_armed = YES and stable_cnt >= CFG_STABLE_HALFSEC and prn_state = PRN_IDLE then
+		label_request("auto")
+	end if
+
+	if prn_state = PRN_IDLE then exit sub
+	if prn_wait > 0 then
+		prn_wait = prn_wait - 1
+		exit sub
+	end if
+	'шаг не завершился вовремя
+	select case prn_state
+	case PRN_CONNECT:
+		prn_finish(ERR_NO_CONNECT)
+	case PRN_STATUS:
+		prn_finish(ERR_NO_STATUS)
+	case PRN_SEND:
+		prn_finish(ERR_SEND)
+	case else:
+		prn_state = PRN_IDLE
+	end select
+end sub
+
+'запрос печати: 0 - принято, иначе код причины
+function label_request(byref why as string) as byte
+	dim g as long = label_weight_g()
+	if prn_state <> PRN_IDLE then
+		label_request = ERR_BUSY
+		exit function
+	end if
+	if scale_age > 4 or scale_stable = NO or g < CFG_MIN_G then
+		label_request = ERR_NO_WEIGHT
+		exit function
+	end if
+	job_g = g
+	if time_ok = YES then
+		dim s as byte
+		rtc.getdata(job_day, job_min, s)
+	else
+		job_day = 0
+		job_min = 0
+	end if
+	lbl_armed = NO                          'следующая автопечать - после того, как товар снимут
+	dbg("Print (" + why + "): " + lstr(g) + " g")
+	prn_start()
+	label_request = 0
+end function
+
+sub prn_start()
+	prn_reply = ""
+	prn_err = 0
+	sock.num = prn_sock
+	sock.targetip = CFG_PRN_IP
+	sock.targetport = CFG_PRN_PORT
+	sock.connect()
+	prn_state = PRN_CONNECT
+	prn_wait = 10                           '5 с на подключение
+end sub
+
+sub label_sock_event(newstatesimple as pl_sock_state_simple)
+	if newstatesimple = PL_SSTS_EST and prn_state = PRN_CONNECT then
+#if CFG_PRN_CHECK
+		'состояние принтера: ответ - две цифры и CR LF, 00 - готов
+		sock.setdata("^XSET,IMMEDIATE,1" + chr(13) + chr(10) + "~S,CHECK" + chr(13) + chr(10))
+		sock.send()
+		prn_state = PRN_STATUS
+		prn_wait = 6                        '3 с на ответ
+#else
+		prn_send_label()
+#endif
+	else if newstatesimple = PL_SSTS_CLOSED then
+		if prn_state = PRN_CLOSE then
+			prn_state = PRN_IDLE
+		else if prn_state <> PRN_IDLE then
+			prn_finish(ERR_NO_CONNECT)
+		end if
+	end if
+end sub
+
+sub label_sock_data()
+	sock.num = prn_sock
+	dim d as string(64) = sock.getdata(64)
+	if prn_state <> PRN_STATUS then exit sub
+	prn_reply = left(prn_reply + d, 16)
+	if instr(1, prn_reply, chr(13), 1) = 0 and instr(1, prn_reply, chr(10), 1) = 0 then exit sub
+	'берём первые две цифры ответа
+	dim i as byte = 1
+	while i <= len(prn_reply) and (mid(prn_reply, i, 1) < "0" or mid(prn_reply, i, 1) > "9")
+		i = i + 1
+	wend
+	dim code as byte = val(mid(prn_reply, i, 2))
+	if code = 0 or code = 50 or code = 60 then
+		prn_send_label()                    'готов, печатает или принимает данные - этикетка встанет в очередь
+	else
+		prn_finish(code + 1)
+	end if
+end sub
+
+'---------------------------------------------------------------------
+' Этикетка 58x40 мм (размер в config.tbh). Поля в мм, переводятся в точки.
+'---------------------------------------------------------------------
+sub prn_send_label()
+	dim CR as string(2) = chr(13) + chr(10)
+	dim f as string(4) = "AT" + CFG_TTF
+	dim s as string(255)
+	dim ean as string(12) = ean_digits(job_g)
+	dim t as string(40)
+	sock.num = prn_sock
+
+	'заголовок задания
+	s = "^Q" + str(CFG_LABEL_H) + "," + str(CFG_LABEL_GAP) + CR + "^W" + str(CFG_LABEL_W) + CR + "^H" + str(CFG_DARKNESS) + CR
+	s = s + "^P1" + CR + "^S" + str(CFG_SPEED) + CR + "^C1" + CR + "^R0" + CR + "^O0" + CR + "^D0" + CR + "^L" + CR
+	sock.setdata(s)
+	'название товара (UTF-8)
+	s = f + "," + dots(2) + "," + dots(2) + "," + dots(4) + "," + dots(4) + ",0,0E,0,0," + p_name + CR
+	sock.setdata(s)
+	'масса
+	s = f + "," + dots(2) + "," + dots(7) + "," + dots(3) + "," + dots(3) + ",0,0E,0,0,Масса нетто" + CR
+	s = s + f + "," + dots(2) + "," + dots(10) + "," + dots(8) + "," + dots(8) + ",0,0BE,0,0," + label_kg_str(job_g) + " кг" + CR
+	sock.setdata(s)
+	'даты
+	if job_day > 0 then
+		t = "Упаковано " + label_date_str(job_day)
+		s = f + "," + dots(2) + "," + dots(19) + "," + dots(3) + "," + dots(3) + ",0,0E,0,0," + t + CR
+		if p_days > 0 then
+			t = "Годен до " + label_date_str(job_day + p_days)
+			s = s + f + "," + dots(2) + "," + dots(22) + "," + dots(3) + "," + dots(3) + ",0,0E,0,0," + t + CR
+		end if
+		sock.setdata(s)
+	end if
+	'весовой EAN-13: префикс, артикул, вес в граммах; контрольную цифру считает принтер
+	s = "BE," + dots(2) + "," + dots(26) + ",2,4," + dots(8) + ",0,1," + ean + CR
+	sock.setdata(s)
+	'QR: артикул; вес, г; дата; номер этикетки
+	t = p_plu + ";" + lstr(job_g) + ";"
+	if job_day > 0 then t = t + label_date_str(job_day)
+	t = t + ";" + str(lbl_count + 1)
+	s = "W" + dots(44) + "," + dots(19) + ",3,2,M,8,3," + str(len(t)) + ",0" + CR + t + CR + "E" + CR
+	sock.setdata(s)
+	sock.notifysent(1)                      'on_sock_data_sent - когда всё уйдёт
+	sock.send()
+	prn_state = PRN_SEND
+	prn_wait = 6
+end sub
+
+sub on_sock_data_sent()
+	if sock.num <> prn_sock or prn_state <> PRN_SEND then exit sub
+	prn_finish(0)
+end sub
+
+'конец задания: запись в журнал и закрытие соединения
+sub prn_finish(code as byte)
+	prn_err = code
+	if code = 0 then
+		lbl_count = lbl_count + 1
+		log_add(1)
+		pat.play("G", PL_PAT_CANINT)
+	else
+		log_add(0)
+		pat.play("R-R-R", PL_PAT_CANINT)
+		dbg("Print error: " + label_prn_text())
+	end if
+	sock.num = prn_sock
+	if sock.statesimple = PL_SSTS_CLOSED then
+		prn_state = PRN_IDLE
+	else
+		sock.close()
+		prn_state = PRN_CLOSE
+		prn_wait = 4
+	end if
+end sub
+
+sub log_add(ok as byte)
+	dim i as byte
+	if log_n < LOG_SIZE then
+		log_n = log_n + 1
+	end if
+	'новые записи сверху: сдвигаем вниз
+	i = log_n - 1
+	while i > 0
+		log_day(i) = log_day(i - 1)
+		log_min(i) = log_min(i - 1)
+		log_g(i) = log_g(i - 1)
+		log_plu(i) = log_plu(i - 1)
+		log_ok(i) = log_ok(i - 1)
+		i = i - 1
+	wend
+	log_day(0) = job_day
+	log_min(0) = job_min
+	log_g(0) = job_g
+	log_plu(0) = p_plu
+	log_ok(0) = ok
+end sub
+
+'текст состояния принтера для страницы
+function label_prn_text() as string
+	select case prn_err
+	case 0:
+		label_prn_text = "готов"
+	case 2:
+		label_prn_text = "кончились этикетки"
+	case 3:
+		label_prn_text = "замялись этикетки"
+	case 4:
+		label_prn_text = "кончилась лента"
+	case 5:
+		label_prn_text = "открыта печатающая головка"
+	case 6:
+		label_prn_text = "переполнен намотчик"
+	case 10:
+		label_prn_text = "ошибка в команде"
+	case 11:
+		label_prn_text = "заклинило нож"
+	case 21:
+		label_prn_text = "принтер на паузе"
+	case ERR_NO_CONNECT:
+		label_prn_text = "нет связи с принтером"
+	case ERR_NO_STATUS:
+		label_prn_text = "принтер не ответил о состоянии"
+	case ERR_SEND:
+		label_prn_text = "этикетка не ушла на принтер"
+	case ERR_NO_WEIGHT:
+		label_prn_text = "нет стабильного веса"
+	case ERR_BUSY:
+		label_prn_text = "принтер занят"
+	case else:
+		label_prn_text = "код принтера " + str(prn_err - 1)
+	end select
+end function
+
+'--- часы ---
+sub label_set_clock(days as word, mins as word, secs as byte)
+	rtc.setdata(days, mins, secs)
+	time_ok = YES
+end sub
+
+'--- оформление ---
+function dots(mm as word) as string
+	dots = str(mm * CFG_DOTS_MM)
+end function
+
+function two(v as word) as string
+	two = str(v)
+	if len(two) < 2 then two = "0" + two
+end function
+
+function label_date_str(d as word) as string
+	label_date_str = two(date(d)) + "." + two(month(d)) + "." + str(2000 + year(d))
+end function
+
+function label_hhmm(m as word) as string
+	label_hhmm = two(m / 60) + ":" + two(m mod 60)
+end function
+
+'граммы -> "1,234"
+function label_kg_str(g as long) as string
+	dim kg as long = g / 1000
+	dim r as word = g mod 1000
+	dim f as string(3) = str(r)
+	while len(f) < 3
+		f = "0" + f
+	wend
+	label_kg_str = lstr(kg) + "," + f
+end function
+
+'12 цифр весового EAN-13: 2 цифры префикса, 5 - артикул, 5 - вес в граммах (до 99,999 кг)
+function ean_digits(g as long) as string
+	dim w as string(5)
+	if g > 99999 then g = 99999
+	if g < 0 then g = 0
+	w = lstr(g)
+	while len(w) < 5
+		w = "0" + w
+	wend
+	ean_digits = left(CFG_EAN_PREFIX + "00", 2) + p_plu + w
+end function

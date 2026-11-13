@@ -1,0 +1,17 @@
+<?
+include "global.tbh"
+'GET /cmd.html?a=clear - очистить задание; a=test - проверка ламп; a=cancel&n=<ячейка> - погасить ячейку;
+'a=clock&t=2026-11-13T14:30 - установить часы
+dim rq as string = sock.httprqstring
+dim a as string(8) = web_arg(rq, "a")
+if a = "clear" then
+	pick_clear()
+else if a = "test" then
+	pick_test()
+else if a = "cancel" then
+	pick_cancel(val(web_arg(rq, "n")))
+else if a = "clock" then
+	web_handle_clock(rq)
+end if
+web_send("OK")
+?>

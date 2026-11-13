@@ -1,0 +1,72 @@
+'=====================================================================
+' Рецепт 15 «Этикетка по весу на принтер Godex» · общий заголовок
+' Устройство DS1101 (порт 0 RS-232 на DB9, Ethernet). Библиотеки Tibbo 2_01_05
+'=====================================================================
+include "config.tbh"
+
+#define DHCP_DEBUG_PRINT 0
+#define SNTP_DEBUG_PRINT 0
+include "sock\trunk\sock.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "sntp\trunk\sntp.tbh"
+
+#define LOG_SIZE 16                         'сколько последних этикеток показывает страница
+
+enum prn_states
+	PRN_IDLE,                               'ждём
+	PRN_CONNECT,                            'подключаемся к принтеру
+	PRN_STATUS,                             'ждём ответ на ~S,CHECK
+	PRN_SEND,                               'отправили этикетку, ждём, пока уйдёт
+	PRN_CLOSE                               'закрываем соединение
+end enum
+
+'--- scale.tbs ---
+declare sub scale_init()
+declare sub scale_feed(byref s as string)
+declare sub scale_poll()
+declare scale_weight as string(16)
+declare scale_unit as string(4)
+declare scale_stable as no_yes
+declare scale_line as string(40)
+declare scale_age as word
+declare scale_milli as long
+
+'--- label.tbs ---
+declare sub label_init()
+declare sub label_tick()
+declare function label_request(byref why as string) as byte
+declare sub label_sock_event(newstatesimple as pl_sock_state_simple)
+declare sub label_sock_data()
+declare sub label_save_product(byref name as string, byref plu as string, days as word, auto as no_yes)
+declare function label_weight_g() as long
+declare function label_kg_str(g as long) as string
+declare function label_date_str(d as word) as string
+declare function label_hhmm(m as word) as string
+declare function label_prn_text() as string
+declare sub label_set_clock(days as word, mins as word, secs as byte)
+declare prn_sock as byte
+declare prn_state as prn_states
+declare prn_err as byte
+declare p_name as string(64)
+declare p_plu as string(5)
+declare p_days as word
+declare p_auto as no_yes
+declare time_ok as no_yes
+declare lbl_count as word
+declare lbl_armed as no_yes
+declare log_n as byte
+declare log_day(LOG_SIZE) as word
+declare log_min(LOG_SIZE) as word
+declare log_g(LOG_SIZE) as long
+declare log_plu(LOG_SIZE) as string(5)
+declare log_ok(LOG_SIZE) as byte
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+
+'--- web.tbs ---
+declare sub web_send(byref s as string)
+declare function web_arg(byref rq as string, byref argname as string) as string
+declare function web_decode(byref s as string) as string
+declare sub web_handle_set(byref rq as string)
+declare function web_html(byref s as string) as string

@@ -1,0 +1,12 @@
+<?
+include "global.tbh"
+'задание: код;ячейка;кол-во;название;состояние (0 ждёт, 1 горит, 2 собрано)
+dim i as byte = 0
+dim s as string
+web_send("code;cell;qty;name;state" + chr(13) + chr(10))
+while i < ln_count
+	s = ln_code(i) + ";" + str(ln_cell(i) + 1) + ";" + str(ln_qty(i)) + ";" + ln_name(i) + ";" + str(ln_state(i)) + chr(13) + chr(10)
+	web_send(s)
+	i = i + 1
+wend
+?>

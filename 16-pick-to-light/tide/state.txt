@@ -1,0 +1,6 @@
+<?
+include "global.tbh"
+'лампы;собрано;строк;номер события;событие;время
+dim s as string = pick_lit_str() + ";" + str(ln_done) + ";" + str(ln_count) + ";" + str(event_no) + ";" + last_event + ";" + pick_clock_str()
+web_send(s)
+?>

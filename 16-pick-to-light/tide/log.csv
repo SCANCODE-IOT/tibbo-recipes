@@ -1,0 +1,14 @@
+<?
+include "global.tbh"
+'журнал: время;ячейка;код;событие (новые сверху)
+dim i as byte = 0
+dim s as string
+web_send("time;cell;code;event" + chr(13) + chr(10))
+while i < log_n
+	s = pick_hhmm(log_min(i)) + ";"
+	if log_cell(i) <> NO_LINE then s = s + str(log_cell(i) + 1)
+	s = s + ";" + log_code(i) + ";" + log_what(i) + chr(13) + chr(10)
+	web_send(s)
+	i = i + 1
+wend
+?>

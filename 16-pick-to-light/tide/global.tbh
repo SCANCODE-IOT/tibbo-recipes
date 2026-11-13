@@ -1,0 +1,62 @@
+'=====================================================================
+' Рецепт 16 «Подбор по свету с ТСД» · общий заголовок
+' Плата TPP2W(G2): #11 в S1 и S3 (лампы ячеек 1-4 и 5-8),
+' #04-8 в S5 и S7 (кнопки ячеек 1-4 и 5-8), #20 в S2+S4 и S6+S8,
+' #33 (питание 24 В) в S11, #18 в S12. Библиотеки Tibbo 2_01_05
+'=====================================================================
+include "config.tbh"
+
+#define DHCP_DEBUG_PRINT 0
+#define SNTP_DEBUG_PRINT 0
+include "sock\trunk\sock.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "sntp\trunk\sntp.tbh"
+
+#define MAX_LINES 48                        'строк в задании
+#define LOG_SIZE 24                         'событий в журнале
+#define NO_LINE 255
+
+'состояние строки задания
+#define LN_WAIT 0
+#define LN_LIT 1
+#define LN_DONE 2
+
+'--- Wi-Fi не используется: заглушка для библиотеки DHCP на платформе TPP2W(G2) ---
+declare function wln_check_association() as pl_wln_association_states
+
+'--- pick.tbs ---
+declare sub pick_init()
+declare sub pick_tick()
+declare function pick_scan(byref code as string) as string
+declare function pick_add(byref code as string, cell as byte, qty as word, byref pname as string) as string
+declare sub pick_clear()
+declare sub pick_cancel(cell as byte)
+declare sub pick_test()
+declare function pick_lit_str() as string
+declare function pick_clock_str() as string
+declare sub pick_set_clock(days as word, mins as word, secs as byte)
+declare function pick_hhmm(m as word) as string
+declare ln_count as byte
+declare ln_code(MAX_LINES) as string(24)
+declare ln_cell(MAX_LINES) as byte
+declare ln_qty(MAX_LINES) as word
+declare ln_name(MAX_LINES) as string(32)
+declare ln_state(MAX_LINES) as byte
+declare ln_done as byte
+declare last_event as string(64)
+declare event_no as word
+declare log_n as byte
+declare log_min(LOG_SIZE) as word
+declare log_cell(LOG_SIZE) as byte
+declare log_code(LOG_SIZE) as string(24)
+declare log_what(LOG_SIZE) as string(24)
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+
+'--- web.tbs ---
+declare sub web_send(byref s as string)
+declare function web_arg(byref rq as string, byref argname as string) as string
+declare function web_decode(byref s as string) as string
+declare function web_html(byref s as string) as string
+declare sub web_handle_clock(byref rq as string)

@@ -1,0 +1,16 @@
+<?
+include "global.tbh"
+'GET /print.html - напечатать этикетку с текущим весом. Ответ: OK или причина
+dim r as byte = label_request("web")
+dim s as string
+if r = 0 then
+	s = "OK"
+else
+	'текст причины берём из того же списка, состояние принтера не трогаем
+	dim keep as byte = prn_err
+	prn_err = r
+	s = label_prn_text()
+	prn_err = keep
+end if
+web_send(s)
+?>

@@ -1,0 +1,11 @@
+<?
+include "global.tbh"
+'GET /add.html?c=<код>&n=<ячейка 1-8>&q=<кол-во>&t=<название> - строка задания. Ответ: OK | FULL | ERR
+dim rq as string = sock.httprqstring
+dim code as string(24) = left(web_decode(web_arg(rq, "c")), 24)
+dim nm as string(32) = left(web_decode(web_arg(rq, "t")), 32)
+dim q as word = val(web_arg(rq, "q"))
+if q = 0 then q = 1
+dim s as string = pick_add(code, val(web_arg(rq, "n")), q, nm)
+web_send(s)
+?>

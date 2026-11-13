@@ -1,0 +1,38 @@
+<?
+include "global.tbh"
+'вес;единица;стабильный;занят;состояние принтера;этикеток;авто;готов к следующей;дата и время
+dim s as string
+dim d, m as word
+dim sec as byte
+if scale_age > 4 then
+	s = ";;0;"
+else
+	s = scale_weight + ";" + scale_unit + ";"
+	if scale_stable = YES then
+		s = s + "1;"
+	else
+		s = s + "0;"
+	end if
+end if
+if prn_state = PRN_IDLE then
+	s = s + "0;"
+else
+	s = s + "1;"
+end if
+s = s + label_prn_text() + ";" + str(lbl_count) + ";"
+if p_auto = YES then
+	s = s + "1;"
+else
+	s = s + "0;"
+end if
+if lbl_armed = YES then
+	s = s + "1;"
+else
+	s = s + "0;"
+end if
+if time_ok = YES then
+	rtc.getdata(d, m, sec)
+	s = s + label_date_str(d) + " " + label_hhmm(m)
+end if
+web_send(s)
+?>

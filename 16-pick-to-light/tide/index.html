@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Подбор по свету · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:10px 12px;display:flex;justify-content:space-between;font-size:15px}header b{color:#EC6C2E}
+main{max-width:520px;margin:0 auto;padding:10px 12px}
+#c{width:100%;box-sizing:border-box;font-size:22px;padding:12px;border:2px solid #EC6C2E;border-radius:10px}
+#res{margin:12px 0;padding:16px;border-radius:12px;background:#fff;border:1px solid #EBE4DB;min-height:96px}
+#res .n{font-size:64px;font-weight:800;line-height:1}#res .q{font-size:24px;font-weight:700}#res .t{font-size:17px;color:#6F6C66}
+#res.ok{background:#FFF2EA;border-color:#EC6C2E}#res.done{background:#E7F5EE;border-color:#2E7D32}#res.bad{background:#FDECEC;border-color:#C0392B}
+.cells{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.cell{padding:10px 0;text-align:center;border-radius:8px;background:#EFE9E1;font-weight:700;font-size:20px}.cell.on{background:#EC6C2E;color:#fff}
+small{color:#6F6C66}a{color:#CC5314}
+</style></head><body>
+<header><span><b>Tibbo</b> · <? include "global.tbh"
+sock.setdata(CFG_RACK_NAME) ?></span><span id=pr>0 / 0</span></header>
+<main>
+<form id=f autocomplete=off><input id=c inputmode=none placeholder="Сканируйте код товара" autofocus></form>
+<div id=res><span class=t>Сканируйте код. У нужной ячейки загорится лампа. Возьмите товар и нажмите кнопку ячейки.</span></div>
+<div class=cells id=cells></div>
+<p><small id=ev></small></p>
+<p><small><a href="task.html">Задание и настройка</a></small></p>
+</main>
+<script>
+var N=<? sock.setdata(str(CFG_CELLS)) ?>,last=-1,cur=0;
+function $(i){return document.getElementById(i)}
+function show(cls,html){var r=$('res');r.className=cls;r.innerHTML=html}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+$('f').onsubmit=function(e){e.preventDefault();var v=$('c').value.trim();$('c').value='';if(!v)return;
+fetch('scan.html?c='+encodeURIComponent(v)+'&_='+Date.now()).then(r=>r.text()).then(t=>{var p=t.trim().split(';');
+if(p[0]==='OK'){cur=+p[1];show('ok','<div class=n>'+p[1]+'</div><div class=q>Взять: '+p[2]+' шт</div><div class=t>'+esc(p.slice(3).join(';')||v)+'</div>');buzz(80)}
+else if(p[0]==='DONE'){show('done','<div class=q>Уже собрано</div><div class=t>Ячейка '+p[1]+' · '+esc(v)+'</div>')}
+else if(p[0]==='BUSY'){show('bad','<div class=q>Ячейка '+p[1]+' занята</div><div class=t>Сначала нажмите кнопку ячейки '+p[1]+'</div>');buzz([200,100,200])}
+else{show('bad','<div class=q>Нет в задании</div><div class=t>'+esc(v)+'</div>');buzz([200,100,200])}upd()}).catch(()=>show('bad','<div class=q>Нет связи с контроллером</div>'))};
+document.addEventListener('click',function(e){if(e.target.tagName!=='A')$('c').focus()});
+function upd(){fetch('state.txt?'+Date.now()).then(r=>r.text()).then(t=>{var p=t.split(';');var h='';
+for(var i=0;i<N;i++)h+='<div class="cell'+(p[0][i]==='1'?' on':'')+'">'+(i+1)+'</div>';$('cells').innerHTML=h;
+$('pr').textContent=p[1]+' / '+p[2];
+if(last>=0&&+p[3]!==last){$('ev').textContent=p[5]+' '+p[4];if(p[4].indexOf('собрано')>0&&p[4].indexOf('Ячейка '+cur+':')===0){show('done','<div class=q>Собрано ✓</div><div class=t>Сканируйте следующий товар</div>');buzz(150)}}
+last=+p[3]}).catch(()=>{})}
+upd();setInterval(upd,1000);
+</script>
+</body></html>

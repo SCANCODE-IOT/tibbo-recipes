@@ -1,6 +1,6 @@
 # Рецепты Tibbo: готовые решения автоматизации
 
-Четырнадцать задач, решённых от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC или проект [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
+Шестнадцать задач, решённых от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC или проект [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
 
 Описания и страницы со спецификацией и ценами - на [tibbo.ru/recipes](https://tibbo.ru/recipes).
 
@@ -20,6 +20,8 @@
 | 12 | [Андон: световая колонна и учёт простоев станка](12-andon/) - Кнопки оператора зажигают световую колонну, контроллер считает минуты работы и простоя, остановки и детали за смену. | TPP2(G2) | да |
 | 13 | [Чёрный ящик RS-485: что было на линии перед сбоем](13-rs485-black-box/) - Слушает линию, хранит последние 150 кадров и замораживает снимок при ошибке CRC, исключении Modbus или тишине. | TPP2(G2) | - |
 | 14 | [Сварочный пост: учёт времени работы сварщика](14-welding-post/) - По току аппарата считает время дуги, время в работе, зажигания и киловатт-часы за сутки; журнал, CSV и MQTT. | TPP2(G2) | да |
+| 15 | [Этикетка по весу на принтер Godex](15-weight-label/) - Весы на RS-232, печать этикетки по стабильному весу на сетевой Godex: масса, даты, весовой EAN-13 и QR. | DS1101 | - |
+| 16 | [Подбор по свету с ТСД](16-pick-to-light/) - ТСД сканирует товар, у ячейки загорается лампа, работник подтверждает кнопкой; задание из учётной системы по HTTP. | TPP2(G2) | - |
 
 ## Принципы
 
@@ -42,7 +44,7 @@
 
 # Tibbo recipes: ready-made automation solutions
 
-Fourteen automation tasks solved end to end on Tibbo hardware: a TIDE project (Tibbo BASIC), an AppBlocks variant, a bill of materials, a Tibbit socket layout with power budget and assembly notes. Documentation inside each recipe is in Russian.
+Sixteen automation tasks solved end to end on Tibbo hardware: a TIDE project (Tibbo BASIC), an AppBlocks variant where it fits, a bill of materials, a Tibbit socket layout with power budget and assembly notes. Documentation inside each recipe is in Russian.
 
 | # | Recipe | Board | AppBlocks |
 |---|---|---|---|
@@ -60,11 +62,14 @@ Fourteen automation tasks solved end to end on Tibbo hardware: a TIDE project (T
 | 12 | [Andon: stack light and machine downtime counters](12-andon/) | TPP2(G2) | yes |
 | 13 | [RS-485 black box: what was on the bus before a failure](13-rs485-black-box/) | TPP2(G2) | - |
 | 14 | [Welding post: welder work time tracking](14-welding-post/) | TPP2(G2) | yes |
+| 15 | [Weight label on a Godex printer](15-weight-label/) | DS1101 | - |
+| 16 | [Pick-to-light with a mobile computer](16-pick-to-light/) | TPP2(G2) | - |
 
 Every project builds with the TIDE compiler with no errors, and AppBlocks variants build with the Tibbo cloud compiler. An AppBlocks variant is simpler than the TIDE one: each recipe lists the differences. Connectors are chosen so that the AppBlocks editor does not flag any socket (power Tibbits #09/#10 use #18, the #29 sensor sits next to #00-3). **Not tested on real hardware** - verify on a bench before deployment.
 
 ## Versions
 
+- **1.5.0** (2026-11-13): recipes 15 and 16 for warehouses and labelling. 15 - a scale on RS-232 and a network Godex printer (EZPL over TCP 9100): the label is printed when the weight is stable, with net weight, packing and best-before dates, a weight EAN-13 and a QR code; printer status is checked with ~S,CHECK. 16 - pick-to-light: a CipherLab, Point Mobile or other Android mobile computer scans in keyboard mode on the controller's web page, the cell lamp lights (#11), the worker confirms with the cell button (#04-8); tasks come from the accounting system over HTTP. Both built with the Tibbo compiler, logic checked on a model.
 - **1.4.0** (2026-11-13): recipe 14 - welding post time tracking. A current switch on the welder supply cable and an isolated 24 V input (#04-5) detect the arc; the controller counts arc time, work time, arc starts and energy per day (Modbus meter), keeps a 62-day journal, CSV and MQTT. TIDE and AppBlocks variants, built with the Tibbo compiler, logic checked on a model.
 - **1.3.0** (2026-11-13): audit of all recipes against their descriptions. AppBlocks variants: 10 - long pause after several power cycles in a row (was only in TIDE); 04 - alarm code no longer flaps every second (it flooded MQTT), threshold delay, inputs 3 and 4, sensor-loss debounce; 08 - one missed sensor reply no longer switches heating off; 05 - web console password; 01, 03 - sane network defaults instead of template values. TIDE: 07 - the overheat flag now returns to 0; 09 - values above 327.67 units were clipped in the chart, CSV and MQTT. Every README now lists how the AppBlocks variant differs from the TIDE one and has a version history.
 - **1.2.0** (2026-11-10): three new recipes. 11 - an MCP server on the Linux board LTPP3(G2): an AI reads sensors, switches relays and writes rules (Python, 27 tests on a board emulator, beta). 12 - Andon, an AppBlocks project built with the Tibbo compiler through the AppBlocks builder. 13 - RS-485 black box in Tibbo BASIC, built with the same compiler; frame splitting checked on a model. None of them has run on real hardware yet.
