@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Сварочный пост · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:820px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:14px;margin:12px 0}
+table{border-collapse:collapse;width:100%}td,th{padding:7px 6px;border-bottom:1px solid #EFE9E1;text-align:left}th{font-size:13px;color:#6F6C66;font-weight:600}
+td.v{font-weight:700;text-align:right;white-space:nowrap}.r{text-align:right}
+.st{display:inline-block;padding:4px 12px;border-radius:999px;font-weight:700;color:#fff;background:#8A857C}
+.st.arc{background:#C2410C}.st.work{background:#2E7D32}
+.big{font-size:34px;font-weight:700;margin:8px 0 2px}
+form{display:flex;gap:6px;align-items:center;flex-wrap:wrap}input{padding:5px}button{padding:6px 12px;border:0;border-radius:8px;background:#2C2B28;color:#fff}
+small{color:#6F6C66}.err{color:#C0392B}.sc{overflow-x:auto}
+</style></head><body>
+<header><b>Tibbo</b> · Сварочный пост</header>
+<main>
+<?
+include "global.tbh"
+dim i as byte
+dim n as byte
+dim prev as word
+dim s as string
+dim arc_s as dword = d_arc_ms / 1000
+
+'--- сегодня ---
+s = "<div class=card><b>" + CFG_POST_NAME + "</b> · "
+if cur_day = 0 then
+	s = s + "сутки без даты"
+else
+	s = s + weld_date_str(cur_day)
+end if
+if arc_on = YES then
+	s = s + " <span class='st arc'>дуга горит</span>"
+else if in_session = YES then
+	s = s + " <span class='st work'>в работе</span>"
+else
+	s = s + " <span class=st>перерыв</span>"
+end if
+web_send(s)
+s = "<div class=big>" + weld_hms(arc_s) + "</div><small>время дуги за сутки</small><table>"
+web_send(s)
+s = "<tr><td>В работе</td><td class=v>" + weld_hms(d_work_s) + "</td></tr>"
+web_send(s)
+s = "<tr><td>Доля дуги</td><td class=v>"
+if d_work_s > 0 then
+	s = s + lstr(arc_s * 100 / d_work_s) + " %"
+else
+	s = s + "-"
+end if
+s = s + "</td></tr>"
+web_send(s)
+s = "<tr><td>Зажиганий дуги</td><td class=v>" + str(d_starts) + "</td></tr>"
+web_send(s)
+s = "<tr><td>Первое зажигание</td><td class=v>" + weld_hhmm(d_first) + "</td></tr>"
+web_send(s)
+s = "<tr><td>Последняя сварка</td><td class=v>" + weld_hhmm(d_last) + "</td></tr>"
+web_send(s)
+#if CFG_USE_METER
+s = "<tr><td>Энергия за сутки, кВт·ч</td><td class=v>" + weld_kwh(weld_day_energy()) + "</td></tr>"
+web_send(s)
+s = "<tr><td>Мощность сейчас, Вт</td><td class=v>"
+if m_ok = YES then
+	s = s + lstr(m_power)
+else
+	s = s + "<span class=err>нет связи со счётчиком</span>"
+end if
+s = s + "</td></tr>"
+web_send(s)
+#endif
+s = "</table></div>"
+web_send(s)
+
+'--- журнал: последние 14 суток ---
+s = "<div class=card><b>Журнал по суткам</b><div class=sc><table><tr><th>Дата</th><th class=r>Дуга</th>"
+web_send(s)
+s = "<th class=r>В работе</th><th class=r>Зажиганий</th><th class=r>Начало</th><th class=r>Конец</th>"
+web_send(s)
+s = "<th class=r>кВт·ч</th></tr>"
+web_send(s)
+prev = 65535
+n = 0
+i = weld_j_next(prev)
+while i <> 255 and n < 14
+	s = "<tr><td>" + weld_date_str(j_day(i)) + "</td><td class=v>" + weld_hms(j_arc(i)) + "</td><td class=r>" + weld_hhmm(j_work(i)) + "</td>"
+	web_send(s)
+	s = "<td class=r>" + str(j_starts(i)) + "</td><td class=r>" + weld_hhmm(j_first(i)) + "</td><td class=r>" + weld_hhmm(j_last(i)) + "</td>"
+	web_send(s)
+	s = "<td class=r>" + weld_kwh(j_e(i)) + "</td></tr>"
+	web_send(s)
+	prev = j_day(i)
+	n = n + 1
+	i = weld_j_next(prev)
+wend
+if n = 0 then
+	s = "<tr><td colspan=7><small>Записей пока нет: итог появится после смены суток.</small></td></tr>"
+	web_send(s)
+end if
+s = "</table></div><p><a href='days.csv'>Скачать все сутки (CSV)</a> · "
+web_send(s)
+s = "<small>в журнале до " + str(J_SIZE) + " суток, в которые шла сварка</small></p></div>"
+web_send(s)
+
+'--- часы ---
+s = "<div class=card><b>Часы контроллера:</b> "
+if time_ok = YES then
+	s = s + weld_clock_str()
+else
+	s = s + "<span class=err>не установлены - сутки не закрываются</span>"
+end if
+if ntp_ok = YES then s = s + " <small>(сверены по сети)</small>"
+web_send(s)
+s = "<form action='set.html'><input type=datetime-local name=t required><button>Установить</button></form></div>"
+web_send(s)
+s = "<p><small>IP " + net.ip + " · id " + dev_id() + " · MQTT: "
+if mqtt_online = YES then
+	s = s + "на связи"
+else
+	s = s + "нет связи"
+end if
+s = s + "</small></p>"
+web_send(s)
+?>
+</main>
+<script>setInterval(function(){var a=document.activeElement;if(!a||a.tagName!='INPUT')location.reload()},10000)</script>
+</body></html>

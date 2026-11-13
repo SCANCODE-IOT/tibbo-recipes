@@ -1,0 +1,503 @@
+'=====================================================================
+' Учёт сварочного поста: признак дуги, время дуги и время в работе,
+' число зажиганий, энергия за сутки, журнал по суткам в EEPROM.
+'=====================================================================
+include "global.tbh"
+
+'#04-5 в S5: вход 1 - линия A сокета, вход 2 - линия B. Ток через оптрон входа - LOW на линии
+#define IO_ARC PL_IO_NUM_13_TX2
+#define IO_IN2 PL_IO_NUM_12_RX2
+'#33 в S11: линия C - выход -PF (LOW - входное питание пропадает).
+'Линию B (-SDWN) прошивка не трогает: LOW на ней выключил бы источник.
+#define IO_PF PL_IO_NUM_5
+
+'EEPROM: счётчики текущих суток - 8 ячеек по 28 байт по кругу (меньше износ), затем журнал - J_SIZE записей по 20 байт
+#define EE_CUR 1
+#define EE_SLOTS 8
+#define EE_SLOT 28
+#define EE_J 225
+#define EE_REC 20
+
+dim arc_on as no_yes = NO                   'дуга горит (после защиты от помех)
+dim time_ok as no_yes = NO                  'часы установлены
+dim cur_day as word = 0                     'учётные сутки, которым принадлежат счётчики (0 - ещё не известно)
+dim d_arc_ms as dword = 0                   'время дуги за сутки, мс
+dim d_work_s as dword = 0                   'время в работе за сутки, с
+dim d_starts as word = 0                    'зажиганий за сутки
+dim d_first as word = NO_MIN                'первое зажигание, минут от полуночи
+dim d_last as word = NO_MIN                 'последняя сварка, минут от полуночи
+dim in_session as no_yes = NO               'сварщик в работе: с последней дуги прошло меньше CFG_BREAK_MIN
+dim m_ok as no_yes = NO                     'счётчик электроэнергии на связи
+dim m_power as long = 0                     'мощность сейчас, Вт
+dim j_day(J_SIZE) as word                   'журнал: сутки (0 - запись свободна)
+dim j_arc(J_SIZE) as dword                  'время дуги, с
+dim j_work(J_SIZE) as word                  'время в работе, мин
+dim j_starts(J_SIZE) as word
+dim j_first(J_SIZE) as word
+dim j_last(J_SIZE) as word
+dim j_e(J_SIZE) as dword                    'энергия за сутки, сотые кВт*ч (NO_E - нет данных)
+
+dim e_now as dword = NO_E                   'показание счётчика, сотые кВт*ч
+dim e_start as dword = NO_E                 'показание на начало суток
+dim gap_s as word = 0                       'секунд после последней дуги
+dim arc_seen as no_yes = NO                 'в текущей секунде дуга горела
+dim arc_by_power as no_yes = NO
+dim on_ms as word = 0
+dim off_ms as word = 0
+dim last_ms as dword = 0
+dim sec_acc as word = 0
+dim save_s as word = 0
+dim dirty as no_yes = NO
+dim ee_seq as dword = 0
+dim ee_slot as byte = 0
+dim pf_saved as no_yes = NO
+dim pf_ms as dword = 0
+dim m_lost_s as word = 0
+
+declare sub arc_start()
+declare sub arc_stop()
+declare sub weld_second()
+declare sub day_close(new_day as word)
+declare function j_put(day as word) as byte
+declare sub j_write(i as byte)
+declare sub cur_save()
+declare sub cur_load()
+declare sub led_update()
+declare function now_min() as word
+declare function d2s(d as dword) as string
+declare function s2d(byref s as string, pos as byte) as dword
+declare function w2s(w as word) as string
+declare function s2w(byref s as string, pos as byte) as word
+declare function ee_sum(byref s as string) as byte
+declare function two(v as word) as string
+
+sub weld_init()
+	dim i as byte
+	dim r as string(EE_REC)
+	io.num = IO_ARC
+	io.enabled = NO
+	io.num = IO_IN2
+	io.enabled = NO
+	io.num = IO_PF
+	io.enabled = NO
+	'журнал - в память
+	for i = 0 to J_SIZE - 1
+		j_day(i) = 0
+		r = stor.getdata(EE_J + i * EE_REC, EE_REC)
+		if len(r) = EE_REC and left(r, 1) = "J" and asc(mid(r, EE_REC, 1)) = ee_sum(r) then
+			j_day(i) = s2w(r, 2)
+			j_arc(i) = s2d(r, 4)
+			j_work(i) = s2w(r, 8)
+			j_starts(i) = s2w(r, 10)
+			j_first(i) = s2w(r, 12)
+			j_last(i) = s2w(r, 14)
+			j_e(i) = s2d(r, 16)
+		end if
+	next i
+	cur_load()
+	if rtc.running = YES then
+		dim d, m as word
+		dim s as byte
+		rtc.getdata(d, m, s)
+		if d > 9000 then time_ok = YES      'дата позже 2024 года - часы уже были установлены
+	end if
+	last_ms = sys.timercountms
+	pf_ms = last_ms - 60000
+	led_update()
+end sub
+
+'вызывается каждые 10 мс
+sub weld_proc_tick()
+	dim now as dword = sys.timercountms
+	dim dt as dword = now - last_ms
+	dim raw as no_yes = NO
+	last_ms = now
+	if dt > 2000 then dt = 2000             'долгая пауза в событиях: не приписываем дуге лишнего
+
+#if CFG_ARC_SOURCE = 0
+	io.num = IO_ARC
+	if io.state = LOW then raw = YES
+#else
+	raw = arc_by_power
+#endif
+	if raw = YES then
+		off_ms = 0
+		if arc_on = NO then
+			on_ms = on_ms + dt
+			if on_ms >= CFG_ARC_ON_MS then arc_start()
+		end if
+	else
+		on_ms = 0
+		if arc_on = YES then
+			off_ms = off_ms + dt
+			if off_ms >= CFG_ARC_OFF_MS then arc_stop()
+		end if
+	end if
+	if arc_on = YES then
+		d_arc_ms = d_arc_ms + dt
+		arc_seen = YES
+	end if
+
+	sec_acc = sec_acc + dt
+	while sec_acc >= 1000
+		sec_acc = sec_acc - 1000
+		weld_second()
+	wend
+
+#if CFG_POWER_FAIL_INPUT
+	'сбой питания: источник #33 предупреждает линией -PF, успеваем сохранить счётчики.
+	'Не чаще раза в минуту: дребезг линии не должен изнашивать память
+	io.num = IO_PF
+	if io.state = LOW then
+		if pf_saved = NO and now - pf_ms >= 60000 then
+			pf_saved = YES
+			pf_ms = now
+			if dirty = YES then cur_save()
+		end if
+	else
+		pf_saved = NO
+	end if
+#endif
+end sub
+
+sub arc_start()
+	arc_on = YES
+	d_arc_ms = d_arc_ms + on_ms             'время, ушедшее на защиту от помех, - тоже дуга
+	on_ms = 0
+	off_ms = 0
+	if d_starts < 65000 then d_starts = d_starts + 1
+	if time_ok = YES then
+		if d_first = NO_MIN then d_first = now_min()
+		d_last = now_min()
+	end if
+	dirty = YES
+	led_update()
+	app_arc_changed()
+end sub
+
+sub arc_stop()
+	arc_on = NO
+	if d_arc_ms >= off_ms then d_arc_ms = d_arc_ms - off_ms      'ожидание после пропадания тока дугой не считаем
+	off_ms = 0
+	on_ms = 0
+	if time_ok = YES then d_last = now_min()
+	dirty = YES
+	led_update()
+	app_arc_changed()
+end sub
+
+'раз в секунду
+sub weld_second()
+	'время в работе: дуга и паузы между швами короче CFG_BREAK_MIN минут
+	if arc_seen = YES then
+		if in_session = YES then d_work_s = d_work_s + gap_s
+		in_session = YES
+		gap_s = 0
+		d_work_s = d_work_s + 1
+		dirty = YES
+	else if in_session = YES then
+		gap_s = gap_s + 1
+		if gap_s > CFG_BREAK_MIN * 60 then
+			in_session = NO
+			gap_s = 0
+		end if
+	end if
+	arc_seen = NO
+
+#if CFG_USE_METER
+	if m_lost_s < 65000 then m_lost_s = m_lost_s + 1
+	if m_lost_s > CFG_METER_LOST_S and m_ok = YES then
+		m_ok = NO
+		m_power = 0
+		arc_by_power = NO
+	end if
+#endif
+
+	'смена учётных суток
+	if time_ok = YES then
+		dim d, m as word
+		dim s as byte
+		rtc.getdata(d, m, s)
+		dim day_id as word = d
+#if CFG_DAY_START_MIN > 0
+		if m < CFG_DAY_START_MIN then day_id = d - 1
+#endif
+		if cur_day = 0 then
+			cur_day = day_id
+			dirty = YES
+		else if day_id <> cur_day then
+			day_close(day_id)
+		end if
+	end if
+
+	save_s = save_s + 1
+	if save_s >= CFG_SAVE_MINUTES * 60 then
+		save_s = 0
+		if dirty = YES then cur_save()
+	end if
+end sub
+
+'сутки закончились: итог - в журнал, счётчики - в ноль
+sub day_close(new_day as word)
+	if d_starts > 0 or d_arc_ms >= 1000 then
+		dim slot as byte = j_put(cur_day)
+		app_day_closed(slot)
+	end if
+	d_arc_ms = 0
+	d_work_s = 0
+	d_starts = 0
+	d_first = NO_MIN
+	d_last = NO_MIN
+	if arc_on = YES then                    'шов идёт через границу суток
+		d_first = now_min()
+		d_last = d_first
+	end if
+	e_start = e_now
+	cur_day = new_day
+	cur_save()
+end sub
+
+'запись суток в журнал: те же сутки - прибавить, иначе - свободная или самая старая запись
+function j_put(day as word) as byte
+	dim i, slot as byte
+	dim oldest as word = 65535
+	dim e as dword = weld_day_energy()
+	slot = 255
+	for i = 0 to J_SIZE - 1
+		if j_day(i) = day then slot = i
+	next i
+	if slot <> 255 then
+		j_arc(slot) = j_arc(slot) + d_arc_ms / 1000
+		j_work(slot) = j_work(slot) + d_work_s / 60
+		j_starts(slot) = j_starts(slot) + d_starts
+		if d_first < j_first(slot) then j_first(slot) = d_first
+		if d_last <> NO_MIN then
+			if j_last(slot) = NO_MIN or d_last > j_last(slot) then j_last(slot) = d_last
+		end if
+		if e <> NO_E then
+			if j_e(slot) = NO_E then
+				j_e(slot) = e
+			else
+				j_e(slot) = j_e(slot) + e
+			end if
+		end if
+	else
+		for i = 0 to J_SIZE - 1
+			if j_day(i) < oldest then
+				oldest = j_day(i)
+				slot = i
+			end if
+		next i
+		j_day(slot) = day
+		j_arc(slot) = d_arc_ms / 1000
+		j_work(slot) = d_work_s / 60
+		j_starts(slot) = d_starts
+		j_first(slot) = d_first
+		j_last(slot) = d_last
+		j_e(slot) = e
+	end if
+	j_write(slot)
+	j_put = slot
+end function
+
+sub j_write(i as byte)
+	dim r as string(EE_REC)
+	r = "J" + w2s(j_day(i)) + d2s(j_arc(i)) + w2s(j_work(i)) + w2s(j_starts(i)) + w2s(j_first(i)) + w2s(j_last(i)) + d2s(j_e(i)) + chr(0)
+	r = left(r, EE_REC - 1) + chr(ee_sum(r))
+	stor.setdata(r, EE_J + i * EE_REC)
+end sub
+
+'следующая запись журнала по убыванию даты: сутки меньше prev; 255 - записей больше нет
+function weld_j_next(prev as word) as byte
+	dim i as byte
+	dim best as word = 0
+	weld_j_next = 255
+	for i = 0 to J_SIZE - 1
+		if j_day(i) <> 0 and j_day(i) < prev and j_day(i) > best then
+			best = j_day(i)
+			weld_j_next = i
+		end if
+	next i
+end function
+
+'--- счётчики текущих суток в EEPROM ---
+sub cur_save()
+	dim r as string(EE_SLOT)
+	dim fl as byte = 0
+	if in_session = YES then fl = 1
+	ee_seq = ee_seq + 1
+	ee_slot = ee_slot + 1
+	if ee_slot >= EE_SLOTS then ee_slot = 0
+	r = "C2" + d2s(ee_seq) + w2s(cur_day) + d2s(d_arc_ms) + d2s(d_work_s) + w2s(d_starts) + w2s(d_first) + w2s(d_last) + d2s(e_start) + chr(fl) + chr(0)
+	r = left(r, EE_SLOT - 1) + chr(ee_sum(r))
+	stor.setdata(r, EE_CUR + ee_slot * EE_SLOT)
+	dirty = NO
+end sub
+
+sub cur_load()
+	dim s as byte
+	dim r as string(EE_SLOT)
+	dim found as no_yes = NO
+	for s = 0 to EE_SLOTS - 1
+		r = stor.getdata(EE_CUR + s * EE_SLOT, EE_SLOT)
+		if len(r) = EE_SLOT and left(r, 2) = "C2" and asc(mid(r, EE_SLOT, 1)) = ee_sum(r) then
+			dim q as dword = s2d(r, 3)
+			if found = NO or q > ee_seq then
+				found = YES
+				ee_seq = q
+				ee_slot = s
+				cur_day = s2w(r, 7)
+				d_arc_ms = s2d(r, 9)
+				d_work_s = s2d(r, 13)
+				d_starts = s2w(r, 17)
+				d_first = s2w(r, 19)
+				d_last = s2w(r, 21)
+				e_start = s2d(r, 23)
+			end if
+		end if
+	next s
+	if found = YES then
+		dbg("Counters restored from slot " + str(ee_slot))
+	else
+		dbg("No saved counters, starting from zero")
+	end if
+end sub
+
+'--- счётчик электроэнергии ---
+'показание нарастающим итогом, кВт*ч: "12345.67"
+sub weld_meter_energy(byref v as string)
+	dim r as real = strtof(v) * 100
+	if r < 0 or r > 4000000000 then exit sub
+	dim e as dword = r + 0.5
+	m_ok = YES
+	m_lost_s = 0
+	if e_start = NO_E or e < e_start then   'первое показание за сутки или счётчик заменили
+		e_start = e
+		dirty = YES
+	end if
+	e_now = e
+end sub
+
+sub weld_meter_power(byref v as string)
+	m_power = strtof(v)
+	if m_power < 0 then m_power = 0
+	m_ok = YES
+	m_lost_s = 0
+	if m_power > CFG_ARC_POWER_W then
+		arc_by_power = YES
+	else
+		arc_by_power = NO
+	end if
+end sub
+
+sub weld_meter_lost()
+end sub
+
+'энергия с начала суток, сотые кВт*ч
+function weld_day_energy() as dword
+	if e_now = NO_E or e_start = NO_E or e_now < e_start then
+		weld_day_energy = NO_E
+	else
+		weld_day_energy = e_now - e_start
+	end if
+end function
+
+'--- часы ---
+sub weld_set_clock(days as word, mins as word, secs as byte)
+	rtc.setdata(days, mins, secs)
+	time_ok = YES
+	led_update()
+end sub
+
+function now_min() as word
+	dim d, m as word
+	dim s as byte
+	rtc.getdata(d, m, s)
+	now_min = m
+end function
+
+function weld_clock_str() as string
+	dim d, m as word
+	dim s as byte
+	if time_ok = NO then
+		weld_clock_str = "не установлены"
+		exit function
+	end if
+	rtc.getdata(d, m, s)
+	weld_clock_str = weld_date_str(d) + " " + weld_hhmm(m)
+end function
+
+'зелёный горит - дуга; короткая зелёная вспышка - ждём; красная вспышка - часы не установлены
+sub led_update()
+	if arc_on = YES then
+		pat.play("~G", PL_PAT_CANINT)
+	else if time_ok = NO then
+		pat.play("~R-------", PL_PAT_CANINT)
+	else
+		pat.play("~G-------", PL_PAT_CANINT)
+	end if
+end sub
+
+'--- оформление ---
+function two(v as word) as string
+	two = str(v)
+	if len(two) < 2 then two = "0" + two
+end function
+
+function weld_date_str(d as word) as string
+	weld_date_str = two(date(d)) + "." + two(month(d)) + "." + str(2000 + year(d))
+end function
+
+function weld_hhmm(m as word) as string
+	if m = NO_MIN then
+		weld_hhmm = "-"
+	else
+		weld_hhmm = two(m / 60) + ":" + two(m mod 60)
+	end if
+end function
+
+'секунды -> "1:05:09"
+function weld_hms(s as dword) as string
+	dim h as dword = s / 3600
+	dim r as word = s mod 3600
+	weld_hms = lstr(h) + ":" + two(r / 60) + ":" + two(r mod 60)
+end function
+
+'сотые кВт*ч -> "12.34"
+function weld_kwh(e as dword) as string
+	if e = NO_E then
+		weld_kwh = "-"
+	else
+		dim f as word = e mod 100
+		weld_kwh = lstr(e / 100) + "." + two(f)
+	end if
+end function
+
+function d2s(d as dword) as string
+	d2s = chr(d shr 24) + chr((d shr 16) and &hFF) + chr((d shr 8) and &hFF) + chr(d and &hFF)
+end function
+
+function s2d(byref s as string, pos as byte) as dword
+	s2d = asc(mid(s, pos, 1))
+	s2d = (s2d shl 8) + asc(mid(s, pos + 1, 1))
+	s2d = (s2d shl 8) + asc(mid(s, pos + 2, 1))
+	s2d = (s2d shl 8) + asc(mid(s, pos + 3, 1))
+end function
+
+function w2s(w as word) as string
+	w2s = chr(w / 256) + chr(w mod 256)
+end function
+
+function s2w(byref s as string, pos as byte) as word
+	s2w = asc(mid(s, pos, 1)) * 256 + asc(mid(s, pos + 1, 1))
+end function
+
+'контрольная сумма всех байтов, кроме последнего
+function ee_sum(byref s as string) as byte
+	dim i as byte
+	dim t as word = 0
+	for i = 1 to len(s) - 1
+		t = (t + asc(mid(s, i, 1))) and &hFF
+	next i
+	ee_sum = t
+end function

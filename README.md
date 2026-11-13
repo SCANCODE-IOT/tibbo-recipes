@@ -1,6 +1,6 @@
 # Рецепты Tibbo: готовые решения автоматизации
 
-Тринадцать задач, решённых от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC или проект [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
+Четырнадцать задач, решённых от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC или проект [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
 
 Описания и страницы со спецификацией и ценами - на [tibbo.ru/recipes](https://tibbo.ru/recipes).
 
@@ -19,6 +19,7 @@
 | 11 | [Контроллер, с которым говорит нейросеть (MCP)](11-ai-mcp-controller/) - Claude, ChatGPT или локальная модель читают датчики и переключают реле обычными фразами и пишут правила, которые плата выполняет сама. Бета. | LTPP3(G2) | - |
 | 12 | [Андон: световая колонна и учёт простоев станка](12-andon/) - Кнопки оператора зажигают световую колонну, контроллер считает минуты работы и простоя, остановки и детали за смену. | TPP2(G2) | да |
 | 13 | [Чёрный ящик RS-485: что было на линии перед сбоем](13-rs485-black-box/) - Слушает линию, хранит последние 150 кадров и замораживает снимок при ошибке CRC, исключении Modbus или тишине. | TPP2(G2) | - |
+| 14 | [Сварочный пост: учёт времени работы сварщика](14-welding-post/) - По току аппарата считает время дуги, время в работе, зажигания и киловатт-часы за сутки; журнал, CSV и MQTT. | TPP2(G2) | да |
 
 ## Принципы
 
@@ -41,7 +42,7 @@
 
 # Tibbo recipes: ready-made automation solutions
 
-Thirteen automation tasks solved end to end on Tibbo hardware: a TIDE project (Tibbo BASIC), an AppBlocks variant, a bill of materials, a Tibbit socket layout with power budget and assembly notes. Documentation inside each recipe is in Russian.
+Fourteen automation tasks solved end to end on Tibbo hardware: a TIDE project (Tibbo BASIC), an AppBlocks variant, a bill of materials, a Tibbit socket layout with power budget and assembly notes. Documentation inside each recipe is in Russian.
 
 | # | Recipe | Board | AppBlocks |
 |---|---|---|---|
@@ -58,11 +59,13 @@ Thirteen automation tasks solved end to end on Tibbo hardware: a TIDE project (T
 | 11 | [A controller that an AI talks to (MCP), beta](11-ai-mcp-controller/) | LTPP3(G2) | - |
 | 12 | [Andon: stack light and machine downtime counters](12-andon/) | TPP2(G2) | yes |
 | 13 | [RS-485 black box: what was on the bus before a failure](13-rs485-black-box/) | TPP2(G2) | - |
+| 14 | [Welding post: welder work time tracking](14-welding-post/) | TPP2(G2) | yes |
 
 Every project builds with the TIDE compiler with no errors, and AppBlocks variants build with the Tibbo cloud compiler. An AppBlocks variant is simpler than the TIDE one: each recipe lists the differences. Connectors are chosen so that the AppBlocks editor does not flag any socket (power Tibbits #09/#10 use #18, the #29 sensor sits next to #00-3). **Not tested on real hardware** - verify on a bench before deployment.
 
 ## Versions
 
+- **1.4.0** (2026-11-13): recipe 14 - welding post time tracking. A current switch on the welder supply cable and an isolated 24 V input (#04-5) detect the arc; the controller counts arc time, work time, arc starts and energy per day (Modbus meter), keeps a 62-day journal, CSV and MQTT. TIDE and AppBlocks variants, built with the Tibbo compiler, logic checked on a model.
 - **1.3.0** (2026-11-13): audit of all recipes against their descriptions. AppBlocks variants: 10 - long pause after several power cycles in a row (was only in TIDE); 04 - alarm code no longer flaps every second (it flooded MQTT), threshold delay, inputs 3 and 4, sensor-loss debounce; 08 - one missed sensor reply no longer switches heating off; 05 - web console password; 01, 03 - sane network defaults instead of template values. TIDE: 07 - the overheat flag now returns to 0; 09 - values above 327.67 units were clipped in the chart, CSV and MQTT. Every README now lists how the AppBlocks variant differs from the TIDE one and has a version history.
 - **1.2.0** (2026-11-10): three new recipes. 11 - an MCP server on the Linux board LTPP3(G2): an AI reads sensors, switches relays and writes rules (Python, 27 tests on a board emulator, beta). 12 - Andon, an AppBlocks project built with the Tibbo compiler through the AppBlocks builder. 13 - RS-485 black box in Tibbo BASIC, built with the same compiler; frame splitting checked on a model. None of them has run on real hardware yet.
 - **1.1.0** (2026-10-26): recipes 02-05 - inputs of #54 on #21 in S10 and the #09 supply on #18 in S12 instead of one #20 (the AppBlocks editor accepts only #18 for power Tibbits); recipe 07 - #00-3 in S11 powers the #29 sensor; recipe 09 - #12 moved to S9; exact terminal numbers in the READMEs.

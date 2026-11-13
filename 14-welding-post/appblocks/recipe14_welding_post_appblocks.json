@@ -1,0 +1,5688 @@
+{
+ "name": "Tibbo-recipe-14-Welding-Post",
+ "device": "TPP2W(G2)",
+ "description": "Recipe 14 from tibbo.ru: welding post time tracking on TPP2(G2). Arc is detected by a current switch on an isolated input of Tibbit #04-5; arc time, work time, arc starts and energy per day (Modbus meter) in the web console and MQTT.",
+ "shortDescription": "",
+ "version": "0.1.19",
+ "runtime": "tios",
+ "featureFlags": [],
+ "featureFlagMap": {},
+ "features": [
+  {
+   "id": "boardsetting",
+   "settings": {
+    "ID": "mquecbkte5plbdjo9sl",
+    "POE": "0",
+    "5VDIRECT": "0",
+    "WIFIANTENNA": "0",
+    "GPRSANTENNA": "0",
+    "TPB": "true",
+    "VPK": "1",
+    "DIN": "1",
+    "POWERADAPTER": "0",
+    "ASM": "asm+rp",
+    "NOTES": ""
+   }
+  },
+  {
+   "id": "general",
+   "settings": {
+    "ID": "mquecbkttwt2hgq703",
+    "DEVICE_NAME": "Welding_Post",
+    "FIRMWAREVERSION": "1.0.0",
+    "TIMEZONE": "17",
+    "LATITUDE": "0",
+    "LONGITUDE": "0",
+    "LOGGING": "sys.debugprint"
+   }
+  },
+  {
+   "id": "global_vars",
+   "settings": {
+    "ID": "mquecbktwgvfvpgurtd",
+    "INTERVAL": "1",
+    "DEBUG_PRINT": "0",
+    "VARS": [
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynoipt46f9et",
+       "VARNAME": "arc_s",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynoiwpetmx7u",
+       "VARNAME": "arc_min",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynoj3gcpx7jr",
+       "VARNAME": "work_s",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynojannj3d47",
+       "VARNAME": "work_min",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynojh6igtaqg",
+       "VARNAME": "starts",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynojoumssp44",
+       "VARNAME": "gap",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynojv6raxjgc",
+       "VARNAME": "in_sess",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynok2t080o5v",
+       "VARNAME": "e_now",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "-1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynok9sbnq9d0",
+       "VARNAME": "kwh_day",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynokg75lmg3b",
+       "VARNAME": "power_w",
+       "DATATYPE": "float",
+       "NAME": "",
+       "FEATURE": "",
+       "FEATURE_SETTING": "",
+       "MINIMUM": "",
+       "MAXIMUM": "",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     }
+    ],
+    "AUTOVARS": [
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrluhv919cwahy9",
+       "VARNAME": "T05_S1",
+       "DATATYPE": "byte",
+       "NAME": "",
+       "FEATURE": "mrubrlt15u4ollyy4vs",
+       "FEATURE_SETTING": "NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 255,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrss3tv3pyxdbuoq",
+       "VARNAME": "T05BAUD",
+       "DATATYPE": "string",
+       "NAME": "Tibbit 05 Baud Rate",
+       "FEATURE": "mrubrsjqjgez7pq729s",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 0,
+       "MAXIMUM": 8,
+       "DEFAULT": "9600",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrvhcqmaloecg96j",
+       "VARNAME": "PARITY",
+       "DATATYPE": "string",
+       "NAME": "Tibbit 05 Parity",
+       "FEATURE": "mrubrvavla7vxt2vpsf",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 1,
+       "MAXIMUM": 1,
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubrw8wbcce7x2uu0u",
+       "VARNAME": "BITS",
+       "DATATYPE": "string",
+       "NAME": "Tibbit 05 Data Bits",
+       "FEATURE": "mrubrw3wxg4yqjdwoei",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 1,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubsh32a2embdnuvai",
+       "VARNAME": "NETNM",
+       "DATATYPE": "string",
+       "NAME": "Ethernet Netmask",
+       "FEATURE": "mrubsgsn5fle7jbssdo",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 16,
+       "DEFAULT": "255.255.255.0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrubshgzsjb4gm63ssr",
+       "VARNAME": "NETGW",
+       "DATATYPE": "string",
+       "NAME": "Ethernet Gateway",
+       "FEATURE": "mrubsh4bc8qcqndpcht",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 16,
+       "DEFAULT": "1.0.0.1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrymiqlhcd1d1rwzu0e",
+       "VARNAME": "TZONE",
+       "DATATYPE": "string",
+       "NAME": "Setting",
+       "FEATURE": "mrymiqezmq36y4mkkkj",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 0,
+       "MAXIMUM": 3,
+       "DEFAULT": "27",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7eljwo0gmyh1e4",
+       "VARNAME": "MQTTI",
+       "DATATYPE": "string",
+       "NAME": "MQTT Client ID",
+       "FEATURE": "mrzo7ea9feve0sv4ygj",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "Client_ID_1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7ezlq467aw7zzak",
+       "VARNAME": "MQTTU",
+       "DATATYPE": "string",
+       "NAME": "MQTT Username",
+       "FEATURE": "mrzo7epx3kygk7rmrs1",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "MQTT_Name_1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7fravh2jgpzc4w",
+       "VARNAME": "MQTPW",
+       "DATATYPE": "string",
+       "NAME": "MQTT Password",
+       "FEATURE": "mrzo7fitpbnham9mxhk",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "Password",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7g6kap2iaa90fkd",
+       "VARNAME": "MQTTH",
+       "DATATYPE": "string",
+       "NAME": "MQTT Server Host Address/IP",
+       "FEATURE": "mrzo7g3tyb6fojffkcn",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 50,
+       "DEFAULT": "1.0.0.1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo7i2o3w3dg4vj2ln",
+       "VARNAME": "MQTSP",
+       "DATATYPE": "string",
+       "NAME": "MQTT Server Port",
+       "FEATURE": "mrzo7ho6f5pcfvevwfa",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 5,
+       "DEFAULT": "1883",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzo9b9xeuua0ggpl8d",
+       "VARNAME": "PUBLISH_TOPIC",
+       "DATATYPE": "string",
+       "NAME": "Setting",
+       "FEATURE": "mrzo9b5wfhv28kp5e6a",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "240",
+       "DEFAULT": "",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzt1s0uv1b1k1bagu",
+       "VARNAME": "NETCP",
+       "DATATYPE": "float",
+       "NAME": "Ethernet DHCP",
+       "FEATURE": "mrzt1rujl4lgn820yvi",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrzt1sslhhf9lkweny7",
+       "VARNAME": "NETIP",
+       "DATATYPE": "string",
+       "NAME": "Ethernet IP",
+       "FEATURE": "mrzt1sdhn1vc0rp5zup",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 16,
+       "DEFAULT": "192.168.1.40",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mrztvqcktdwhdlgoryd",
+       "VARNAME": "WBPWD",
+       "DATATYPE": "string",
+       "NAME": "Web Admin Password",
+       "FEATURE": "mrztvq72hd8zzwdfusm",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": 32,
+       "DEFAULT": "",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynoibwr784ib",
+       "VARNAME": "arc_in",
+       "DATATYPE": "boolean",
+       "NAME": "Tibbit 04_5",
+       "FEATURE": "mweynohqbeo54un",
+       "FEATURE_SETTING": "L1NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynoiize27vec",
+       "VARNAME": "in2",
+       "DATATYPE": "boolean",
+       "NAME": "Tibbit 04_5",
+       "FEATURE": "mweynohqbeo54un",
+       "FEATURE_SETTING": "L2NAME",
+       "MINIMUM": 0,
+       "MAXIMUM": 1,
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynokuctzx0uk",
+       "VARNAME": "BREAK_MIN",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mweynokn72c1bc2",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "1",
+       "MAXIMUM": "240",
+       "DEFAULT": "15",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynolm28ijgkr",
+       "VARNAME": "METER_ADDR",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mweynolfq7ygl73",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "1",
+       "MAXIMUM": "247",
+       "DEFAULT": "1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynomeu515gdh",
+       "VARNAME": "SARC",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mweynom7lzbdxso",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "4000000",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynomsh6uw4t7",
+       "VARNAME": "SWORK",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mweynoml2gep0u4",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "4000000",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynon6yp1didv",
+       "VARNAME": "SSTART",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mweynomzp5lj6po",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "4000000",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynonk9mmfmz3",
+       "VARNAME": "ESTART",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mweynondsqhlhyn",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "-1",
+       "MAXIMUM": "4000000",
+       "DEFAULT": "-1",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynony372ejd6",
+       "VARNAME": "LARC",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mweynonrmugr42u",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "4000000",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynoocgxcnv1i",
+       "VARNAME": "LWORK",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mweynoo5hzl8gr3",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "4000000",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynooqyikp2nv",
+       "VARNAME": "LSTARTS",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mweynooj1nnif0m",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "4000000",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     },
+     {
+      "id": "variable",
+      "settings": {
+       "ID": "mweynop4tomljwk",
+       "VARNAME": "LKWH",
+       "DATATYPE": "float",
+       "NAME": "Setting",
+       "FEATURE": "mweynooxwv3njpx",
+       "FEATURE_SETTING": "SETTINGID",
+       "MINIMUM": "0",
+       "MAXIMUM": "4000000",
+       "DEFAULT": "0",
+       "POLL_INTERVAL": ""
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "net",
+   "settings": {
+    "ID": "mquecbkt7eahgszzc6g",
+    "ENABLED": "1",
+    "DHCP": "1",
+    "IP": "192.168.1.200",
+    "NM": "255.255.255.0",
+    "GI": "192.168.1.1"
+   }
+  },
+  {
+   "id": "flash_devices",
+   "settings": {
+    "ID": "mqueccssuznhrlmb4ap",
+    "FLASH_DEVICES": [
+     {
+      "id": "flash_device",
+      "settings": {
+       "ID": "mrubri0k6lw5x4pzr9b",
+       "NAME": "flash0",
+       "BUILTIN": "1",
+       "BUILTINID": "flash0",
+       "LINKED_FEATURE": "",
+       "FLASH_DEVICE_NAME": "flash0",
+       "PARTITIONS": [
+        {
+         "id": "flash_partition",
+         "settings": {
+          "ID": "mrubri0kwbwn28dswk",
+          "NAME": "boot_partition",
+          "ADDRESS": "8200",
+          "SIZE": "457728",
+          "LABEL": "boot_partition",
+          "MOUNT_POINT": ""
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "flash_device",
+      "settings": {
+       "ID": "mrubri0klfywzjonti",
+       "NAME": "at45db081e",
+       "BUILTIN": "1",
+       "BUILTINID": "at45db081e",
+       "LINKED_FEATURE": "",
+       "FLASH_DEVICE_NAME": "at45db081e",
+       "PARTITIONS": [
+        {
+         "id": "flash_partition",
+         "settings": {
+          "ID": "mrubri0kias1w5xffb",
+          "NAME": "storage_partition",
+          "ADDRESS": "0",
+          "SIZE": "1048576",
+          "LABEL": "storage_partition",
+          "MOUNT_POINT": "/lfs"
+         }
+        }
+       ]
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "peripheral_wiring",
+   "settings": {
+    "ID": "mquecdkhubfazo3zmsk",
+    "ENABLED": "1",
+    "LAYOUT_DATA": "[]",
+    "CUSTOM_SHAPES": "[]",
+    "CUSTOM_GROUPS": "[]"
+   }
+  },
+  {
+   "id": "datetime",
+   "settings": {
+    "ID": "mquece9nfn3kvdkizho"
+   }
+  },
+  {
+   "id": "dhcp",
+   "settings": {
+    "ID": "mquece9n9swb69v12g"
+   }
+  },
+  {
+   "id": "time",
+   "settings": {
+    "ID": "mquecebjj4h4tkoi25d"
+   }
+  },
+  {
+   "id": "sock",
+   "settings": {
+    "ID": "mquecebjkw6smsjwht"
+   }
+  },
+  {
+   "id": "tibbit_05",
+   "settings": {
+    "ID": "mrubrlt15u4ollyy4vs",
+    "SOCKET": "1",
+    "TIBBIT": "05",
+    "PLATFORM": "",
+    "NAME": "T05_S1",
+    "MODE": "RS485",
+    "BAUD": "9600",
+    "FLOWCONTROL": "0",
+    "PARITY": "0",
+    "BITS": "1",
+    "TXBUF": "1",
+    "RXBUF": "1"
+   }
+  },
+  {
+   "id": "timers",
+   "settings": {
+    "ID": "mrubrq7hry0t2aiqgr",
+    "DEBUG_PRINT": "0",
+    "TIMERS": []
+   }
+  },
+  {
+   "id": "cron",
+   "settings": {
+    "ID": "mrubrq7j6psp7kuo3s6",
+    "SCHEDULES": [
+     {
+      "id": "crontab",
+      "settings": {
+       "ID": "mweynopinr5acnl",
+       "NAME": "midnight",
+       "PATTERN": "0 0 0 * * *"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "commands",
+   "settings": {
+    "ID": "mrubrq7km9e93bdx0sf",
+    "COMMANDS": [
+     {
+      "id": "command",
+      "settings": {
+       "ID": "mweynopbmx3fz8j",
+       "NAME": "NEW_DAY",
+       "DESCRIPTION": "Close the day: save totals to the DAYS table, clear counters"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "log",
+   "settings": {
+    "ID": "mrubrq7leok0mwos33i",
+    "ENABLED": "0"
+   }
+  },
+  {
+   "id": "stg",
+   "settings": {
+    "ID": "mrubrq7mnv87nufrvr9",
+    "ENABLED": "1",
+    "STG_DEBUG_PRINT": "0",
+    "STORAGE": "FLASH",
+    "STG_TIMESTAMP": "0",
+    "REDUNDANCY": "0",
+    "STG_MAX_NUM_SETTINGS": "0",
+    "STG_RAM_ARRAY_SIZE": "0",
+    "STG_MAX_SETTING_NAME_LEN": "0",
+    "STG_MAX_SETTING_VALUE_LEN": "0",
+    "SETTINGS": [
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubrsjqjgez7pq729s",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "T05BAUD",
+       "NAME": "Tibbit 05 Baud Rate",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 0,
+       "MAX": 8,
+       "INITIALIZE": "A",
+       "DEFAULT": "9600"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubrvavla7vxt2vpsf",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "PARITY",
+       "NAME": "Tibbit 05 Parity",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 1,
+       "MAX": 1,
+       "INITIALIZE": "A",
+       "DEFAULT": "0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubrw3wxg4yqjdwoei",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "BITS",
+       "NAME": "Tibbit 05 Data Bits",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 1,
+       "MAX": 1,
+       "INITIALIZE": "A",
+       "DEFAULT": "1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubsgsn5fle7jbssdo",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETNM",
+       "NAME": "Ethernet Netmask",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 16,
+       "INITIALIZE": "A",
+       "DEFAULT": "255.255.255.0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrubsh4bc8qcqndpcht",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETGW",
+       "NAME": "Ethernet Gateway",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 16,
+       "INITIALIZE": "A",
+       "DEFAULT": "192.168.1.1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrymiqezmq36y4mkkkj",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "TZONE",
+       "NAME": "Device Time Zone",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": 0,
+       "MAX": 3,
+       "INITIALIZE": "A",
+       "DEFAULT": "17"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7ea9feve0sv4ygj",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTTI",
+       "NAME": "MQTT Client ID",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": "Client_ID_1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7epx3kygk7rmrs1",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTTU",
+       "NAME": "MQTT Username",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": "MQTT_Name_1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7fitpbnham9mxhk",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTPW",
+       "NAME": "MQTT Password",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": ""
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7g3tyb6fojffkcn",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTTH",
+       "NAME": "MQTT Server Host Address/IP",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 50,
+       "INITIALIZE": "A",
+       "DEFAULT": "1.0.0.1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo7ho6f5pcfvevwfa",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "MQTSP",
+       "NAME": "MQTT Server Port",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 5,
+       "INITIALIZE": "A",
+       "DEFAULT": "1883"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzo9b5wfhv28kp5e6a",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "PUBLISH_TOPIC",
+       "NAME": "MQTT Publish Topic Prefix",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": "240",
+       "INITIALIZE": "A",
+       "DEFAULT": ""
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzt1rujl4lgn820yvi",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETCP",
+       "NAME": "Ethernet DHCP",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": 0,
+       "MAX": 1,
+       "INITIALIZE": "A",
+       "DEFAULT": "1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrzt1sdhn1vc0rp5zup",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "NETIP",
+       "NAME": "Ethernet IP",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 16,
+       "INITIALIZE": "A",
+       "DEFAULT": "192.168.1.40"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mrztvq72hd8zzwdfusm",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "WBPWD",
+       "NAME": "Web Admin Password",
+       "STORAGE": "E",
+       "SETTINGTYPE": "string",
+       "DATATYPE": "S",
+       "MIN": "",
+       "MAX": 32,
+       "INITIALIZE": "A",
+       "DEFAULT": ""
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mweynokn72c1bc2",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "BREAK_MIN",
+       "NAME": "Break between welds counted as work, min",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "1",
+       "MAX": "240",
+       "INITIALIZE": "I",
+       "DEFAULT": "15"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mweynolfq7ygl73",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "METER_ADDR",
+       "NAME": "Energy meter Modbus address",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "1",
+       "MAX": "247",
+       "INITIALIZE": "I",
+       "DEFAULT": "1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mweynom7lzbdxso",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "SARC",
+       "NAME": "Saved: arc time today, s",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "4000000",
+       "INITIALIZE": "I",
+       "DEFAULT": "0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mweynoml2gep0u4",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "SWORK",
+       "NAME": "Saved: work time today, s",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "4000000",
+       "INITIALIZE": "I",
+       "DEFAULT": "0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mweynomzp5lj6po",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "SSTART",
+       "NAME": "Saved: arc starts today",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "4000000",
+       "INITIALIZE": "I",
+       "DEFAULT": "0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mweynondsqhlhyn",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "ESTART",
+       "NAME": "Meter reading at day start, kWh",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "-1",
+       "MAX": "4000000",
+       "INITIALIZE": "I",
+       "DEFAULT": "-1"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mweynonrmugr42u",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "LARC",
+       "NAME": "Last day: arc time, min",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "4000000",
+       "INITIALIZE": "I",
+       "DEFAULT": "0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mweynoo5hzl8gr3",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "LWORK",
+       "NAME": "Last day: work time, min",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "4000000",
+       "INITIALIZE": "I",
+       "DEFAULT": "0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mweynooj1nnif0m",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "LSTARTS",
+       "NAME": "Last day: arc starts",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "4000000",
+       "INITIALIZE": "I",
+       "DEFAULT": "0"
+      }
+     },
+     {
+      "id": "stg_setting",
+      "settings": {
+       "ID": "mweynooxwv3njpx",
+       "GENERAL": "",
+       "ADVANCED": "",
+       "SETTINGID": "LKWH",
+       "NAME": "Last day: energy, kWh",
+       "STORAGE": "E",
+       "SETTINGTYPE": "float",
+       "DATATYPE": "F",
+       "MIN": "0",
+       "MAX": "4000000",
+       "INITIALIZE": "I",
+       "DEFAULT": "0"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tbl",
+   "settings": {
+    "ID": "mrubrq7n41jcwl4pn2p",
+    "ENABLED": "1",
+    "TBL_DEBUG_PRINT": "0",
+    "WEBENABLED": "1",
+    "TABLES": [
+     {
+      "id": "tbl_table",
+      "settings": {
+       "ID": "mweynopp8d2h6ck",
+       "NAME": "DAYS",
+       "COMMENT": "",
+       "IN_MEMORY": "0",
+       "MAXRECORDS": "400",
+       "STRUCT": "L",
+       "KEYFIELDS": "0",
+       "FIELDS": [
+        {
+         "id": "tbl_field",
+         "settings": {
+          "ID": "mweynopws1dck5o",
+          "NAME": "TS",
+          "DISPLAY_NAME": "",
+          "FIELDTYPE": "E",
+          "P1": "0",
+          "P2": "2147483647",
+          "DEFAULT": "",
+          "ENUMS": []
+         }
+        },
+        {
+         "id": "tbl_field",
+         "settings": {
+          "ID": "mweynoq3pk7hezd",
+          "NAME": "ARC_MIN",
+          "DISPLAY_NAME": "",
+          "FIELDTYPE": "F",
+          "P1": "-2147483648",
+          "P2": "2147483647",
+          "DEFAULT": "",
+          "ENUMS": []
+         }
+        },
+        {
+         "id": "tbl_field",
+         "settings": {
+          "ID": "mweynoqatkbgj8m",
+          "NAME": "WORK_MIN",
+          "DISPLAY_NAME": "",
+          "FIELDTYPE": "F",
+          "P1": "-2147483648",
+          "P2": "2147483647",
+          "DEFAULT": "",
+          "ENUMS": []
+         }
+        },
+        {
+         "id": "tbl_field",
+         "settings": {
+          "ID": "mweynoqhu692hfo",
+          "NAME": "STARTS",
+          "DISPLAY_NAME": "",
+          "FIELDTYPE": "F",
+          "P1": "-2147483648",
+          "P2": "2147483647",
+          "DEFAULT": "",
+          "ENUMS": []
+         }
+        },
+        {
+         "id": "tbl_field",
+         "settings": {
+          "ID": "mweynoqo6saeive",
+          "NAME": "KWH",
+          "DISPLAY_NAME": "",
+          "FIELDTYPE": "F",
+          "P1": "-2147483648",
+          "P2": "2147483647",
+          "DEFAULT": "",
+          "ENUMS": []
+         }
+        }
+       ],
+       "IN_MEMORY_TABLE": "[]"
+      }
+     }
+    ],
+    "STORAGE_PATH": "/lfs"
+   }
+  },
+  {
+   "id": "cell",
+   "settings": {
+    "ID": "mrubrq7om0lm1x7reyj",
+    "ENABLED": "0",
+    "CELL_MODE": "CELL__PPP_MODE_ISENABLED",
+    "CELL_APN": "",
+    "CELL_UN": "myusername@realm",
+    "CELL_PW": "",
+    "CELL_PIN": "?",
+    "CELL_BAND_TYPE": "1",
+    "CELL__DEBUG_PRINT": "1",
+    "CELL_LOG_LEVEL": "2"
+   }
+  },
+  {
+   "id": "bt",
+   "settings": {
+    "ID": "mrubrq7oy4s2mz0bcrt",
+    "ENABLED": "0",
+    "DEVICENAME": "MyBTDevice",
+    "EMULATION": "PL_WLN_BT_EMULATION_MODE_MICROCHIP",
+    "TXBUF": "1",
+    "RXBUF": "1"
+   }
+  },
+  {
+   "id": "mqtt",
+   "settings": {
+    "ID": "mrubrq7paiw1hmfo1bm",
+    "GENERAL": "",
+    "CERTIFICATE": "",
+    "ENABLED": "1",
+    "MQTT_APP_CLIENT_ID": "Client_ID_1",
+    "MQTT_NAME": "MQTT_Name_1",
+    "MQTT_PASSWORD": "",
+    "MQTT_SERVER_HOST": "1.0.0.1",
+    "MQTT_DESTINATION_PORT": "1883",
+    "MQTT_TLS": "0",
+    "MQTT_KEEPALIVE_INTERVAL": "30",
+    "MQTT_DEBUG_PRINT": "1",
+    "CERTIFICATEFILE": "",
+    "CERTIFICATE_PATH": "",
+    "CLIENT_CERTIFICATE_PATH": "",
+    "TOPICS": []
+   }
+  },
+  {
+   "id": "cgg",
+   "settings": {
+    "ID": "mrubrq7pal0qeoxr0u8",
+    "GENERAL": "",
+    "SETTINGS": "",
+    "CONSOLE": "",
+    "ADVANCED": "",
+    "ENABLED": "0",
+    "SERVER": "192.168.1.201",
+    "SERVER_PORT": "1883",
+    "USERNAME": "",
+    "PASSWORD": "",
+    "DEBUG_PRINT": "0",
+    "WIDGETS": [],
+    "WIDGET_GROUPS": [
+     {
+      "id": "widget_group",
+      "settings": {
+       "ID": "mrubrq7pxwbce02prvo",
+       "GROUPID": "group1",
+       "NAME": "Group",
+       "WIDGETS": []
+      }
+     }
+    ],
+    "INTERVAL": "1",
+    "TLS": "0",
+    "GROUPS": [
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrubrq7pau0c4r6v916",
+       "GROUPID": "group1",
+       "NAME": "General",
+       "SETTINGS": []
+      }
+     }
+    ],
+    "CONSOLE_PREVIEW": "cloud",
+    "TABLES": []
+   }
+  },
+  {
+   "id": "httpserver",
+   "settings": {
+    "ID": "mrubrq7qm4xcnjyt9s8",
+    "GENERAL": "",
+    "ADVANCED": "",
+    "ENABLED": "1",
+    "PORT": "80",
+    "SOCKETS": "2",
+    "TXBUF": "10",
+    "RXBUF": "10",
+    "VARBUF": "1",
+    "ENDPOINTS": [],
+    "DEBUG_PRINT": "0",
+    "TLS_ENABLED": "0"
+   }
+  },
+  {
+   "id": "http",
+   "settings": {
+    "ID": "mrubrq7qgx4eh0mu6el",
+    "ENABLED": "0",
+    "MAX_REQUESTS": "5",
+    "DEBUG_PRINT": "0"
+   }
+  },
+  {
+   "id": "socket",
+   "settings": {
+    "ID": "mrubrq7r5r28mns1ko8",
+    "SOCKETS": []
+   }
+  },
+  {
+   "id": "dns",
+   "settings": {
+    "ID": "mrubrq7r3ge8ga8smn3",
+    "ENABLED": "1",
+    "SERVER1": "8.8.8.8",
+    "SERVER2": "",
+    "DNS_TIMEOUT": "5000",
+    "DNS_DEBUG_PRINT": "0"
+   }
+  },
+  {
+   "id": "sntp",
+   "settings": {
+    "ID": "mrubrq7shyohrudx4gn",
+    "ENABLED": "1",
+    "DEBUGPRINT": "0",
+    "SNTP_SERVER": "216.239.35.0"
+   }
+  },
+  {
+   "id": "mbedtls",
+   "settings": {
+    "ID": "mrubrq7spks63m3sm2",
+    "ENABLED": "0",
+    "CONFIGS": "\nCONFIG_MBEDTLS_HEAP_SIZE=30000\nCONFIG_MBEDTLS_SSL_MAX_CONTENT_LEN=4096                \n"
+   }
+  },
+  {
+   "id": "snmp_agent",
+   "settings": {
+    "ID": "mrubrq7sd9emcmt1ad",
+    "GENERAL": "",
+    "SYSTEM": "",
+    "V3": "",
+    "ADVANCED": "",
+    "ENABLED": "0",
+    "PORT": "161",
+    "READ_COMMUNITY": "public",
+    "WRITE_COMMUNITY": "private",
+    "OBJECTS": [],
+    "SYSDESCR": "Tibbo Device",
+    "SYSOBJECTID": "1.3.6.1.4.1.20738",
+    "SYSCONTACT": "",
+    "SYSNAME": "",
+    "SYSLOCATION": "",
+    "V3_ENABLED": "0",
+    "USERS": [],
+    "OBJECT_CAPACITY": "16",
+    "LOG_LEVEL": "4"
+   }
+  },
+  {
+   "id": "smtp_client",
+   "settings": {
+    "ID": "mrubrq7thy56poqyyzm",
+    "GENERAL": "",
+    "AUTH": "",
+    "ADVANCED": "",
+    "ENABLED": "0",
+    "SERVER": "",
+    "PORT": "465",
+    "SECURITY": "tls",
+    "FROM_ADDRESS": "",
+    "AUTH_METHOD": "login",
+    "USERNAME": "",
+    "PASSWORD": "",
+    "TIMEOUT": "10000",
+    "LOG_LEVEL": "3"
+   }
+  },
+  {
+   "id": "modbus_master",
+   "settings": {
+    "ID": "mrubrq7t0jv8nqk7bvd",
+    "DEBUG_PRINT": "0",
+    "TIMEOUT": "1000",
+    "POLL_INTERVAL": "1000",
+    "FRAME_DELAY": "2",
+    "MAX_REQUESTS": "10",
+    "MODBUSDEVICES": []
+   }
+  },
+  {
+   "id": "modbus_slave",
+   "settings": {
+    "ID": "mrubrq7uvezopfuci",
+    "DEBUG_PRINT": "0",
+    "SLAVEPROTOCOL": "modbus_RTU",
+    "DEVICEID": "1",
+    "SLAVE_SERIAL_PORT": "",
+    "SLAVE_TCP_PORT": "502",
+    "MODBUSTABLEITEMS": []
+   }
+  },
+  {
+   "id": "lcd",
+   "settings": {
+    "ID": "mrubrq7uqk6oqszelbr",
+    "GENERAL": "",
+    "IMAGES_GROUP": "",
+    "SETTINGS": "",
+    "ENABLED": "0",
+    "BACKCOLOR": "#000000",
+    "FORECOLOR": "#ffffff",
+    "LOGFONT": "LCD_SMALL_FONT",
+    "WIDGETS": [],
+    "SCREENS": [],
+    "IMAGES": [],
+    "LCD_SCREEN_WIDGET_COLUMNS": 320,
+    "LCD_SCREEN_WIDGET_ROWS": 240,
+    "GROUPS": [
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrubrq7u7p7g8mggced",
+       "GROUPID": "group2",
+       "NAME": "General",
+       "SETTINGS": []
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "lcd_graph",
+   "settings": {
+    "ID": "mrubrq7vlwp02vzb4n",
+    "ENABLED": "0",
+    "MINY": "-100",
+    "MAXY": "100",
+    "STARTX": "0",
+    "STARTY": 0,
+    "WIDTH": 320,
+    "HEIGHT": 240,
+    "FILL": "#00ff00"
+   }
+  },
+  {
+   "id": "web_dashboard",
+   "settings": {
+    "ID": "mrubrq7w5smh555khek",
+    "GENERAL": "",
+    "SETTINGS": "",
+    "ADVANCED": "",
+    "CUSTOM_PAGES": "",
+    "ENABLED": "1",
+    "TABLESENABLED": "1",
+    "SETTINGSENABLED": "1",
+    "WIDGETENABLED": "1",
+    "INTERVAL": "1",
+    "DASHBOARD_TITLE": "Welding post",
+    "GROUPS": [
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mvp2honorpi3cl0",
+       "GROUPID": "gmvp2ho",
+       "NAME": "Welding",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mweynol19os7xqi",
+          "SETTINGID": "mweynokn72c1bc2",
+          "NAME": "Break between welds counted as work, min",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mweynol8cza3rqf",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mweynolt9zlolmw",
+          "SETTINGID": "mweynolfq7ygl73",
+          "NAME": "Energy meter Modbus address",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mweynom022rk9rm",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrzocamz6onj42hdm",
+       "GROUPID": "webgroup2",
+       "NAME": "General",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrztvxo8z2skfzmlmy",
+          "SETTINGID": "mrztvq72hd8zzwdfusm",
+          "NAME": "Web Admin Password",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrztvxo84a76ch5xj2j",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzocqzl563lrptxbnt",
+          "SETTINGID": "mrymiqezmq36y4mkkkj",
+          "NAME": "Device Time Zone",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8ffw1qcwv64v",
+             "LABEL": "UTC-12:00",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8bgmr8r2yuzw",
+             "LABEL": "UTC-11:00",
+             "VALUE": "1"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8a1mpviy2pde",
+             "LABEL": "UTC-10:00",
+             "VALUE": "2"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz80ryj36l8ou9",
+             "LABEL": "UTC-09:00",
+             "VALUE": "3"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8grvqj16u8o9",
+             "LABEL": "UTC-08:00",
+             "VALUE": "4"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8j4q0fy7gk1",
+             "LABEL": "UTC-07:00",
+             "VALUE": "5"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8z56gyc919v",
+             "LABEL": "UTC-06:00",
+             "VALUE": "6"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8wi8wk73ky9f",
+             "LABEL": "UTC-05:00",
+             "VALUE": "7"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8wopv411gu6k",
+             "LABEL": "UTC-04:30",
+             "VALUE": "8"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8497gvkqwgbn",
+             "LABEL": "UTC-04:00",
+             "VALUE": "9"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8v9iip32fyz",
+             "LABEL": "UTC-03:30",
+             "VALUE": "10"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8c1ltlh1bqa5",
+             "LABEL": "UTC-03:00",
+             "VALUE": "11"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8ypq95t4pl18",
+             "LABEL": "UTC-02:00",
+             "VALUE": "12"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8nz6dyc66iho",
+             "LABEL": "UTC-01:00",
+             "VALUE": "13"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8pqm6y3f2oc",
+             "LABEL": "UTC",
+             "VALUE": "14"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8x3al1g6delm",
+             "LABEL": "UTC+01:00",
+             "VALUE": "15"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz81ht612g4x3n",
+             "LABEL": "UTC+02:00",
+             "VALUE": "16"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8qk1p8lakoc",
+             "LABEL": "UTC+03:00",
+             "VALUE": "17"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8bc6lf1l3317",
+             "LABEL": "UTC+03:30",
+             "VALUE": "18"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8x9d7ievtjpn",
+             "LABEL": "UTC+04:00",
+             "VALUE": "19"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8okoiz8zxcdh",
+             "LABEL": "UTC+04:30",
+             "VALUE": "20"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz87a8u90y3ocb",
+             "LABEL": "UTC+05:00",
+             "VALUE": "21"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8wq62jbrznup",
+             "LABEL": "UTC+05:30",
+             "VALUE": "22"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8aflt8js6x9h",
+             "LABEL": "UTC+05:45",
+             "VALUE": "23"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8ibrll63vzbd",
+             "LABEL": "UTC+06:00",
+             "VALUE": "24"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz88h6ut205i4i",
+             "LABEL": "UTC+06:30",
+             "VALUE": "25"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8s7ixt8z634r",
+             "LABEL": "UTC+07:00",
+             "VALUE": "26"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz80w0jom599cd",
+             "LABEL": "UTC+08:00",
+             "VALUE": "27"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz8amqd6jv4baf",
+             "LABEL": "UTC+09:00",
+             "VALUE": "28"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz87q5u5q0083b",
+             "LABEL": "UTC+9:30",
+             "VALUE": "29"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9bi6otz31cfu",
+             "LABEL": "UTC+10:00",
+             "VALUE": "30"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9tadf9gy9ivo",
+             "LABEL": "UTC+11:00",
+             "VALUE": "31"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9hnjkuwnfxoa",
+             "LABEL": "UTC+12:00",
+             "VALUE": "32"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzocuz9e8pssio44me",
+             "LABEL": "UTC+13:00",
+             "VALUE": "33"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrucyal20jhh1pzu096n",
+       "GROUPID": "webgroup1",
+       "NAME": "Network",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucyfckj12hj6kxjyk",
+          "SETTINGID": "mrzt1rujl4lgn820yvi",
+          "NAME": "Ethernet DHCP",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyh2yi7uhrx617lt",
+             "LABEL": "Disabled",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyh2ypl43rs4efea",
+             "LABEL": "Enabled",
+             "VALUE": "1"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucyjswtij74ddqhrd",
+          "SETTINGID": "mrzt1sdhn1vc0rp5zup",
+          "NAME": "Ethernet IP",
+          "CONTROL": "IPCTRL",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyjswxhwtnbxkhzj",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucynijjca18967m6",
+          "SETTINGID": "mrubsgsn5fle7jbssdo",
+          "NAME": "Ethernet Netmask",
+          "CONTROL": "IPCTRL",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucynijxabrbbisclr",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucyr06v2woip59x4",
+          "SETTINGID": "mrubsh4bc8qcqndpcht",
+          "NAME": "Ethernet Gateway",
+          "CONTROL": "IPCTRL",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucyr06c9xuqg6ctcs",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrubrq7wq74v0983l1",
+       "GROUPID": "group3",
+       "NAME": "Modbus",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucxvahkdeipxow6p",
+          "SETTINGID": "mrubrsjqjgez7pq729s",
+          "NAME": "Tibbit 05 Baud Rate",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdycxomvlqv3",
+             "LABEL": "1200",
+             "VALUE": "1200"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdxu4h6okqc5r",
+             "LABEL": "2400",
+             "VALUE": "2400"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsd9qna3creu29",
+             "LABEL": "4800",
+             "VALUE": "4800"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsd05l7xgbjmkw",
+             "LABEL": "9600",
+             "VALUE": "9600"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdrnlgonp7xg",
+             "LABEL": "19200",
+             "VALUE": "19200"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdkclc3z43ke",
+             "LABEL": "38400",
+             "VALUE": "38400"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdiozr36z2t6",
+             "LABEL": "57600",
+             "VALUE": "57600"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsd53yqo3ocypa",
+             "LABEL": "115200",
+             "VALUE": "115200"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdej9kx01vmgw",
+             "LABEL": "230400",
+             "VALUE": "230400"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdc8xdasfw35s",
+             "LABEL": "460800",
+             "VALUE": "460800"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucxxsdd07e0nd1m28",
+             "LABEL": "921600",
+             "VALUE": "921600"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucxzlo3bt860fssz",
+          "SETTINGID": "mrubrvavla7vxt2vpsf",
+          "NAME": "Tibbit 05 Parity",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19gubfymwhwwk",
+             "LABEL": "None",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19g3z05wnh14dq",
+             "LABEL": "Even",
+             "VALUE": "1"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19g1ccumxsnwnu",
+             "LABEL": "Odd",
+             "VALUE": "2"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19gw2cty4zfdh",
+             "LABEL": "Mark(Always 1)",
+             "VALUE": "3"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy19g9o15l7expop",
+             "LABEL": "Space(Always 0)",
+             "VALUE": "4"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrucy2cfnfz42z6k9d",
+          "SETTINGID": "mrubrw3wxg4yqjdwoei",
+          "NAME": "Tibbit 05 Data Bits",
+          "CONTROL": "STATIC",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy3yrv3owj2lnxkl",
+             "LABEL": "7 Bits",
+             "VALUE": "0"
+            }
+           },
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrucy3yrj9hlwqgy3y",
+             "LABEL": "8 Bits",
+             "VALUE": "1"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     },
+     {
+      "id": "luis_group",
+      "settings": {
+       "ID": "mrzode0sag5675gjwve",
+       "GROUPID": "webgroup3",
+       "NAME": "MQTT",
+       "SETTINGS": [
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzodh80zwtmef5uu7k",
+          "SETTINGID": "mrzo7g3tyb6fojffkcn",
+          "NAME": "MQTT Server Host Address/IP",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzodh80dz1enxil1h8",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzodpwnvu3l4xk63yi",
+          "SETTINGID": "mrzo7ho6f5pcfvevwfa",
+          "NAME": "MQTT Server Port",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzodpwnm1sp9pva68g",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzoeno42afa7plccw",
+          "SETTINGID": "mrzo9b5wfhv28kp5e6a",
+          "NAME": "MQTT Publish Topic Prefix",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzoeno41d9164nayym",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzodvcf6zbhex5v9t5",
+          "SETTINGID": "mrzo7ea9feve0sv4ygj",
+          "NAME": "MQTT Client ID",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzodvcfiz5psa9jjib",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzoefpv4xinht2knh",
+          "SETTINGID": "mrzo7epx3kygk7rmrs1",
+          "NAME": "MQTT Username",
+          "CONTROL": "EDIT",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzoefpvngsb8bg3ibs",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        },
+        {
+         "id": "luis_item",
+         "settings": {
+          "ID": "mrzoejtquqx1pdw82lk",
+          "SETTINGID": "mrzo7fitpbnham9mxhk",
+          "NAME": "MQTT Password",
+          "CONTROL": "PASSWORD",
+          "OPTIONS": [
+           {
+            "id": "luis_item_option",
+            "settings": {
+             "ID": "mrzoejtq8p1xigkbjvf",
+             "LABEL": "OPTION_LABEL",
+             "VALUE": "0"
+            }
+           }
+          ],
+          "FILEDIR": "/lfs",
+          "FILEACCEPT": "",
+          "VALIDATION": "",
+          "STATUS": "",
+          "READONLY": "0"
+         }
+        }
+       ]
+      }
+     }
+    ],
+    "WIDGETS": [],
+    "WIDGET_GROUPS": [
+     {
+      "id": "widget_group",
+      "settings": {
+       "ID": "mrubrq7wekb7o2fbbqa",
+       "GROUPID": "group2",
+       "NAME": "Welding post",
+       "WIDGETS": [
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#c2410c",
+          "DECIMAL_PLACES": "1",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Arc time today, min",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynoiwpetmx7u",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mweynpzzk1juzou",
+          "X": 0,
+          "Y": 0
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#2e7d32",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Work time today, min",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynojannj3d47",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mweynq06ttfh2lg",
+          "X": 3,
+          "Y": 0
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Arc starts today",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynojh6igtaqg",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mweynq0dc7rbb5a",
+          "X": 6,
+          "Y": 0
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#1976d2",
+          "DECIMAL_PLACES": "2",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Energy today, kWh",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynok9sbnq9d0",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mweynq0kka00nyg",
+          "X": 9,
+          "Y": 0
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#616161",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Power now, W",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynokg75lmg3b",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mweynq0r4328l1a",
+          "X": 0,
+          "Y": 3
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#616161",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Current switch: 0 - arc is on",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynoibwr784ib",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mweynq0yz2w1vfv",
+          "X": 3,
+          "Y": 3
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#616161",
+          "DECIMAL_PLACES": "1",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Last day: arc time, min",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynony372ejd6",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mweynq15ofk7eo2",
+          "X": 0,
+          "Y": 6
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#616161",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Last day: work time, min",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynoocgxcnv1i",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mweynq1cbpfnu8i",
+          "X": 3,
+          "Y": 6
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#616161",
+          "DECIMAL_PLACES": "0",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Last day: arc starts",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynooqyikp2nv",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mweynq1jj1y3bap",
+          "X": 6,
+          "Y": 6
+         }
+        },
+        {
+         "id": "card_widget",
+         "settings": {
+          "COLOR": "#616161",
+          "DECIMAL_PLACES": "2",
+          "FONT_SIZE": "60",
+          "H": "3",
+          "LABEL": "Last day: energy, kWh",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynop4tomljwk",
+          "VISIBLE": "1",
+          "W": "3",
+          "ID": "mweynq1qnmpp206",
+          "X": 9,
+          "Y": 6
+         }
+        },
+        {
+         "id": "button_widget",
+         "settings": {
+          "BUTTON_LABEL": "Close day now",
+          "COLOR": "#1976d2",
+          "FONT_SIZE": "16",
+          "H": "3",
+          "HAS_INPUT": "0",
+          "LABEL": "Save totals and clear counters",
+          "LABEL_FONT_SIZE": "16",
+          "TEXT_COLOR": "#000000",
+          "VARIABLE": "mweynopbmx3fz8j",
+          "VISIBLE": "1",
+          "W": "6",
+          "ID": "mweynq1xijs8d6o",
+          "X": 6,
+          "Y": 3
+         }
+        }
+       ]
+      }
+     }
+    ],
+    "USER": "admin",
+    "PASSWORD": "",
+    "USER_REGULAR": "user",
+    "USER_PASSWORD": "",
+    "WEB_ADMIN_WIDGET_COLUMNS": "10",
+    "WEB_ADMIN_WIDGET_ROWS": "15",
+    "CONSOLE_PREVIEW": "device",
+    "TABLES": [
+     {
+      "id": "console_table_item",
+      "settings": {
+       "ID": "mweynoqvwyxx6cx",
+       "TABLE": "mweynopp8d2h6ck",
+       "NAME": ""
+      }
+     }
+    ],
+    "CUSTOM_PAGES_REFRESH_INTERVAL": "2",
+    "CUSTOM_PAGES_JSON": "[]",
+    "CUSTOM_PAGES_EDITOR": ""
+   }
+  },
+  {
+   "id": "luis",
+   "settings": {
+    "ID": "mrubrq7wbczxfpnpxe9",
+    "ENABLED": "0",
+    "BTENABLED": "1",
+    "WEBENABLED": "0",
+    "START_ENABLED": "1",
+    "PASSWORD": "",
+    "GROUPS": []
+   }
+  },
+  {
+   "id": "ds_man",
+   "settings": {
+    "ID": "mrubrq7xu2hhyy4utwf",
+    "ENABLED": "0",
+    "GROUPS": []
+   }
+  },
+  {
+   "id": "custom_features",
+   "settings": {
+    "ID": "mrubrq7xnn81nz3otvq",
+    "FEATURES": []
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubrskaax2o6rk7gxj",
+    "SETTINGID": "BAUD",
+    "LINKEDSETTING": "mrubrsjqjgez7pq729s",
+    "FEATURE": "mrubrlt15u4ollyy4vs"
+   }
+  },
+  {
+   "id": "fd",
+   "settings": {
+    "ID": "mrubrt5tezlln38nbsv",
+    "ENABLED": "1",
+    "FILES": "32",
+    "SECTORS": "100"
+   }
+  },
+  {
+   "id": "filenum",
+   "settings": {
+    "ID": "mrubrtjqr98nsxe2lsb"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubrvbf9d9awq6dmgt",
+    "SETTINGID": "PARITY",
+    "LINKEDSETTING": "mrubrvavla7vxt2vpsf",
+    "FEATURE": "mrubrlt15u4ollyy4vs"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubrw4a1kc2qlt2zg4",
+    "SETTINGID": "BITS",
+    "LINKEDSETTING": "mrubrw3wxg4yqjdwoei",
+    "FEATURE": "mrubrlt15u4ollyy4vs"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubsgsx1s23jr8akod",
+    "SETTINGID": "NM",
+    "LINKEDSETTING": "mrubsgsn5fle7jbssdo",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrubsh4icuhl4xcfnpo",
+    "SETTINGID": "GI",
+    "LINKEDSETTING": "mrubsh4bc8qcqndpcht",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "stgcmd_lib",
+   "settings": {
+    "ID": "mrubwb787ck2o5caqji"
+   }
+  },
+  {
+   "id": "node_system",
+   "settings": {
+    "ID": "mruc1kwub9esrimd9d",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 0,
+    "INPUTS": [
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwup7tk263gp98",
+       "NAME": "Halt",
+       "PORTID": "sys.halt",
+       "PARAMS": []
+      }
+     },
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwuampa3o961jw",
+       "NAME": "Reboot",
+       "PORTID": "sys.reboot",
+       "PARAMS": []
+      }
+     }
+    ],
+    "OUTPUTS": [
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwu2i1tshrpyxx",
+       "NAME": "Boot Complete",
+       "PORTID": "boot",
+       "PARAMS": []
+      }
+     },
+     {
+      "id": "node_port",
+      "settings": {
+       "ID": "mruc1kwu1r2ew19mmtxh",
+       "NAME": "System tick",
+       "PORTID": "on_sys_timer",
+       "PARAMS": []
+      }
+     }
+    ],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "modbus",
+   "settings": {
+    "ID": "mruc8kyow8g1vgjgacj"
+   }
+  },
+  {
+   "id": "tibbit_21",
+   "settings": {
+    "ID": "mrucxiznr3yjiuzxun",
+    "SOCKET": "2",
+    "TIBBIT": "21",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "tibbit_18",
+   "settings": {
+    "ID": "mrugtw45o0mlklquzjo",
+    "SOCKET": "12",
+    "TIBBIT": "18",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrymiqfm057j0qm71hef",
+    "SETTINGID": "TIMEZONE",
+    "LINKEDSETTING": "mrymiqezmq36y4mkkkj",
+    "FEATURE": "mquecbkttwt2hgq703"
+   }
+  },
+  {
+   "id": "mqtt_lib",
+   "settings": {
+    "ID": "mrzo79kt29gl5doepyt"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7easqrldtonej4h",
+    "SETTINGID": "MQTT_APP_CLIENT_ID",
+    "LINKEDSETTING": "mrzo7ea9feve0sv4ygj",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7eqchru21c9tx5h",
+    "SETTINGID": "MQTT_NAME",
+    "LINKEDSETTING": "mrzo7epx3kygk7rmrs1",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7fj7f2qppm2qyks",
+    "SETTINGID": "MQTT_PASSWORD",
+    "LINKEDSETTING": "mrzo7fitpbnham9mxhk",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7g49mpujzxx21ll",
+    "SETTINGID": "MQTT_SERVER_HOST",
+    "LINKEDSETTING": "mrzo7g3tyb6fojffkcn",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzo7hov4l6dcr22pzd",
+    "SETTINGID": "MQTT_DESTINATION_PORT",
+    "LINKEDSETTING": "mrzo7ho6f5pcfvevwfa",
+    "FEATURE": "mrubrq7paiw1hmfo1bm"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzt1rvlr599ubh8qw",
+    "SETTINGID": "DHCP",
+    "LINKEDSETTING": "mrzt1rujl4lgn820yvi",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrzt1sdy89idnrj9jlc",
+    "SETTINGID": "IP",
+    "LINKEDSETTING": "mrzt1sdhn1vc0rp5zup",
+    "FEATURE": "mquecbkt7eahgszzc6g"
+   }
+  },
+  {
+   "id": "linked_setting",
+   "settings": {
+    "ID": "mrztvq7nv86zswmlg0l",
+    "SETTINGID": "PASSWORD",
+    "LINKEDSETTING": "mrztvq72hd8zzwdfusm",
+    "FEATURE": "mrubrq7w5smh555khek"
+   }
+  },
+  {
+   "id": "tibbit_04_5",
+   "settings": {
+    "ID": "mweynohqbeo54un",
+    "SOCKET": "5",
+    "TIBBIT": "04_5",
+    "PLATFORM": "",
+    "NAME": "T04_5_S5",
+    "L1NAME": "arc_in",
+    "L1MODE": "1",
+    "L2NAME": "in2",
+    "L2MODE": "0"
+   }
+  },
+  {
+   "id": "tibbit_21",
+   "settings": {
+    "ID": "mweynohxwuvdt1c",
+    "SOCKET": "6",
+    "TIBBIT": "21",
+    "PLATFORM": ""
+   }
+  },
+  {
+   "id": "tibbit_33",
+   "settings": {
+    "ID": "mweynoi4kcrzuj9",
+    "SOCKET": "11",
+    "TIBBIT": "33",
+    "PLATFORM": "",
+    "PF": "0"
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mweynor21dn07tc",
+    "DISPLAY_NAME": "arc and work time",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_time_interval",
+   "settings": {
+    "ID": "mweynor919bm49d",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [],
+    "INTERVAL": "1"
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mweynorgex13jwa",
+    "DISPLAY_NAME": "current flows?",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynornllk628n",
+       "ARGVALUE": "{{$mweynoibwr784ib}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynorurg1ae8v",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynos10njf3od",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynos80qgo8py",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynor919bm49d",
+    "SOURCE_PORT": "timer_tick",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynorgex13jwa",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynosfswimkpk",
+    "DISPLAY_NAME": "arc second",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynosmyfgchov",
+       "ARGVALUE": "{{$mweynoipt46f9et}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynoipt46f9et"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynostnjnlg0z",
+    "DISPLAY_NAME": "work: this second and the pause before it",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynot08ent5wi",
+       "ARGVALUE": "{{$mweynoj3gcpx7jr}}+1+{{$mweynojoumssp44}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynoj3gcpx7jr"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynot7etqm499",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynote1xyhlxr",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojoumssp44"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynotlkmmgu5p",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynotslh89qwh",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojv6raxjgc"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynotzq2hd41e",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1800,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynou62os5mfk",
+       "ARGVALUE": "{{$mweynoipt46f9et}}/60",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynoiwpetmx7u"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynoudgzw7wwg",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2100,
+    "Y": 300,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynoukwc4ic56",
+       "ARGVALUE": "{{$mweynoj3gcpx7jr}}/60",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojannj3d47"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynourp7tbsk0",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynorgex13jwa",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynosfswimkpk",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynouy0uzw0ab",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynosfswimkpk",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynostnjnlg0z",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynov595j6ett",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynostnjnlg0z",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynot7etqm499",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynovcupuuqxg",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynot7etqm499",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynotlkmmgu5p",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynovjz0ycsns",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynotlkmmgu5p",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynotzq2hd41e",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynovqdilcmzo",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynotzq2hd41e",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynoudgzw7wwg",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mweynovxwjoa5bt",
+    "DISPLAY_NAME": "still at work?",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynow43i7d22r",
+       "ARGVALUE": "{{$mweynojv6raxjgc}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynowbiwc8l7y",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynowigjnuczp",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynowpjkb1h7p",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynorgex13jwa",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynovxwjoa5bt",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynoww9uf4nn5",
+    "DISPLAY_NAME": "pause, s",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynox3vgoiyxo",
+       "ARGVALUE": "{{$mweynojoumssp44}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojoumssp44"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynoxa2r8ryjk",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynovxwjoa5bt",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynoww9uf4nn5",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mweynoxhzwi3ehn",
+    "DISPLAY_NAME": "pause too long?",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynoxo755qlgu",
+       "ARGVALUE": "{{$mweynojoumssp44}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynoxvo1s27hv",
+       "ARGVALUE": ">",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynoy2ijhu2zs",
+       "ARGVALUE": "{{$mweynokuctzx0uk}}*60",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynoy9vmztjyf",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynoww9uf4nn5",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynoxhzwi3ehn",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynoygt0d0xe5",
+    "DISPLAY_NAME": "break",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynoynjube51a",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojv6raxjgc"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynoyuategmlx",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1800,
+    "Y": 450,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynoz1zt9uani",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojoumssp44"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynoz8mzuvt34",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynoxhzwi3ehn",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynoygt0d0xe5",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynozfpqf6vx7",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynoygt0d0xe5",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynoyuategmlx",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_keypad",
+   "settings": {
+    "ID": "mweynozmb064gar",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 620,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [],
+    "BUTTON": "arc_in_kp"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynozt6st02k6",
+    "DISPLAY_NAME": "one more arc start",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 620,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp00ca99rbv",
+       "ARGVALUE": "{{$mweynojh6igtaqg}}+1",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojh6igtaqg"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp07heu9cfa",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynozmb064gar",
+    "SOURCE_PORT": "on_kp",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynozt6st02k6",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_changed",
+   "settings": {
+    "ID": "mweynp0ez5qm9oy",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 760,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [],
+    "VARIABLE": "mweynoibwr784ib"
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mweynp0l9xl0gxm",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 760,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp0sdg58du5",
+       "ARGVALUE": "{{$mweynoibwr784ib}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp0zacy5feb",
+       "ARGVALUE": "=",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp16ketoj3m",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp1dzbs4ym7",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp0ez5qm9oy",
+    "SOURCE_PORT": "variable_changed",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp0l9xl0gxm",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mweynp1k6e4dvgj",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 760,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp1rel2jnmg",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/arc",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp1y258o232",
+       "ARGVALUE": "1",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp25df15t8m",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp2c2u05kcn",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp2jf3zja9h",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp0l9xl0gxm",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp1k6e4dvgj",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mweynp2q7oklc8s",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 880,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynor21dn07tc",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp2x80jp549",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/arc",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp34xxbs9jp",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp3bniwjs5x",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp3iscsl41y",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp3pgw8cu5e",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp0l9xl0gxm",
+    "SOURCE_PORT": "false_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp2q7oklc8s",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mweynp3wxa2ajda",
+    "DISPLAY_NAME": "energy meter",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 1040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_time_interval",
+   "settings": {
+    "ID": "mweynp43obuvmdg",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 1140,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [],
+    "INTERVAL": "10"
+   }
+  },
+  {
+   "id": "node_modbus_write",
+   "settings": {
+    "ID": "mweynp4agl6ghwg",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 1140,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [],
+    "DEVICE": "",
+    "PROTOCOL": "modbus_RTU",
+    "SERIAL_PORT": "mrubrlt15u4ollyy4vs",
+    "DEVICEIP": "1.0.0.1",
+    "DEVICEPORT": "502",
+    "FUNCTIONCODE": "ReadInputRegisters",
+    "DEVICEID": "{{$mweynolm28ijgkr}}",
+    "REGISTER_ADDRESS": "342",
+    "LENGTH": "2",
+    "VARTYPE": "FLOAT",
+    "ENDIAN": "BIG",
+    "DATA": ""
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp4hr47qlel",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp43obuvmdg",
+    "SOURCE_PORT": "timer_tick",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp4agl6ghwg",
+    "TARGET_PORT": "modbus_poll",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynp4odxmrnz8",
+    "DISPLAY_NAME": "meter total, kWh",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 1140,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp4vvrvo437",
+       "ARGVALUE": "{{$response_data}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynok2t080o5v"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp52if5quxs",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp4agl6ghwg",
+    "SOURCE_PORT": "modbus_response",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp4odxmrnz8",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mweynp59tk36wf0",
+    "DISPLAY_NAME": "no reading at day start yet?",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 1140,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp5g98xa3k7",
+       "ARGVALUE": "{{$mweynonk9mmfmz3}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp5nrze80z6",
+       "ARGVALUE": "<",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp5u85n5gaj",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynp613dhwqgc",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 1140,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp68o9bli1m",
+       "ARGVALUE": "{{$mweynok2t080o5v}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynonk9mmfmz3"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp6fi9opzt9",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp4odxmrnz8",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp59tk36wf0",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp6mh8g8imy",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp59tk36wf0",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp613dhwqgc",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mweynp6t06dwki6",
+    "DISPLAY_NAME": "meter replaced?",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 1270,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp702i061mf",
+       "ARGVALUE": "{{$mweynok2t080o5v}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp77vzla9qi",
+       "ARGVALUE": "<",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp7eoyg0etq",
+       "ARGVALUE": "{{$mweynonk9mmfmz3}}",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynp7lby9o83u",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 1270,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp7sbllxsec",
+       "ARGVALUE": "{{$mweynok2t080o5v}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynonk9mmfmz3"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp7znx4u87q",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp4odxmrnz8",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp6t06dwki6",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp868r25qu6",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp6t06dwki6",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp7lby9o83u",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynp8dtf7hmli",
+    "DISPLAY_NAME": "energy today",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 1400,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp8kp3dmju0",
+       "ARGVALUE": "{{$mweynok2t080o5v}}-{{$mweynonk9mmfmz3}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynok9sbnq9d0"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp8rd5aizsk",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp4odxmrnz8",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp8dtf7hmli",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_modbus_write",
+   "settings": {
+    "ID": "mweynp8yp1zy09j",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 1530,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [],
+    "DEVICE": "",
+    "PROTOCOL": "modbus_RTU",
+    "SERIAL_PORT": "mrubrlt15u4ollyy4vs",
+    "DEVICEIP": "1.0.0.1",
+    "DEVICEPORT": "502",
+    "FUNCTIONCODE": "ReadInputRegisters",
+    "DEVICEID": "{{$mweynolm28ijgkr}}",
+    "REGISTER_ADDRESS": "12",
+    "LENGTH": "2",
+    "VARTYPE": "FLOAT",
+    "ENDIAN": "BIG",
+    "DATA": ""
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp95e0c9pq4",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp4odxmrnz8",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp8yp1zy09j",
+    "TARGET_PORT": "modbus_poll",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynp9c6umeonr",
+    "DISPLAY_NAME": "power, W",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 1530,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynp9j51x5zv7",
+       "ARGVALUE": "{{$response_data}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynokg75lmg3b"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynp9q73w03k7",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp8yp1zy09j",
+    "SOURCE_PORT": "modbus_response",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp9c6umeonr",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynp9xyhd8ds1",
+    "DISPLAY_NAME": "no answer",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 1650,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpa40q5aubw",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynokg75lmg3b"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpab1sugwmd",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp8yp1zy09j",
+    "SOURCE_PORT": "modbus_timeout",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynp9xyhd8ds1",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpaiil1oz88",
+    "DISPLAY_NAME": "no answer",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 1650,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynp3wxa2ajda",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpap9du4j33",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynokg75lmg3b"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpaws1zb7ap",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynp4agl6ghwg",
+    "SOURCE_PORT": "modbus_timeout",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpaiil1oz88",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mweynpb3cgqs8xh",
+    "DISPLAY_NAME": "day totals",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 1800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_cron_event",
+   "settings": {
+    "ID": "mweynpba4y0lpp8",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 1900,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [],
+    "SCHEDULE": "mweynopinr5acnl"
+   }
+  },
+  {
+   "id": "node_command_trigger",
+   "settings": {
+    "ID": "mweynpbheji7lyb",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 1900,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpboysgat8s",
+       "ARGVALUE": "",
+       "TARGETPARAM": "data"
+      }
+     }
+    ],
+    "COMMAND": "mweynopbmx3fz8j"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpbvildwfei",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpba4y0lpp8",
+    "SOURCE_PORT": "cron_expired",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpbheji7lyb",
+    "TARGET_PORT": "command_trigger",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_command_triggered",
+   "settings": {
+    "ID": "mweynpc2wv0htk4",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 2040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [],
+    "COMMAND": "mweynopbmx3fz8j"
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mweynpc937l6ccg",
+    "DISPLAY_NAME": "was there any welding?",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 2040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpcgj896yuq",
+       "ARGVALUE": "{{$mweynojh6igtaqg}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpcnpiwlw38",
+       "ARGVALUE": ">",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpcuiep8o8q",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpd1xo188h0",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpc2wv0htk4",
+    "SOURCE_PORT": "on_command_triggered",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpc937l6ccg",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpd87s0peap",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 2040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpdfvf5trhs",
+       "ARGVALUE": "{{$mweynoiwpetmx7u}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynony372ejd6"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpdm3cpl3zs",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 2040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpdtm4v7kib",
+       "ARGVALUE": "{{$mweynojannj3d47}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynoocgxcnv1i"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpe0zn36ylu",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 2040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpe7de8p1dw",
+       "ARGVALUE": "{{$mweynojh6igtaqg}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynooqyikp2nv"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpee3tdzwv8",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 2040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpelh9qulki",
+       "ARGVALUE": "{{$mweynok9sbnq9d0}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynop4tomljwk"
+   }
+  },
+  {
+   "id": "node_datetime",
+   "settings": {
+    "ID": "mweynpeslcn5gx6",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1800,
+    "Y": 2040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_table_insert",
+   "settings": {
+    "ID": "mweynpeztqizlfw",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2100,
+    "Y": 2040,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpf6f47wb3s",
+       "ARGVALUE": "{{$time_now}}",
+       "TARGETPARAM": "TS"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpfdydfxshs",
+       "ARGVALUE": "{{$mweynony372ejd6}}",
+       "TARGETPARAM": "ARC_MIN"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpfk0w4l17k",
+       "ARGVALUE": "{{$mweynoocgxcnv1i}}",
+       "TARGETPARAM": "WORK_MIN"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpfrazgtq0o",
+       "ARGVALUE": "{{$mweynooqyikp2nv}}",
+       "TARGETPARAM": "STARTS"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpfy287trsg",
+       "ARGVALUE": "{{$mweynop4tomljwk}}",
+       "TARGETPARAM": "KWH"
+      }
+     }
+    ],
+    "TABLE": "mweynopp8d2h6ck"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpg5ykxs1bt",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpc937l6ccg",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpd87s0peap",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpgceekqxwn",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpd87s0peap",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpdm3cpl3zs",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpgj5ipceyt",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpdm3cpl3zs",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpe0zn36ylu",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpgqk03mtn6",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpe0zn36ylu",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpee3tdzwv8",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpgxl5z3sd9",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpee3tdzwv8",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpeslcn5gx6",
+    "TARGET_PORT": "timestamp_get",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynph458xqnxy",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpeslcn5gx6",
+    "SOURCE_PORT": "timestamp_now",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpeztqizlfw",
+    "TARGET_PORT": "tbl_add",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynphbgb2q7j6",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynphi8vnblft",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynoipt46f9et"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynphpkq423t1",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynphwlaaiaeh",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynoj3gcpx7jr"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpi34p2bzzz",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpiarfw0a0d",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojh6igtaqg"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpihe5h0b86",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpion3glfxn",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynoiwpetmx7u"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpiv5g4y23v",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpj2gzyzcg1",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojannj3d47"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpj9ip8m16k",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1800,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpjgetjrujk",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojoumssp44"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpjn5rgiirj",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2100,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpju78hrvt1",
+       "ARGVALUE": "{{$mweynok2t080o5v}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynonk9mmfmz3"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpk1jrieoym",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2400,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpk8bcsli7l",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynok9sbnq9d0"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpkf65kd1nl",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 2700,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpkmbpbmz93",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynomeu515gdh"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpkt0pwwuf6",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 3000,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpl02ul5xb7",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynomsh6uw4t7"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpl7hu5wejg",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 3300,
+    "Y": 2200,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpb3cgqs8xh",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynplelbn664d",
+       "ARGVALUE": "0",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynon6yp1didv"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpllp9pq8tu",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpc2wv0htk4",
+    "SOURCE_PORT": "on_command_triggered",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynphbgb2q7j6",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynplsk64yxdc",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynphbgb2q7j6",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynphpkq423t1",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynplzjap6yrr",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynphpkq423t1",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpi34p2bzzz",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpm6nk116o2",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpi34p2bzzz",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpihe5h0b86",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpmd9h848gm",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpihe5h0b86",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpiv5g4y23v",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpmkbps0f4c",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpiv5g4y23v",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpj9ip8m16k",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpmrsqppvlm",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpj9ip8m16k",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpjn5rgiirj",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpmy1j2b4ny",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpjn5rgiirj",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpk1jrieoym",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpn542gi3hh",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpk1jrieoym",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpkf65kd1nl",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpncw1ex2ps",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpkf65kd1nl",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpkt0pwwuf6",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpnj1dzafa2",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpkt0pwwuf6",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpl7hu5wejg",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mweynpnq34fd6zb",
+    "DISPLAY_NAME": "save and restore",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 2380,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_time_interval",
+   "settings": {
+    "ID": "mweynpnxic3r89l",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 2480,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpnq34fd6zb",
+    "ARGUMENTS": [],
+    "INTERVAL": "600"
+   }
+  },
+  {
+   "id": "node_comparison",
+   "settings": {
+    "ID": "mweynpo46q2hv78",
+    "DISPLAY_NAME": "changed since last save?",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 2480,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpnq34fd6zb",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpobmzbri3w",
+       "ARGVALUE": "{{$mweynoipt46f9et}}",
+       "TARGETPARAM": "operand1"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpoi67zt9ri",
+       "ARGVALUE": ">",
+       "TARGETPARAM": "operator"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpopcmglu6z",
+       "ARGVALUE": "{{$mweynomeu515gdh}}",
+       "TARGETPARAM": "operand2"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpowl0vrrto",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpnxic3r89l",
+    "SOURCE_PORT": "timer_tick",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpo46q2hv78",
+    "TARGET_PORT": "comp",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpp31ozaenu",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 2480,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpnq34fd6zb",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynppadtu8qo1",
+       "ARGVALUE": "{{$mweynoipt46f9et}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynomeu515gdh"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpphk5jqtiv",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 2480,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpnq34fd6zb",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynppoczzepe8",
+       "ARGVALUE": "{{$mweynoj3gcpx7jr}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynomsh6uw4t7"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynppv4niuqc1",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 2480,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpnq34fd6zb",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpq2y6hvdqp",
+       "ARGVALUE": "{{$mweynojh6igtaqg}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynon6yp1didv"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpq9qbgmbkx",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpo46q2hv78",
+    "SOURCE_PORT": "true_output",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpp31ozaenu",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpqgwzcgxnq",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpp31ozaenu",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpphk5jqtiv",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpqnj4yhpuz",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpphk5jqtiv",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynppv4niuqc1",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpqupcry0al",
+    "DISPLAY_NAME": "restore after reboot",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 2620,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpnq34fd6zb",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpr1ranh5u8",
+       "ARGVALUE": "{{$mweynomeu515gdh}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynoipt46f9et"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpr8aeu57dx",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 2620,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpnq34fd6zb",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynprfx94ftia",
+       "ARGVALUE": "{{$mweynomsh6uw4t7}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynoj3gcpx7jr"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynprmy1zvjue",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 2620,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpnq34fd6zb",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynprteyc1obo",
+       "ARGVALUE": "{{$mweynon6yp1didv}}",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojh6igtaqg"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynps04ndhg0v",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 2620,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpnq34fd6zb",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynps754j6dqd",
+       "ARGVALUE": "{{$mweynoipt46f9et}}/60",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynoiwpetmx7u"
+   }
+  },
+  {
+   "id": "node_variable_set",
+   "settings": {
+    "ID": "mweynpseuqwj904",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 2620,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynpnq34fd6zb",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpsll3fssoh",
+       "ARGVALUE": "{{$mweynoj3gcpx7jr}}/60",
+       "TARGETPARAM": "value"
+      }
+     }
+    ],
+    "VARIABLE": "mweynojannj3d47"
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpsso4i9qgt",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mruc1kwub9esrimd9d",
+    "SOURCE_PORT": "boot",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpqupcry0al",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpsz2gbtpgy",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpqupcry0al",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpr8aeu57dx",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpt60euwv92",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpr8aeu57dx",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynprmy1zvjue",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynptdr6wpveb",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynprmy1zvjue",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynps04ndhg0v",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynptk10vvqye",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynps04ndhg0v",
+    "SOURCE_PORT": "variable_set_done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpseuqwj904",
+    "TARGET_PORT": "set_value",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_group",
+   "settings": {
+    "ID": "mweynptrf904dz8",
+    "DISPLAY_NAME": "mqtt",
+    "FEATURE": "",
+    "X": -60,
+    "Y": 2800,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_time_interval",
+   "settings": {
+    "ID": "mweynpty21pce2y",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 0,
+    "Y": 2900,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynptrf904dz8",
+    "ARGUMENTS": [],
+    "INTERVAL": "60"
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mweynpu5octw0ly",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 300,
+    "Y": 2900,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynptrf904dz8",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpucmheucam",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/arc_s",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpujqgrdcyg",
+       "ARGVALUE": "{{$mweynoipt46f9et}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpuq6eado83",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpuxbxpfbxd",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mweynpv438p4xfv",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 600,
+    "Y": 2900,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynptrf904dz8",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpvbjl0p9uk",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/work_min",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpviag3m1y8",
+       "ARGVALUE": "{{$mweynojannj3d47}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpvpo7s5jjz",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpvwtecly6y",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mweynpw3hhxuha1",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 900,
+    "Y": 2900,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynptrf904dz8",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpwatvje2l3",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/starts",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpwhbcswzax",
+       "ARGVALUE": "{{$mweynojh6igtaqg}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpwo5xx0lgu",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpwvjykkyo1",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mweynpx2rkxa6vq",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1200,
+    "Y": 2900,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynptrf904dz8",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpx9cp8296t",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/kwh_day",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpxgzjzo30u",
+       "ARGVALUE": "{{$mweynok9sbnq9d0}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpxn7vyq2v7",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpxugtxwpqt",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_mqtt_pub",
+   "settings": {
+    "ID": "mweynpy1q4g17o2",
+    "DISPLAY_NAME": "",
+    "FEATURE": "",
+    "X": 1500,
+    "Y": 2900,
+    "INPUTS": [],
+    "OUTPUTS": [],
+    "GROUP": "mweynptrf904dz8",
+    "ARGUMENTS": [
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpy8nh7i93e",
+       "ARGVALUE": "{{$mrzo9b9xeuua0ggpl8d}}/power_w",
+       "TARGETPARAM": "topic"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpyft6xlqah",
+       "ARGVALUE": "{{$mweynokg75lmg3b}}",
+       "TARGETPARAM": "publish_data"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpym3br5csd",
+       "ARGVALUE": "QOS_AT_MOST_ONCE",
+       "TARGETPARAM": "qos"
+      }
+     },
+     {
+      "id": "node_argument",
+      "settings": {
+       "ID": "mweynpyt3p777tc",
+       "ARGVALUE": "false",
+       "TARGETPARAM": "retain"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpz0xmc326k",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpty21pce2y",
+    "SOURCE_PORT": "timer_tick",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpu5octw0ly",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpz735ypr94",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpu5octw0ly",
+    "SOURCE_PORT": "done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpv438p4xfv",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpze4hje25b",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpv438p4xfv",
+    "SOURCE_PORT": "done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpw3hhxuha1",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpzl6sp718f",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpw3hhxuha1",
+    "SOURCE_PORT": "done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpx2rkxa6vq",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  },
+  {
+   "id": "node_link",
+   "settings": {
+    "ID": "mweynpzsmarvh24",
+    "SOURCE": "",
+    "SOURCE_FEATURE": "mweynpx2rkxa6vq",
+    "SOURCE_PORT": "done",
+    "TARGET": "",
+    "TARGET_FEATURE": "mweynpy1q4g17o2",
+    "TARGET_PORT": "mqtt_publish",
+    "ARGUMENTS": []
+   }
+  }
+ ]
+}

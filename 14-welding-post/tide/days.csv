@@ -1,0 +1,23 @@
+<?
+include "global.tbh"
+dim i as byte
+dim prev as word
+dim s as string
+s = "date;arc_seconds;arc_time;work_minutes;work_time;arc_starts;first_arc;last_arc;kwh" + chr(13) + chr(10)
+web_send(s)
+'текущие сутки - первой строкой
+if cur_day <> 0 then
+	s = weld_date_str(cur_day) + ";" + lstr(d_arc_ms / 1000) + ";" + weld_hms(d_arc_ms / 1000) + ";" + lstr(d_work_s / 60) + ";" + weld_hhmm(d_work_s / 60) + ";" + str(d_starts) + ";"
+	s = s + weld_hhmm(d_first) + ";" + weld_hhmm(d_last) + ";" + weld_kwh(weld_day_energy()) + chr(13) + chr(10)
+	web_send(s)
+end if
+prev = 65535
+i = weld_j_next(prev)
+while i <> 255
+	s = weld_date_str(j_day(i)) + ";" + lstr(j_arc(i)) + ";" + weld_hms(j_arc(i)) + ";" + str(j_work(i)) + ";" + weld_hhmm(j_work(i)) + ";" + str(j_starts(i)) + ";"
+	s = s + weld_hhmm(j_first(i)) + ";" + weld_hhmm(j_last(i)) + ";" + weld_kwh(j_e(i)) + chr(13) + chr(10)
+	web_send(s)
+	prev = j_day(i)
+	i = weld_j_next(prev)
+wend
+?>

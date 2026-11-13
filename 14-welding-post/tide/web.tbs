@@ -1,0 +1,62 @@
+'=====================================================================
+' Веб-страница: разбор запроса, вывод по частям, установка часов
+' set.html?t=2026-11-13T14:30 - установить часы
+'=====================================================================
+include "global.tbh"
+
+function web_arg(byref rq as string, byref argname as string) as string
+	dim key as string(16)
+	dim i, j as byte
+	web_arg = ""
+	key = "?" + argname + "="
+	i = instr(1, rq, key, 1)
+	if i = 0 then
+		key = "&" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
+	if i = 0 then exit function
+	i = i + len(key)
+	j = i
+	while j <= len(rq)
+		dim c as string(1) = mid(rq, j, 1)
+		if c = "&" or c = " " then goto done
+		j = j + 1
+	wend
+done:
+	web_arg = mid(rq, i, j - i)
+end function
+
+'вывод части страницы: ждём место в буфере сокета
+sub web_send(byref s as string)
+	while sock.txfree < len(s)
+		sock.send()
+		doevents
+	wend
+	sock.setdata(s)
+	sock.send()
+end sub
+
+'"14:30" или "14%3A30" -> 870
+function web_parse_hhmm(byref s as string) as word
+	dim t as string(16) = s
+	dim p as byte = instr(1, t, "%3A", 1)
+	if p > 0 then t = left(t, p - 1) + ":" + mid(t, p + 3, 2)
+	p = instr(1, t, ":", 1)
+	web_parse_hhmm = 0
+	if p < 2 then exit function
+	dim h as word = val(left(t, p - 1))
+	dim m as word = val(mid(t, p + 1, 2))
+	if h > 23 or m > 59 then exit function
+	web_parse_hhmm = h * 60 + m
+end function
+
+sub web_handle_set(byref rq as string)
+	dim t as string(24) = web_arg(rq, "t")
+	if t = "" then exit sub
+	'2026-11-13T14%3A30 или 2026-11-13T14:30
+	dim y as byte = val(mid(t, 3, 2))
+	dim mo as byte = val(mid(t, 6, 2))
+	dim dd as byte = val(mid(t, 9, 2))
+	dim tm as string(8) = mid(t, 12, 8)
+	if y > 0 and mo > 0 and mo < 13 and dd > 0 and dd < 32 then weld_set_clock(daycount(y, mo, dd), web_parse_hhmm(tm), 0)
+end sub
