@@ -65,7 +65,7 @@ for i = 0 to GR_COUNT - 1
 	web_send(s)
 next i
 
-s = "<div class=box><h2>Эффект на лентах 12 В</h2>"
+s = "<div class=box><h2>Эффект на лентах 12 В</h2><p><small>Каналы IO1-IO3 - для одноцветных лент и гирлянд 12 В.</small></p>"
 if fx_ok = NO then s = s + "<p class=warn>Tibbit #17 не ответил при включении: проверьте, что он стоит в S1, и перезапустите контроллер.</p>"
 s = s + "<form action='set.html'><select name=fx>"
 web_send(s)
