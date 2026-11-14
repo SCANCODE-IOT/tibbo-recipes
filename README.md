@@ -1,6 +1,6 @@
 # Рецепты Tibbo: готовые решения автоматизации
 
-Двадцать задач, решённых от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC или проект [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
+Двадцать одна задача, решённая от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC или проект [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
 
 Описания и страницы со спецификацией и ценами - на [tibbo.ru/recipes](https://tibbo.ru/recipes).
 
@@ -26,6 +26,7 @@
 | 18 | [Анализатор → ЛИС с буфером](18-lab-analyzer-lis/) - DS1101 принимает результаты анализатора по ASTM, хранит во флеш-памяти и пересылает в ЛИС: ЛИС недоступна - результаты не теряются. | DS1101 | - |
 | 19 | [Багажные весы на стойке регистрации](19-checkin-scale/) - Данные весов идут в программу регистрации как раньше, а DS1101 ведёт журнал взвешиваний, отмечает перевес и следит за весами. | DS1101 | - |
 | 20 | [Прибор на связи? Serial-over-IP с контролем обмена](20-serial-link-monitor/) - Виртуальный COM-порт, который сам сообщает в syslog, если прибор замолчал или программа отключилась. | DS1101 | - |
+| 21 | [Счётчик посетителей на модуле EM510](21-people-counter/) - Два ИК-луча: вход и выход по часам, журнал во внешней флеш-памяти, страница и CSV. Для своего устройства на модуле. | EM510 | - |
 
 ## Принципы
 
@@ -49,7 +50,7 @@
 
 # Tibbo recipes: ready-made automation solutions
 
-Twenty automation tasks solved end to end on Tibbo hardware: a TIDE project (Tibbo BASIC), an AppBlocks variant where it fits, a bill of materials, a Tibbit socket layout with power budget and assembly notes. Documentation inside each recipe is in Russian.
+Twenty-one automation tasks solved end to end on Tibbo hardware: a TIDE project (Tibbo BASIC), an AppBlocks variant where it fits, a bill of materials, a Tibbit socket layout with power budget and assembly notes. Documentation inside each recipe is in Russian.
 
 | # | Recipe | Board | AppBlocks |
 |---|---|---|---|
@@ -73,11 +74,13 @@ Twenty automation tasks solved end to end on Tibbo hardware: a TIDE project (Tib
 | 18 | [Lab analyzer → LIS with a flash buffer (ASTM E1381)](18-lab-analyzer-lis/) | DS1101 | - |
 | 19 | [Check-in baggage scale: weighing log, overweight, scale health](19-checkin-scale/) | DS1101 | - |
 | 20 | [Is the device alive? Serial-over-IP with link monitoring and syslog](20-serial-link-monitor/) | DS1101 | - |
+| 21 | [People counter on the EM510 module: two beams, hourly log in external flash](21-people-counter/) | EM510 | - |
 
 Every project builds with the TIDE compiler with no errors, and AppBlocks variants build with the Tibbo cloud compiler. An AppBlocks variant is simpler than the TIDE one: each recipe lists the differences. Connectors are chosen so that the AppBlocks editor does not flag any socket (power Tibbits #09/#10 use #18, the #29 sensor sits next to #00-3). **Not tested on real hardware** - verify on a bench before deployment. Recipe 17 is for the Tibbo OSS station rather than a TPS board: a Docker server plus a patch to the official Tibbo firmware.
 
 ## Versions
 
+- **1.8.0** (2026-11-14): recipe 21 - people counter for your own device on the EM510 module: two IR beams with debounce and direction, hourly log in a wear-levelled ring of raw sectors on the external AT45DB041 flash (fd), current hour saved to EEPROM, SNTP soft clock (EM510 has no RTC), web page with a chart, CSV and hourly UDP. Builds with the Tibbo compiler (WLN_AVAILABLE is redefined to 0 on purpose); not tested on hardware.
 - **1.7.0** (2026-11-14): recipes 18-20 for DS1101 device servers in clinics and airports. 18 - ASTM E1381 receiver for a lab analyzer that ACKs each frame only after writing it to a wear-levelled flash ring buffer, then forwards messages to the LIS over TCP with the same protocol; LIS outages, reboots mid-transfer and a full buffer are handled (logic checked on a Python model). 19 - check-in baggage scale: transparent channel for the check-in application plus a weighing log, two overweight limits, zero and link checks, UDP message per bag. 20 - transparent Serial-over-IP that reports a silent device, missing replies or a disconnected application to syslog without storing the traffic. All three build with the Tibbo compiler; not tested on real devices.
 - **1.6.0** (2026-11-14): recipe 17 - Tibbo OSS (Outdoor Sensor System) with your own server instead of Azure. The Tibbo Alibaba Cloud firmware gets your CA certificate and port 8883 (patch script and a `.tcu` packer that reproduces official Tibbo releases byte for byte); the server is Docker Compose with Mosquitto (TLS, per-device logins and ACL), Node-RED (time reply, parsing, thresholds, no-data watchdog, Telegram), InfluxDB 2 and Grafana. Server checked with an OSS simulator; the patched firmware builds with the Tibbo compiler; not tested on a real OSS.
 - **1.5.1** (2026-11-13): fixes after an independent code review. Web pages of recipes 02, 03, 04, 05, 08, 09, 10, 13, 14, 15, 16: the first query parameter was not found because the TiOS request string has no leading "?" - buttons, settings and the clock set from the page could fail. Recipe 06: values on the page are sent as TiOS documentation requires. Recipe 15: the print button got no reply (it went to the printer socket), QR in alphanumeric mode, weight without float rounding, stuck printer connection reset, EZPL control characters removed from the product name. Recipe 16: no lost first parameter, longer request buffer, full journal events, CSV-safe codes and names.

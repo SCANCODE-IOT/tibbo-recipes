@@ -1,0 +1,112 @@
+'=====================================================================
+' Журнал по часам во внешней флеш-памяти (прямой доступ к секторам fd)
+' Сектор: "P", номер записи (4 байта), день (2), час (1), вошли (2),
+' вышли (2). Записи идут по кругу: самая старая заменяется новой,
+' каждый сектор переписывается раз в несколько месяцев.
+'=====================================================================
+include "global.tbh"
+
+dim log_n as word = 0
+dim log_wr as word = 0
+dim log_count as word = 0
+dim log_seq as dword = 1
+dim r_day as word = 0
+dim r_hour as byte = 0
+dim r_in as word = 0
+dim r_out as word = 0
+
+function b2(v as word) as string
+	b2 = chr(v / 256) + chr(v mod 256)
+end function
+
+function w2(byref s as string, pos as byte) as word
+	w2 = asc(mid(s, pos, 1)) * 256 + asc(mid(s, pos + 1, 1))
+end function
+
+function d4(byref s as string, pos as byte) as dword
+	dim v as dword = asc(mid(s, pos, 1))
+	v = v * 256 + asc(mid(s, pos + 1, 1))
+	v = v * 256 + asc(mid(s, pos + 2, 1))
+	v = v * 256 + asc(mid(s, pos + 3, 1))
+	d4 = v
+end function
+
+function log_prev(idx as word) as word
+	if idx = 0 then
+		log_prev = log_n - 1
+	else
+		log_prev = idx - 1
+	end if
+end function
+
+function log_read(idx as word) as ok_ng
+	dim cs as word
+	log_read = NG
+	if log_n = 0 then exit function
+	fd.buffernum = 0
+	if fd.getsector(idx) <> PL_FD_STATUS_OK then exit function
+	if fd.checksum(PL_FD_CSUM_MODE_VERIFY, cs) <> OK then exit function
+	dim h as string(12) = fd.getbuffer(0, 12)
+	if left(h, 1) <> "P" then exit function
+	r_day = w2(h, 6)
+	r_hour = asc(mid(h, 8, 1))
+	r_in = w2(h, 9)
+	r_out = w2(h, 11)
+	log_read = OK
+end function
+
+function log_add(d as word, h as byte, nin as word, nout as word) as ok_ng
+	dim cs as word
+	log_add = NG
+	if log_n = 0 then exit function
+	dim v as dword = log_seq
+	dim s4 as string(4) = chr((v shr 24) and &hFF) + chr((v shr 16) and &hFF) + chr((v shr 8) and &hFF) + chr(v and &hFF)
+	fd.buffernum = 0
+	fd.setbuffer("P" + s4 + b2(d) + chr(h) + b2(nin) + b2(nout), 0)
+	fd.checksum(PL_FD_CSUM_MODE_CALCULATE, cs)
+	if fd.setsector(log_wr) <> PL_FD_STATUS_OK then exit function
+	log_seq = log_seq + 1
+	log_wr = log_wr + 1
+	if log_wr >= log_n then log_wr = 0
+	if log_count < log_n then log_count = log_count + 1
+	log_add = OK
+end function
+
+sub log_init()
+	dim i, newest as word
+	dim best as dword = 0
+	dim found as no_yes = NO
+	dim cs as word
+	log_n = fd.availableflashspace
+	if log_n > CFG_LOG_SECTORS then log_n = CFG_LOG_SECTORS
+	if log_n = 0 then
+		dbg("No external flash: hourly log disabled")
+		exit sub
+	end if
+	log_count = 0
+	newest = 0
+	fd.buffernum = 0
+	for i = 0 to log_n - 1
+		if fd.getsector(i) = PL_FD_STATUS_OK then
+			if fd.checksum(PL_FD_CSUM_MODE_VERIFY, cs) = OK then
+				dim h as string(5) = fd.getbuffer(0, 5)
+				if left(h, 1) = "P" then
+					log_count = log_count + 1
+					dim sq as dword = d4(h, 2)
+					if found = NO or sq > best then
+						best = sq
+						newest = i
+						found = YES
+					end if
+				end if
+			end if
+		end if
+		if (i and 63) = 0 then doevents
+	next i
+	if found = YES then
+		log_wr = newest + 1
+		if log_wr >= log_n then log_wr = 0
+		log_seq = best + 1
+	end if
+	dbg("Log: " + str(log_n) + " sectors, " + str(log_count) + " hours stored")
+end sub

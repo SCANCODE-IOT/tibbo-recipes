@@ -1,0 +1,9 @@
+<?
+include "global.tbh"
+dim s as string
+s = "name=" + CFG_NAME + chr(10) + "time_ok=" + str(clk_ok) + chr(10) + "date=" + date_str(clk_day) + chr(10) + "hour=" + str(cur_hour) + chr(10)
+s = s + "in_hour=" + str(in_h) + chr(10) + "out_hour=" + str(out_h) + chr(10) + "in_today=" + lstr(in_day) + chr(10) + "out_today=" + lstr(out_day) + chr(10)
+web_send(s)
+s = "log_hours=" + str(log_count) + chr(10) + "log_capacity=" + str(log_n) + chr(10)
+web_send(s)
+?>

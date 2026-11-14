@@ -1,0 +1,15 @@
+<?
+include "global.tbh"
+'по часам, новые сверху: дата;час;вошли;вышли. Первая строка - текущий час
+dim i, k as word
+web_send("name;date;hour;in;out" + chr(13) + chr(10))
+web_send(CFG_NAME + ";" + date_str(clk_day) + ";" + str(cur_hour) + ";" + str(in_h) + ";" + str(out_h) + chr(13) + chr(10))
+if log_n > 0 then
+	i = log_prev(log_wr)
+	for k = 1 to CFG_CSV_HOURS
+		if log_read(i) <> OK then exit for
+		web_send(CFG_NAME + ";" + date_str(r_day) + ";" + str(r_hour) + ";" + str(r_in) + ";" + str(r_out) + chr(13) + chr(10))
+		i = log_prev(i)
+	next k
+end if
+?>

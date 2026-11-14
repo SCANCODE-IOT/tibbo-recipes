@@ -1,0 +1,221 @@
+'=====================================================================
+' Подсчёт: два луча, направление по тому, какой перекрыт первым.
+' Опрос каждые 10 мс с защитой от дребезга. Часы - от SNTP, счёт по
+' часам, запись в журнал при смене часа, счётчик текущего часа
+' сохраняется в EEPROM, чтобы пережить пропадание питания.
+'=====================================================================
+include "global.tbh"
+
+dim clk_ok as no_yes = NO
+dim clk_day as word = 0
+dim clk_sec as dword = 0
+dim in_h as word = 0
+dim out_h as word = 0
+dim in_day as dword = 0
+dim out_day as dword = 0
+dim cur_hour as byte = 255
+dim udp_sock as byte
+
+dim a_on, b_on as no_yes                    'луч перекрыт (после защиты от дребезга)
+dim a_cnt, b_cnt as byte
+dim pst as byte = 0                         '0 - ждём, 1 - первым перекрыт A, 2 - первым B, 3 - ждём, пока оба освободятся
+dim pt as word = 0
+dim other as no_yes = NO
+dim up_sec as dword = 0                     'секунд с включения - пока нет времени от SNTP
+dim save_cnt as word = 0
+dim sv_day as word = 0                      'сохранённое в EEPROM
+dim sv_hour as byte = 255
+dim sv_in, sv_out as word
+
+declare sub hour_close()
+declare sub count_save()
+
+sub count_init()
+	io.num = CFG_BEAM_A
+	io.enabled = NO
+	io.num = CFG_BEAM_B
+	io.enabled = NO
+	a_on = NO
+	b_on = NO
+	udp_sock = sock_get("UDP")
+	sock.num = udp_sock
+	sock.protocol = PL_SOCK_PROTOCOL_UDP
+	sock.inconmode = PL_SOCK_INCONMODE_NONE
+	sock.rxbuffrq(1)
+	sock.txbuffrq(1)
+	'счётчик часа, сохранённый до выключения: "C", день, час, вошли, вышли
+	dim s as string(8) = stor.getdata(1, 8)
+	if len(s) = 8 and left(s, 1) = "C" then
+		sv_day = asc(mid(s, 2, 1)) * 256 + asc(mid(s, 3, 1))
+		sv_hour = asc(mid(s, 4, 1))
+		sv_in = asc(mid(s, 5, 1)) * 256 + asc(mid(s, 6, 1))
+		sv_out = asc(mid(s, 7, 1)) * 256 + asc(mid(s, 8, 1))
+	end if
+end sub
+
+'один луч с защитой от дребезга
+function beam(num as pl_io_num, byref st as no_yes, byref cnt as byte) as no_yes
+	dim raw as no_yes = NO
+	if io.lineget(num) = CFG_BLOCKED_LEVEL then raw = YES
+	if raw <> st then
+		cnt = cnt + 1
+		if cnt >= CFG_DEBOUNCE then
+			st = raw
+			cnt = 0
+		end if
+	else
+		cnt = 0
+	end if
+	beam = st
+end function
+
+'каждые 10 мс
+sub count_tick()
+	dim a as no_yes = beam(CFG_BEAM_A, a_on, a_cnt)
+	dim b as no_yes = beam(CFG_BEAM_B, b_on, b_cnt)
+	select case pst
+	case 0:
+		if a = YES and b = NO then
+			pst = 1
+		else if b = YES and a = NO then
+			pst = 2
+		else if a = YES and b = YES then
+			pst = 3                         'оба сразу - направление не понять, не считаем
+		end if
+		pt = 0
+		other = NO
+	case 1, 2:
+		pt = pt + 1
+		if (pst = 1 and b = YES) or (pst = 2 and a = YES) then other = YES
+		if a = NO and b = NO then
+			if other = YES then
+				if pst = 1 then
+					in_h = in_h + 1
+					in_day = in_day + 1
+				else
+					out_h = out_h + 1
+					out_day = out_day + 1
+				end if
+			end if
+			pst = 0
+		else if pt > CFG_PASS_TIMEOUT then
+			pst = 3                         'кто-то стоит в проходе - ждём, пока освободится
+		end if
+	case else:
+		if a = NO and b = NO then pst = 0
+	end select
+end sub
+
+'раз в секунду: часы, смена часа, сохранение в EEPROM
+sub count_second()
+	up_sec = up_sec + 1
+	if clk_ok = YES then
+		clk_sec = clk_sec + 1
+		if clk_sec >= 86400 then
+			clk_sec = 0
+			clk_day = clk_day + 1
+		end if
+	end if
+	dim h as byte
+	if clk_ok = YES then
+		h = clk_sec / 3600
+	else
+		h = (up_sec / 3600) mod 24
+	end if
+	if cur_hour = 255 then cur_hour = h
+	if h <> cur_hour then
+		hour_close()
+		cur_hour = h
+	end if
+	save_cnt = save_cnt + 1
+	if save_cnt >= CFG_SAVE_MIN * 60 then
+		save_cnt = 0
+		count_save()
+	end if
+end sub
+
+'час закончился: в журнал, в UDP, обнулить
+sub hour_close()
+	dim d as word = clk_day
+	if clk_ok = YES and cur_hour = 23 and clk_sec < 3600 then d = d - 1      'час 23 закрывается уже в новые сутки
+	if clk_ok = NO then d = 0
+	log_add(d, cur_hour, in_h, out_h)
+	if CFG_UDP_IP <> "" then
+		dim keep as byte = sock.num
+		sock.num = udp_sock
+		if sock.statesimple = PL_SSTS_CLOSED then
+			sock.targetip = CFG_UDP_IP
+			sock.targetport = CFG_UDP_PORT
+			sock.connect()
+		end if
+		dim msg as string(64) = CFG_NAME + ";" + date_str(d) + ";" + str(cur_hour) + ";" + str(in_h) + ";" + str(out_h)
+		if sock.txfree >= len(msg) then
+			sock.setdata(msg)
+			sock.send()
+		end if
+		sock.num = keep
+	end if
+	dbg("Hour " + str(cur_hour) + ": in " + str(in_h) + ", out " + str(out_h))
+	in_h = 0
+	out_h = 0
+	if cur_hour = 23 then
+		in_day = 0
+		out_day = 0
+	end if
+	count_save()
+end sub
+
+sub count_save()
+	if clk_ok = NO then exit sub            'без времени не понять, к какому часу относится счётчик
+	dim s as string(8) = "C" + chr(clk_day / 256) + chr(clk_day mod 256) + chr(cur_hour) + chr(in_h / 256) + chr(in_h mod 256) + chr(out_h / 256) + chr(out_h mod 256)
+	stor.setdata(s, 1)
+end sub
+
+'время пришло: установить часы и, если сохранённый счётчик - этого же часа, продолжить его
+sub clock_set(d as word, sec as dword)
+	dim first as no_yes = NO
+	if clk_ok = NO then first = YES
+	clk_day = d
+	clk_sec = sec
+	clk_ok = YES
+	if first = YES then
+		cur_hour = clk_sec / 3600
+		if sv_day = clk_day and sv_hour = cur_hour then
+			in_h = in_h + sv_in
+			out_h = out_h + sv_out
+			dbg("Hour counter restored from EEPROM")
+		end if
+		sv_hour = 255
+		'сегодняшние итоги - из журнала
+		count_restore()
+	end if
+end sub
+
+'итоги за сегодня: часы этого дня из журнала плюс текущий час
+sub count_restore()
+	in_day = in_h
+	out_day = out_h
+	if log_n = 0 then exit sub
+	dim i as word = log_prev(log_wr)
+	dim k as word
+	for k = 1 to 24
+		if log_read(i) <> OK then exit sub
+		if r_day <> clk_day then exit sub
+		in_day = in_day + r_in
+		out_day = out_day + r_out
+		i = log_prev(i)
+	next k
+end sub
+
+function two(v as word) as string
+	two = str(v)
+	if v < 10 then two = "0" + two
+end function
+
+function date_str(d as word) as string
+	if d = 0 then
+		date_str = ""
+	else
+		date_str = str(2000 + year(d)) + "-" + two(month(d)) + "-" + two(date(d))
+	end if
+end function

@@ -1,0 +1,48 @@
+'=====================================================================
+' Рецепт 21 «Счётчик посетителей» · общий заголовок
+' Модуль EM510 (Ethernet, GPIO, внешняя флеш-память для fd). Библиотеки 2_01_05
+'=====================================================================
+include "config.tbh"
+
+#define WLN_AVAILABLE 0                     'Wi-Fi (WA2000) в рецепте не используется
+#define DHCP_DEBUG_PRINT 0
+#define SNTP_DEBUG_PRINT 0
+include "sock\trunk\sock.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "sntp\trunk\sntp.tbh"
+
+'--- count.tbs ---
+declare sub count_init()
+declare sub count_tick()
+declare sub count_second()
+declare sub clock_set(d as word, sec as dword)
+declare sub count_restore()
+declare function date_str(d as word) as string
+declare clk_ok as no_yes
+declare clk_day as word
+declare clk_sec as dword
+declare in_h as word                        'вошли за текущий час
+declare out_h as word
+declare in_day as dword                     'за сегодня
+declare out_day as dword
+declare cur_hour as byte
+declare udp_sock as byte
+
+'--- log.tbs ---
+declare sub log_init()
+declare function log_add(d as word, h as byte, nin as word, nout as word) as ok_ng
+declare function log_read(idx as word) as ok_ng
+declare function log_prev(idx as word) as word
+declare log_n as word
+declare log_wr as word
+declare log_count as word                   'сколько часов в журнале
+declare r_day as word
+declare r_hour as byte
+declare r_in as word
+declare r_out as word
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+
+'--- web.tbs ---
+declare sub web_send(byref s as string)
