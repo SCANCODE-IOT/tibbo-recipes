@@ -1,0 +1,188 @@
+'=====================================================================
+' Веб: разбор запроса, вывод, команды
+' set.html?g=1&a=on|off|auto                       - группа: включить, выключить, по расписанию
+' set.html?fx=3&br=80&sp=3                         - эффект, яркость %, скорость 1-5
+' set.html?sh=-15&off=01:00&mo=1&mon=06:30&ny=1    - расписание
+' set.html?lat=55.7558&lon=37.6173&tz=180          - место и часовой пояс
+' set.html?t=2026-12-15T17:30                      - часы вручную
+'=====================================================================
+include "global.tbh"
+
+declare function web_int(byref s as string) as integer
+declare function web_e4(byref s as string) as long
+
+'значение параметра из строки запроса: "GET /set.html?g=1&a=on HTTP/1.1"
+function web_arg(byref rq as string, byref argname as string) as string
+	dim key as string(16)
+	dim i, j as word
+	web_arg = ""
+	'в строке запроса TiOS нет "?": она начинается с первого параметра, например "g=1&a=on HTTP/1.1"
+	key = argname + "="
+	if left(rq, len(key)) = key then
+		i = 1
+	else
+		key = "?" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
+	if i = 0 then
+		key = "&" + argname + "="
+		i = instr(1, rq, key, 1)
+	end if
+	if i = 0 then exit function
+	i = i + len(key)
+	j = i
+	while j <= len(rq)
+		dim c as string(1) = mid(rq, j, 1)
+		if c = "&" or c = " " then goto done
+		j = j + 1
+	wend
+done:
+	web_arg = mid(rq, i, j - i)
+end function
+
+function web_hhmm(m as word) as string
+	dim h as string(2) = str(m / 60)
+	dim mm as string(2) = str(m mod 60)
+	if len(h) < 2 then h = "0" + h
+	if len(mm) < 2 then mm = "0" + mm
+	web_hhmm = h + ":" + mm
+end function
+
+'"18:00" или "18%3A00" -> 1080; пусто или ошибка -> 0
+function web_parse_hhmm(byref s as string) as word
+	dim t as string(16) = s
+	dim p as byte = instr(1, t, "%3A", 1)
+	if p > 0 then t = left(t, p - 1) + ":" + mid(t, p + 3, 2)
+	p = instr(1, t, ":", 1)
+	web_parse_hhmm = 0
+	if p < 2 then exit function
+	dim h as word = val(left(t, p - 1))
+	dim m as word = val(mid(t, p + 1, 2))
+	if h > 23 or m > 59 then exit function
+	web_parse_hhmm = h * 60 + m
+end function
+
+'"-15" -> -15
+function web_int(byref s as string) as integer
+	dim v as integer
+	if left(s, 1) = "-" then
+		v = val(mid(s, 2, 6))
+		web_int = -v
+	else
+		web_int = val(s)
+	end if
+end function
+
+'"55.7558" -> 557558, "-0.5" -> -5000, "55,75" -> 557500
+function web_e4(byref s as string) as long
+	dim t as string(16) = s
+	dim neg as no_yes = NO
+	if left(t, 1) = "-" then
+		neg = YES
+		t = mid(t, 2, 15)
+	end if
+	dim p as byte = instr(1, t, ".", 1)
+	if p = 0 then p = instr(1, t, ",", 1)
+	if p = 0 then p = instr(1, t, "%2C", 1)
+	dim ip as string(8)
+	dim fr as string(8) = ""
+	if p = 0 then
+		ip = t
+	else
+		ip = left(t, p - 1)
+		fr = mid(t, p + 1, 4)
+		if left(fr, 2) = "2C" then fr = mid(t, p + 3, 4)
+	end if
+	while len(fr) < 4
+		fr = fr + "0"
+	wend
+	dim v as long = lval(ip)
+	v = v * 10000 + lval(fr)
+	if neg = YES then v = -v
+	web_e4 = v
+end function
+
+'вывод части страницы: ждём место в буфере сокета
+sub web_send(byref s as string)
+	while sock.txfree < len(s)
+		sock.send()
+		doevents
+	wend
+	sock.setdata(s)
+	sock.send()
+end sub
+
+sub web_handle_set(byref rq as string)
+	dim t as string(24) = web_arg(rq, "t")
+	if t <> "" then
+		'2026-12-15T17%3A30 или 2026-12-15T17:30
+		dim y as byte = val(mid(t, 3, 2))
+		dim mo as byte = val(mid(t, 6, 2))
+		dim dd as byte = val(mid(t, 9, 2))
+		dim tm as string(8) = mid(t, 12, 8)
+		if y > 0 and mo > 0 and dd > 0 then light_set_clock(daycount(y, mo, dd), web_parse_hhmm(tm), 0)
+		exit sub
+	end if
+
+	dim gs as string(4) = web_arg(rq, "g")
+	if gs <> "" then
+		dim g as byte = val(gs)
+		if g < 1 or g > GR_COUNT then exit sub
+		dim a as string(8) = web_arg(rq, "a")
+		if a = "on" then
+			light_set_mode(g - 1, MODE_ON)
+		else if a = "off" then
+			light_set_mode(g - 1, MODE_OFF)
+		else if a = "auto" then
+			light_set_mode(g - 1, MODE_AUTO)
+		else
+			exit sub
+		end if
+		light_save()
+		exit sub
+	end if
+
+	dim fxs as string(4) = web_arg(rq, "fx")
+	if fxs <> "" then
+		dim k as byte = val(fxs)
+		if k <= FX_TWINKLE then fx_kind = k
+		dim br as byte = val(web_arg(rq, "br"))
+		if br >= 10 and br <= 100 then fx_bright = br
+		dim sp as byte = val(web_arg(rq, "sp"))
+		if sp >= 1 and sp <= 5 then fx_speed = sp
+		light_save()
+		exit sub
+	end if
+
+	if instr(1, rq, "off=", 1) > 0 then
+		dim sh as integer = web_int(web_arg(rq, "sh"))
+		if sh >= -180 and sh <= 180 then s_shift = sh
+		s_off = web_parse_hhmm(web_arg(rq, "off"))
+		s_morn_on = web_parse_hhmm(web_arg(rq, "mon"))
+		if web_arg(rq, "mo") = "1" then
+			s_morning = YES
+		else
+			s_morning = NO
+		end if
+		if web_arg(rq, "ny") = "1" then
+			s_ny = YES
+		else
+			s_ny = NO
+		end if
+		light_save()
+		light_apply()
+		exit sub
+	end if
+
+	if instr(1, rq, "lat=", 1) > 0 then
+		dim la as long = web_e4(web_arg(rq, "lat"))
+		dim lo as long = web_e4(web_arg(rq, "lon"))
+		dim tz as integer = web_int(web_arg(rq, "tz"))
+		if la >= -900000 and la <= 900000 then s_lat_e4 = la
+		if lo >= -1800000 and lo <= 1800000 then s_lon_e4 = lo
+		if tz >= -720 and tz <= 840 then s_tz = tz
+		light_save()
+		light_refresh()
+		ntp_request()                   'часы заново - с новым часовым поясом
+	end if
+end sub

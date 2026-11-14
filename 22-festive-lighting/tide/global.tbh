@@ -1,0 +1,100 @@
+'=====================================================================
+' Рецепт 22 «Гирлянды и подсветка по закату» · общий заголовок
+' Библиотеки Tibbo 2_01_05; работа с Tibbit #17 - файлы Tibbo из примера
+' CA-Test-Tibbits-16-17-31 (PIC_HAL, pic_gra, super_i2c), без изменений.
+'=====================================================================
+include "config.tbh"
+
+#define DHCP_DEBUG_PRINT 0
+#define SNTP_DEBUG_PRINT 0
+
+'Tibbit #17 в сокете S1 платы TPP2(G2): линии сокета S1
+#define PIC_CLK_PIN PL_IO_NUM_9_TX0
+#define PIC_DATA_PIN PL_IO_NUM_8_RX0
+#define PIC_RST_PIN PL_IO_NUM_0
+#define PIC_INT_PIN PL_IO_NUM_16_INT0
+
+include "sock\trunk\sock.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "sntp\trunk\sntp.tbh"
+include "ssi\trunk\ssi.tbh"
+include "super_i2c.tbh"
+include "PIC_HAL.tbh"
+include "pic_gra.tbh"
+
+#define GR_COUNT 3                          'группы: 0 - реле 1, 1 - реле 2, 2 - ленты на #17
+
+enum gr_modes
+	MODE_OFF,                               'выключено вручную
+	MODE_ON,                                'включено вручную
+	MODE_AUTO                               'по закату и расписанию
+end enum
+
+enum fx_kinds
+	FX_STEADY,                              'ровный свет
+	FX_BREATH,                              'плавное «дыхание»
+	FX_CHASE,                               'бегущие огни по трём каналам
+	FX_FLOW,                                'перелив: каналы плавно сменяют друг друга
+	FX_TWINKLE                              'мерцание, как у свечей
+end enum
+
+enum sun_states
+	SUN_OK,
+	SUN_POLAR_NIGHT,                        'солнце не встаёт
+	SUN_POLAR_DAY                           'солнце не заходит
+end enum
+
+'--- Wi-Fi не используется: заглушка для библиотеки DHCP на платформе TPP2W(G2) ---
+declare function wln_check_association() as pl_wln_association_states
+
+'--- солнце (sun.tbs) ---
+declare sun_rise as word                    'восход, минуты от полуночи по местному времени
+declare sun_set as word                     'закат
+declare sun_state as sun_states
+declare sub sun_calc(day as word)
+
+'--- расписание, выходы, настройки (light.tbs) ---
+declare gr_mode(GR_COUNT) as gr_modes
+declare gr_out(GR_COUNT) as no_yes
+declare s_shift as integer                  'включение: закат + s_shift минут
+declare s_off as word
+declare s_morning as no_yes
+declare s_morn_on as word
+declare s_ny as no_yes
+declare s_lat_e4 as long
+declare s_lon_e4 as long
+declare s_tz as integer
+declare time_ok as no_yes
+declare ntp_ok as no_yes
+declare sub light_init()
+declare sub light_set_mode(g as byte, mode as gr_modes)
+declare sub light_apply()
+declare sub light_proc_second()
+declare sub light_save()
+declare function light_name(g as byte) as string
+declare function light_on_time() as word
+declare function light_sched(day as word, m as word) as no_yes
+declare sub light_set_clock(days as word, mins as word, secs as byte)
+declare sub light_refresh()
+declare function light_clock_str() as string
+declare function light_e4_str(v as long) as string
+
+'--- эффекты на лентах (fx.tbs) ---
+declare fx_ok as no_yes
+declare fx_kind as fx_kinds
+declare fx_bright as byte
+declare fx_speed as byte
+declare sub fx_init()
+declare sub fx_tick()
+declare function fx_name(k as fx_kinds) as string
+
+'--- веб (web.tbs) ---
+declare function web_arg(byref rq as string, byref argname as string) as string
+declare function web_hhmm(m as word) as string
+declare function web_parse_hhmm(byref s as string) as word
+declare sub web_send(byref s as string)
+declare sub web_handle_set(byref rq as string)
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+declare sub ntp_request()

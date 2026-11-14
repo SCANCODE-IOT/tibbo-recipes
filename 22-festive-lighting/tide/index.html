@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Гирлянды и подсветка · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#181F1B;color:#F3EFE6;padding:14px 16px}header b{color:#F0B429}
+main{max-width:760px;margin:0 auto;padding:12px 16px 32px}
+.box{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:14px;margin:12px 0}
+.sun{display:flex;gap:18px;flex-wrap:wrap;font-size:15px}.sun b{font-size:20px;display:block}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.st{font-weight:700;padding:3px 10px;border-radius:99px}.on{background:#FFF2EA;color:#CC5314}.off{background:#eee;color:#6F6C66}
+.btns a{display:inline-block;padding:7px 12px;border:1px solid #DDD4C8;border-radius:8px;margin:6px 6px 0 0;text-decoration:none;color:#2C2B28}
+.btns a.sel{background:#EC6C2E;border-color:#EC6C2E;color:#fff}
+form{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+input,select{padding:5px;font-size:14px}input[type=number]{width:90px}
+button{padding:7px 14px;border:0;border-radius:8px;background:#2C2B28;color:#fff;font-size:14px}
+h2{font-size:16px;margin:0 0 10px}small{color:#6F6C66}.warn{color:#B4450C}
+</style></head><body>
+<header><b>Tibbo</b> · Гирлянды и подсветка по закату</header>
+<main>
+<?
+include "global.tbh"
+dim i as byte
+dim s as string
+s = "<p><small>Время: " + light_clock_str()
+if ntp_ok = YES then
+	s = s + " (SNTP)"
+else
+	s = s + " (не синхронизировано)"
+end if
+s = s + " · IP " + net.ip + "</small></p>"
+web_send(s)
+if time_ok = YES then
+	dim d, m as word
+	dim sc as byte
+	rtc.getdata(d, m, sc)
+	sun_calc(d)
+	s = "<div class='box sun'><div>Восход<b>" + web_hhmm(sun_rise) + "</b></div><div>Закат<b>" + web_hhmm(sun_set) + "</b></div>"
+	if sun_state = SUN_POLAR_DAY then
+		s = s + "<div>Полярный день<b>вечером не включаем</b></div></div>"
+	else
+		s = s + "<div>Включение<b>" + web_hhmm(light_on_time()) + "</b></div><div>Выключение<b>" + web_hhmm(s_off) + "</b></div></div>"
+	end if
+	web_send(s)
+	light_refresh()
+else
+	s = "<p class=warn>Часы не установлены: в режиме «По закату» подсветка выключена. Проверьте доступ к серверу времени или установите часы внизу страницы.</p>"
+	web_send(s)
+end if
+for i = 0 to GR_COUNT - 1
+	s = "<div class=box><div class=top><b>" + light_name(i) + "</b><span class='st "
+	if gr_out(i) = YES then
+		s = s + "on'>ГОРИТ</span></div>"
+	else
+		s = s + "off'>ВЫКЛ</span></div>"
+	end if
+	web_send(s)
+	s = "<div class=btns><a href='set.html?g=" + str(i + 1) + "&a=auto'"
+	if gr_mode(i) = MODE_AUTO then s = s + " class=sel"
+	s = s + ">По закату</a><a href='set.html?g=" + str(i + 1) + "&a=on'"
+	if gr_mode(i) = MODE_ON then s = s + " class=sel"
+	s = s + ">Включить</a><a href='set.html?g=" + str(i + 1) + "&a=off'"
+	if gr_mode(i) = MODE_OFF then s = s + " class=sel"
+	s = s + ">Выключить</a></div></div>"
+	web_send(s)
+next i
+
+s = "<div class=box><h2>Эффект на лентах 12 В</h2>"
+if fx_ok = NO then s = s + "<p class=warn>Tibbit #17 не ответил при включении: проверьте, что он стоит в S1, и перезапустите контроллер.</p>"
+s = s + "<form action='set.html'><select name=fx>"
+web_send(s)
+for i = 0 to FX_TWINKLE
+	s = "<option value=" + str(i)
+	if fx_kind = i then s = s + " selected"
+	s = s + ">" + fx_name(i) + "</option>"
+	web_send(s)
+next i
+s = "</select> яркость <input type=number name=br min=10 max=100 value=" + str(fx_bright) + ">% скорость <input type=number name=sp min=1 max=5 value=" + str(fx_speed) + "> <button>Сохранить</button></form></div>"
+web_send(s)
+
+s = "<div class=box><h2>Расписание</h2><form action='set.html'>включать: закат + <input type=number name=sh min=-180 max=180 value=" + stri(s_shift) + "> мин, выключать в <input type=time name=off value=" + web_hhmm(s_off) + ">"
+web_send(s)
+s = "<label><input type=checkbox name=mo value=1"
+if s_morning = YES then s = s + " checked"
+s = s + "> и утром с </label><input type=time name=mon value=" + web_hhmm(s_morn_on) + "> до восхода <label><input type=checkbox name=ny value=1"
+if s_ny = YES then s = s + " checked"
+s = s + "> в ночь на 1 января - до утра</label><button>Сохранить</button></form></div>"
+web_send(s)
+
+s = "<div class=box><h2>Место</h2><form action='set.html'>широта <input name=lat size=9 value=" + light_e4_str(s_lat_e4) + "> долгота <input name=lon size=9 value=" + light_e4_str(s_lon_e4) + "> пояс, мин от UTC <input type=number name=tz min=-720 max=840 value=" + stri(s_tz) + "> <button>Сохранить</button></form>"
+s = s + "<p><small>Южная широта и западная долгота - со знаком минус. Москва: 55.7558, 37.6173, 180.</small></p></div>"
+web_send(s)
+?>
+<form action="set.html"><small>Часы вручную:</small> <input type="datetime-local" name="t"> <button>Установить</button></form>
+<p><small>«Включить» и «Выключить» действуют, пока не нажата «По закату». Время восхода и заката посчитано по формулам, точность - несколько минут.</small></p>
+</main></body></html>

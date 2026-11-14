@@ -1,0 +1,96 @@
+'=====================================================================
+' Восход и закат по широте, долготе и дате (формулы NOAA, точность -
+' несколько минут). В TiOS нет sin и cos, поэтому они посчитаны здесь:
+' ряд Тейлора и обратный косинус делением отрезка пополам.
+' Считается раз в сутки и при установке часов.
+'=====================================================================
+include "global.tbh"
+
+#define SUN_PI 3.14159265
+#define SUN_2PI 6.2831853
+#define SUN_HALF_PI 1.5707963
+#define SUN_DEG 0.017453293
+
+dim sun_rise as word = 420
+dim sun_set as word = 1020
+dim sun_state as sun_states = SUN_OK
+
+declare function fsin(x as real) as real
+declare function fcos(x as real) as real
+declare function facos(c as real) as real
+
+function fsin(x as real) as real
+	dim x2 as real
+	while x > SUN_PI
+		x = x - SUN_2PI
+	wend
+	while x < -SUN_PI
+		x = x + SUN_2PI
+	wend
+	if x > SUN_HALF_PI then
+		x = SUN_PI - x
+	else if x < -SUN_HALF_PI then
+		x = -SUN_PI - x
+	end if
+	x2 = x * x
+	fsin = x * (1.0 - x2 / 6.0 * (1.0 - x2 / 20.0 * (1.0 - x2 / 42.0 * (1.0 - x2 / 72.0))))
+end function
+
+function fcos(x as real) as real
+	fcos = fsin(x + SUN_HALF_PI)
+end function
+
+'угол 0..pi, косинус которого равен c (c от -1 до 1)
+function facos(c as real) as real
+	dim lo as real = 0.0
+	dim hi as real = SUN_PI
+	dim md as real
+	dim i as byte
+	for i = 1 to 24
+		md = (lo + hi) / 2.0
+		if fcos(md) > c then
+			lo = md
+		else
+			hi = md
+		end if
+	next i
+	facos = (lo + hi) / 2.0
+end function
+
+sub sun_calc(day as word)
+	dim n as word = day - daycount(year(day), 1, 1)        'номер дня в году, с нуля
+	dim g as real = n
+	g = g * SUN_2PI / 365.0
+	dim e as real = 229.18 * (0.000075 + 0.001868 * fcos(g) - 0.032077 * fsin(g) - 0.014615 * fcos(2.0 * g) - 0.040849 * fsin(2.0 * g))
+	dim decl as real = 0.006918 - 0.399912 * fcos(g) + 0.070257 * fsin(g) - 0.006758 * fcos(2.0 * g) + 0.000907 * fsin(2.0 * g) - 0.002697 * fcos(3.0 * g) + 0.00148 * fsin(3.0 * g)
+	dim lat as real = s_lat_e4
+	lat = lat / 10000.0 * SUN_DEG
+	dim lon as real = s_lon_e4
+	lon = lon / 10000.0
+	dim tz as real = s_tz
+	'полдень по местным часам, минуты
+	dim noon as real = 720.0 - 4.0 * lon - e + tz
+	'-0.833 градуса: верхний край диска с учётом преломления в атмосфере
+	dim c as real = (fsin(-0.833 * SUN_DEG) - fsin(lat) * fsin(decl)) / (fcos(lat) * fcos(decl))
+	dim r, s as real
+	if c >= 1.0 then
+		sun_state = SUN_POLAR_NIGHT
+		r = noon
+		s = noon
+	else if c <= -1.0 then
+		sun_state = SUN_POLAR_DAY
+		r = 0.0
+		s = 1439.0
+	else
+		sun_state = SUN_OK
+		dim h as real = facos(c) / SUN_DEG
+		r = noon - 4.0 * h
+		s = noon + 4.0 * h
+	end if
+	if r < 0.0 then r = 0.0
+	if r > 1439.0 then r = 1439.0
+	if s < 0.0 then s = 0.0
+	if s > 1439.0 then s = 1439.0
+	sun_rise = r + 0.5
+	sun_set = s + 0.5
+end sub

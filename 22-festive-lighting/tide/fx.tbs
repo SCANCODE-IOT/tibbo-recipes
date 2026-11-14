@@ -1,0 +1,183 @@
+'=====================================================================
+' Световые эффекты на трёх каналах Tibbit #17 (ШИМ 2 кГц, ключи на +12 В)
+' fx_tick() вызывается каждые 50 мс. Включение и выключение - плавные,
+' около 2,5 с. Яркость пересчитывается с гамма-поправкой (квадрат), чтобы
+' «половина» на глаз выглядела как половина.
+'=====================================================================
+include "global.tbh"
+
+#define FX_PERIOD 1000                      'период ШИМ в тактах 2 МГц: 2 кГц
+#define FX_FADE_STEP 5                      'шаг плавного включения за 50 мс (из 255)
+
+dim fx_ok as no_yes = NO
+dim fx_kind as fx_kinds = FX_FLOW
+dim fx_bright as byte = 80
+dim fx_speed as byte = 3
+
+dim fx_env as byte = 0                      'общая огибающая: 0 - выключено, 255 - включено
+dim fx_ph as word = 0                       'фаза эффекта
+dim fx_tw(3) as byte                        'мерцание: текущая яркость каналов
+dim fx_tt(3) as byte                        'мерцание: к какой яркости идём
+dim fx_last(3) as word                      'последние отправленные значения ШИМ
+
+declare function tri(p as word) as byte
+declare function fx_step() as byte
+
+sub fx_init()
+	dim s as string(32) = ""
+	dim i as byte
+	for i = 0 to 2
+		fx_last(i) = 65535
+		fx_tw(i) = 200
+		fx_tt(i) = 200
+	next i
+	select case pic_init(YES, s)
+	case PIC_FWNG
+		dbg("Tibbit #17 does not answer or has unexpected firmware: '" + s + "'")
+		fx_ok = NO
+		exit sub
+	case PIC_NG, PIC_REJ
+		dbg("Tibbit #17: SSI not available, bit-banging is used")
+	end select
+	pic_config(PIC_PIN0, PIC_FUNC_PWM)
+	pic_config(PIC_PIN1, PIC_FUNC_PWM)
+	pic_config(PIC_PIN2, PIC_FUNC_PWM)
+	pic_pwm_config(PIC_PWM0, 0, FX_PERIOD, PIC_PRE_16)
+	pic_pwm_config(PIC_PWM1, 0, FX_PERIOD, PIC_PRE_16)
+	pic_pwm_config(PIC_PWM2, 0, FX_PERIOD, PIC_PRE_16)
+	pic_pwm_duty(0, 0, 0)
+	fx_ok = YES
+	dbg("Tibbit #17 ready")
+end sub
+
+function fx_name(k as fx_kinds) as string
+	select case k
+	case FX_STEADY
+		fx_name = "Ровный свет"
+	case FX_BREATH
+		fx_name = "Дыхание"
+	case FX_CHASE
+		fx_name = "Бегущие огни"
+	case FX_FLOW
+		fx_name = "Перелив"
+	case else
+		fx_name = "Мерцание"
+	end select
+end function
+
+'треугольная волна: фаза 0..511 -> 0..255..0
+function tri(p as word) as byte
+	p = p mod 512
+	if p < 256 then
+		tri = p
+	else
+		tri = 511 - p
+	end if
+end function
+
+'на сколько сдвигается фаза за 50 мс при скорости 1..5
+function fx_step() as byte
+	select case fx_speed
+	case 1
+		fx_step = 2
+	case 2
+		fx_step = 4
+	case 3
+		fx_step = 6
+	case 4
+		fx_step = 10
+	case else
+		fx_step = 16
+	end select
+end function
+
+sub fx_tick()
+	if fx_ok = NO then exit sub
+	dim lv(3) as byte
+	dim i as byte
+
+	'плавное включение и выключение группы «ленты»
+	if gr_out(2) = YES then
+		if fx_env < 255 - FX_FADE_STEP then
+			fx_env = fx_env + FX_FADE_STEP
+		else
+			fx_env = 255
+		end if
+	else
+		if fx_env > FX_FADE_STEP then
+			fx_env = fx_env - FX_FADE_STEP
+		else
+			fx_env = 0
+		end if
+	end if
+
+	fx_ph = (fx_ph + fx_step()) mod 3072
+
+	select case fx_kind
+	case FX_STEADY
+		for i = 0 to 2
+			lv(i) = 255
+		next i
+	case FX_BREATH
+		dim b as word = tri(fx_ph)
+		b = 40 + b * 215 / 255
+		for i = 0 to 2
+			lv(i) = b
+		next i
+	case FX_CHASE
+		'один канал горит, два приглушены; шаг - 128 единиц фазы
+		dim k as byte = (fx_ph / 128) mod 3
+		for i = 0 to 2
+			if i = k then
+				lv(i) = 255
+			else
+				lv(i) = 25
+			end if
+		next i
+	case FX_FLOW
+		'три волны со сдвигом на треть периода
+		for i = 0 to 2
+			lv(i) = tri(fx_ph + i * 171)
+		next i
+	case else
+		'мерцание: каждый канал медленно идёт к случайной яркости 110..255
+		dim rnd as string(3)
+		for i = 0 to 2
+			if fx_tw(i) = fx_tt(i) then
+				rnd = random(1)
+				fx_tt(i) = 110 + asc(rnd) * 145 / 255
+			end if
+			if fx_tw(i) < fx_tt(i) then
+				if fx_tt(i) - fx_tw(i) > fx_speed * 3 then
+					fx_tw(i) = fx_tw(i) + fx_speed * 3
+				else
+					fx_tw(i) = fx_tt(i)
+				end if
+			else
+				if fx_tw(i) - fx_tt(i) > fx_speed * 3 then
+					fx_tw(i) = fx_tw(i) - fx_speed * 3
+				else
+					fx_tw(i) = fx_tt(i)
+				end if
+			end if
+			lv(i) = fx_tw(i)
+		next i
+	end select
+
+	'яркость, огибающая, гамма -> скважность 0..1000 (десятые доли процента)
+	dim d(3) as word
+	dim x as dword
+	for i = 0 to 2
+		x = lv(i)
+		x = x * fx_bright / 100
+		x = x * fx_env / 255
+		x = x * x * 1000 / 65025
+		d(i) = x
+	next i
+	if d(0) <> fx_last(0) or d(1) <> fx_last(1) or d(2) <> fx_last(2) then
+		pic_pwm_duty(d(0), d(1), d(2))
+		for i = 0 to 2
+			fx_last(i) = d(i)
+		next i
+	end if
+end sub

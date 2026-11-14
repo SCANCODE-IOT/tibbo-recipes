@@ -1,0 +1,305 @@
+'=====================================================================
+' Расписание по закату, выходы реле, настройки в EEPROM
+' Реле #03-1 в S3: RL1 - линия A (PL_IO_NUM_11_TX1), RL2 - линия B (PL_IO_NUM_10_RX1).
+' Реле Tibbo включаются уровнем LOW; после включения питания оба выключены.
+'=====================================================================
+include "global.tbh"
+
+#define EE_MAGIC "G1"
+#define EE_BASE 1
+#define EE_LEN 26
+
+dim gr_mode(GR_COUNT) as gr_modes
+dim gr_out(GR_COUNT) as no_yes
+dim s_shift as integer = CFG_DEF_SUNSET_SHIFT
+dim s_off as word = CFG_DEF_OFF
+dim s_morning as no_yes = CFG_DEF_MORNING
+dim s_morn_on as word = CFG_DEF_MORNING_ON
+dim s_ny as no_yes = CFG_DEF_NY_NIGHT
+dim s_lat_e4 as long = CFG_DEF_LAT_E4
+dim s_lon_e4 as long = CFG_DEF_LON_E4
+dim s_tz as integer = CFG_DEF_TZ_MINUTES
+dim time_ok as no_yes = NO
+dim ntp_ok as no_yes = NO
+
+dim relay_line(2) as pl_io_num
+dim last_min as word = 65535
+dim sun_day as word = 0
+
+declare function in_window(m as word, w_on as word, w_off as word) as no_yes
+declare sub set_out(g as byte, st_on as no_yes)
+declare sub light_load()
+declare sub sun_for(day as word)
+declare function w2s(w as word) as string
+declare function s2w(byref s as string, pos as byte) as word
+
+sub light_init()
+	dim i as byte
+	relay_line(0) = PL_IO_NUM_11_TX1
+	relay_line(1) = PL_IO_NUM_10_RX1
+	for i = 0 to 1
+		io.num = relay_line(i)
+		io.enabled = YES                'сначала выход, потом уровень
+		io.state = HIGH                 'реле выключено
+	next i
+	for i = 0 to GR_COUNT - 1
+		gr_out(i) = NO
+	next i
+	light_load()
+	if rtc.running = YES then
+		dim d, m as word
+		dim s as byte
+		rtc.getdata(d, m, s)
+		if d > 9000 then time_ok = YES    'дата позже 2024 года - часы уже были установлены
+	end if
+	light_apply()
+end sub
+
+function light_name(g as byte) as string
+	select case g
+	case 0
+		light_name = CFG_NAME1
+	case 1
+		light_name = CFG_NAME2
+	case else
+		light_name = CFG_NAME3
+	end select
+end function
+
+sub set_out(g as byte, st_on as no_yes)
+	gr_out(g) = st_on
+	if g < 2 then
+		io.num = relay_line(g)
+		if st_on = YES then
+			io.state = LOW
+		else
+			io.state = HIGH
+		end if
+	end if
+	'группа 2 - ленты: яркость плавно догоняет состояние в fx_tick()
+end sub
+
+sub light_set_mode(g as byte, mode as gr_modes)
+	if g >= GR_COUNT then exit sub
+	gr_mode(g) = mode
+	light_apply()
+end sub
+
+'выставить все выходы по режимам и расписанию прямо сейчас
+sub light_apply()
+	dim i as byte
+	dim st as no_yes = NO
+	if time_ok = YES then
+		dim d, m as word
+		dim s as byte
+		rtc.getdata(d, m, s)
+		st = light_sched(d, m)
+	end if
+	for i = 0 to GR_COUNT - 1
+		select case gr_mode(i)
+		case MODE_ON
+			set_out(i, YES)
+		case MODE_OFF
+			set_out(i, NO)
+		case else
+			set_out(i, st)              'часы не установлены - в автоматическом режиме выключено
+		end select
+	next i
+end sub
+
+'окно [on, off) с переходом через полночь; on = off - окно пустое
+function in_window(m as word, w_on as word, w_off as word) as no_yes
+	in_window = NO
+	if w_on = w_off then exit function
+	if w_on < w_off then
+		if m >= w_on and m < w_off then in_window = YES
+	else
+		if m >= w_on or m < w_off then in_window = YES
+	end if
+end function
+
+sub sun_for(day as word)
+	if day = sun_day then exit sub
+	sun_day = day
+	sun_calc(day)
+end sub
+
+'время вечернего включения сегодня (закат + сдвиг); в полярную ночь - полдень
+function light_on_time() as word
+	dim t as integer = sun_set
+	t = t + s_shift
+	if t < 0 then t = 0
+	if t > 1439 then t = 1439
+	light_on_time = t
+end function
+
+'должна ли подсветка гореть в день day в минуту m (местное время)
+function light_sched(day as word, m as word) as no_yes
+	light_sched = NO
+	dim cur as word = day
+	'после полуночи и до полудня вечернее окно - вчерашнее
+	if m < 720 then cur = day - 1
+	sun_for(cur)
+	if sun_state <> SUN_POLAR_DAY then
+		dim w_on as word = light_on_time()
+		'если выключение назначено на вечер раньше заката (белые ночи), вечером не включаем
+		if s_off < 720 or s_off > w_on then
+			if m >= 720 then
+				if m >= w_on and (s_off < 720 or m < s_off) then light_sched = YES
+			else
+				if s_off < 720 and m < s_off then light_sched = YES
+			end if
+		end if
+	end if
+	sun_for(day)
+	'утро: с заданного времени до восхода
+	if s_morning = YES and sun_state <> SUN_POLAR_DAY and m < 720 then
+		if in_window(m, s_morn_on, sun_rise) = YES and s_morn_on < sun_rise then light_sched = YES
+	end if
+	'новогодняя ночь: 31 декабря после включения и до восхода 1 января
+	if s_ny = YES then
+		if month(day) = 12 and date(day) = 31 and m >= 720 then
+			if sun_state <> SUN_POLAR_DAY and m >= light_on_time() then light_sched = YES
+		else if month(day) = 1 and date(day) = 1 and m < sun_rise then
+			light_sched = YES
+		end if
+	end if
+end function
+
+'раз в секунду: на смене минуты пересчитать автоматические группы
+sub light_proc_second()
+	if time_ok = NO then exit sub
+	dim d, m as word
+	dim s as byte
+	rtc.getdata(d, m, s)
+	if m = last_min then exit sub
+	last_min = m
+	dim st as no_yes = light_sched(d, m)
+	dim i as byte
+	for i = 0 to GR_COUNT - 1
+		if gr_mode(i) = MODE_AUTO and gr_out(i) <> st then
+			set_out(i, st)
+			if st = YES then
+				dbg(light_name(i) + ": on")
+			else
+				dbg(light_name(i) + ": off")
+			end if
+		end if
+	next i
+end sub
+
+sub light_set_clock(days as word, mins as word, secs as byte)
+	rtc.setdata(days, mins, secs)
+	time_ok = YES
+	last_min = 65535
+	sun_day = 0
+	sun_calc(days)
+	dbg("Today: sunrise " + web_hhmm(sun_rise) + ", sunset " + web_hhmm(sun_set))
+	light_apply()
+end sub
+
+sub light_refresh()
+	sun_day = 0
+	last_min = 65535
+	light_apply()
+end sub
+
+function light_clock_str() as string
+	dim d, m as word
+	dim s as byte
+	if time_ok = NO then
+		light_clock_str = "не установлено"
+		exit function
+	end if
+	rtc.getdata(d, m, s)
+	dim dd as string(2) = str(date(d))
+	dim mm as string(2) = str(month(d))
+	if len(dd) < 2 then dd = "0" + dd
+	if len(mm) < 2 then mm = "0" + mm
+	light_clock_str = dd + "." + mm + "." + str(2000 + year(d)) + " " + web_hhmm(m)
+end function
+
+'557558 -> "55.7558", -1234 -> "-0.1234"
+function light_e4_str(v as long) as string
+	dim neg as string(1) = ""
+	if v < 0 then
+		neg = "-"
+		v = -v
+	end if
+	dim fr as string(4) = lstr(v mod 10000)
+	while len(fr) < 4
+		fr = "0" + fr
+	wend
+	light_e4_str = neg + lstr(v / 10000) + "." + fr
+end function
+
+'--- EEPROM: 2 байта метки, затем 24 байта настроек ---
+'режимы трёх групп, эффект, яркость, скорость, утро, новогодняя ночь,
+'сдвиг от заката + 1000, выключение, утреннее включение, широта и долгота (+1 800 000), пояс + 1000
+sub light_save()
+	dim r as string(32)
+	dim la as dword = s_lat_e4 + 1800000
+	dim lo as dword = s_lon_e4 + 1800000
+	dim sh as word = s_shift + 1000
+	dim tz as word = s_tz + 1000
+	r = chr(gr_mode(0)) + chr(gr_mode(1)) + chr(gr_mode(2)) + chr(fx_kind) + chr(fx_bright) + chr(fx_speed) + chr(s_morning) + chr(s_ny)
+	r = r + w2s(sh) + w2s(s_off) + w2s(s_morn_on) + w2s(la / 65536) + w2s(la mod 65536) + w2s(lo / 65536) + w2s(lo mod 65536) + w2s(tz)
+	stor.setdata(EE_MAGIC + r, EE_BASE)
+end sub
+
+sub light_load()
+	dim i as byte
+	dim r as string(32) = stor.getdata(EE_BASE, EE_LEN)
+	if left(r, 2) <> EE_MAGIC then
+		for i = 0 to GR_COUNT - 1
+			gr_mode(i) = MODE_AUTO
+		next i
+		fx_kind = CFG_DEF_EFFECT
+		fx_bright = CFG_DEF_BRIGHT
+		fx_speed = CFG_DEF_SPEED
+		light_save()
+		exit sub
+	end if
+	for i = 0 to GR_COUNT - 1
+		gr_mode(i) = asc(mid(r, 3 + i, 1))
+		if gr_mode(i) > MODE_AUTO then gr_mode(i) = MODE_AUTO
+	next i
+	fx_kind = asc(mid(r, 6, 1))
+	if fx_kind > FX_TWINKLE then fx_kind = FX_STEADY
+	fx_bright = asc(mid(r, 7, 1))
+	if fx_bright < 10 or fx_bright > 100 then fx_bright = CFG_DEF_BRIGHT
+	fx_speed = asc(mid(r, 8, 1))
+	if fx_speed < 1 or fx_speed > 5 then fx_speed = CFG_DEF_SPEED
+	s_morning = asc(mid(r, 9, 1))
+	if s_morning <> YES then s_morning = NO
+	s_ny = asc(mid(r, 10, 1))
+	if s_ny <> YES then s_ny = NO
+	dim sh as integer = s2w(r, 11)
+	s_shift = sh - 1000
+	if s_shift < -180 or s_shift > 180 then s_shift = CFG_DEF_SUNSET_SHIFT
+	s_off = s2w(r, 13)
+	if s_off > 1439 then s_off = CFG_DEF_OFF
+	s_morn_on = s2w(r, 15)
+	if s_morn_on > 1439 then s_morn_on = CFG_DEF_MORNING_ON
+	dim la as dword = s2w(r, 17)
+	la = la * 65536 + s2w(r, 19)
+	dim lo as dword = s2w(r, 21)
+	lo = lo * 65536 + s2w(r, 23)
+	s_lat_e4 = la
+	s_lat_e4 = s_lat_e4 - 1800000
+	s_lon_e4 = lo
+	s_lon_e4 = s_lon_e4 - 1800000
+	if s_lat_e4 < -900000 or s_lat_e4 > 900000 then s_lat_e4 = CFG_DEF_LAT_E4
+	if s_lon_e4 < -1800000 or s_lon_e4 > 1800000 then s_lon_e4 = CFG_DEF_LON_E4
+	dim tz as integer = s2w(r, 25)
+	s_tz = tz - 1000
+	if s_tz < -720 or s_tz > 840 then s_tz = CFG_DEF_TZ_MINUTES
+end sub
+
+function w2s(w as word) as string
+	w2s = chr(w / 256) + chr(w mod 256)
+end function
+
+function s2w(byref s as string, pos as byte) as word
+	s2w = asc(mid(s, pos, 1)) * 256 + asc(mid(s, pos + 1, 1))
+end function

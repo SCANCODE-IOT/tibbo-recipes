@@ -1,0 +1,15 @@
+<?
+include "global.tbh"
+dim s as string
+dim i as byte
+s = "time=" + light_clock_str() + chr(10) + "ntp=" + str(ntp_ok) + chr(10)
+if time_ok = YES then s = s + "sunrise=" + web_hhmm(sun_rise) + chr(10) + "sunset=" + web_hhmm(sun_set) + chr(10) + "on_time=" + web_hhmm(light_on_time()) + chr(10)
+s = s + "off_time=" + web_hhmm(s_off) + chr(10)
+web_send(s)
+for i = 0 to GR_COUNT - 1
+	s = "out" + str(i + 1) + "=" + str(gr_out(i)) + chr(10) + "mode" + str(i + 1) + "=" + str(gr_mode(i)) + chr(10)
+	web_send(s)
+next i
+s = "effect=" + str(fx_kind) + chr(10) + "bright=" + str(fx_bright) + chr(10) + "pwm_ok=" + str(fx_ok) + chr(10)
+web_send(s)
+?>
