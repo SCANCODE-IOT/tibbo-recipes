@@ -1,0 +1,78 @@
+'=====================================================================
+' Рецепт 18 «Анализатор -> ЛИС с буфером» · общий заголовок
+' Устройство DS1101 (порт 0 RS-232 на DB9, Ethernet, флеш-память).
+' Библиотеки Tibbo 2_01_05
+'=====================================================================
+include "config.tbh"
+
+#define DHCP_DEBUG_PRINT 0
+include "sock\trunk\sock.tbh"
+include "dhcp\trunk\dhcp.tbh"
+
+'управляющие символы ASTM E1381
+#define C_STX 2
+#define C_ETX 3
+#define C_EOT 4
+#define C_ENQ 5
+#define C_ACK 6
+#define C_LF 10
+#define C_CR 13
+#define C_NAK 21
+#define C_ETB 23
+
+'типы записей в буфере
+#define REC_DATA "D"                        'кадр от анализатора
+#define REC_END "E"                         'анализатор закончил передачу (EOT) - сообщение целое
+#define REC_DROP "X"                        'передача оборвалась - сообщение не пересылать
+#define REC_SENT "A"                        'сообщение принято ЛИС
+
+enum lis_states
+	LIS_IDLE,                               'ждём целое сообщение
+	LIS_ENQ,                                'отправили ENQ, ждём ACK
+	LIS_FRAME,                              'отправили кадр, ждём ACK
+	LIS_PAUSE                               'ЛИС отказала - ждём перед повтором
+end enum
+
+'--- log.tbs: буфер во флеш-памяти ---
+declare sub log_init()
+declare function log_write(byref typ as string, msg as dword, etb as no_yes, byref text as string) as ok_ng
+declare function log_read(idx as word) as ok_ng
+declare function log_free() as word
+declare function log_next(idx as word) as word
+declare log_n as word                       'секторов в буфере
+declare log_wr as word                      'куда пишем следующий сектор
+declare log_start as word                   'начало самого старого неотправленного сообщения
+declare msg_next as dword                   'номер следующего сообщения
+declare msg_sent as dword                   'последнее сообщение, принятое ЛИС
+'последний прочитанный сектор
+declare r_typ as string(1)
+declare r_msg as dword
+declare r_etb as no_yes
+declare r_text as string(240)
+
+'--- astm.tbs: приём от анализатора ---
+declare sub astm_init()
+declare sub astm_feed(byref s as string)
+declare sub astm_tick()
+declare rx_busy as no_yes
+declare rx_frames as dword
+declare rx_naks as dword
+declare rx_msgs as dword
+declare rx_msg as dword
+declare function hex2(v as byte) as string
+
+'--- lis.tbs: отправка в ЛИС ---
+declare sub lis_init()
+declare sub lis_tick()
+declare sub lis_data()
+declare sub lis_event(newstatesimple as pl_sock_state_simple)
+declare lis_sock as byte
+declare lis_state as lis_states
+declare lis_msgs as dword
+declare lis_err as string(40)
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+
+'--- web.tbs ---
+declare sub web_send(byref s as string)

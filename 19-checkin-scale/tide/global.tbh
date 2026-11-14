@@ -1,0 +1,48 @@
+'=====================================================================
+' Рецепт 19 «Багажные весы на стойке регистрации» · общий заголовок
+' Устройство DS1101 (порт 0 RS-232 на DB9, Ethernet, часы). Библиотеки 2_01_05
+'=====================================================================
+include "config.tbh"
+
+#define DHCP_DEBUG_PRINT 0
+#define SNTP_DEBUG_PRINT 0
+include "sock\trunk\sock.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "sntp\trunk\sntp.tbh"
+
+#define LOG_SIZE 40                         'сколько последних взвешиваний хранит журнал
+
+'--- scale.tbs ---
+declare sub scale_init()
+declare sub scale_feed(byref s as string)
+declare sub scale_poll()
+declare scale_weight as string(16)
+declare scale_unit as string(4)
+declare scale_stable as no_yes
+declare scale_line as string(40)
+declare scale_age as word
+declare scale_milli as long
+
+'--- weigh.tbs ---
+declare sub weigh_init()
+declare sub weigh_tick()
+declare function weigh_kg(g as long) as string
+declare function weigh_time(d as word, m as word) as string
+declare function weigh_class(g as long) as byte
+declare raw_sock as byte
+declare udp_sock as byte
+declare time_ok as no_yes
+declare w_count as word
+declare w_over as word
+declare w_total as dword
+declare zero_bad as no_yes
+declare log_n as byte
+declare log_day(LOG_SIZE) as word
+declare log_min(LOG_SIZE) as word
+declare log_g(LOG_SIZE) as long
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+
+'--- web.tbs ---
+declare sub web_send(byref s as string)

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Багажные весы · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:720px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:16px 18px;margin:12px 0}
+#wbox{border-left:8px solid #1E9E63}#wbox.c1{border-left-color:#F0B429}#wbox.c2{border-left-color:#D64545}
+#w{font-size:72px;font-weight:700;letter-spacing:-.02em}#u{font-size:26px;color:#6F6C66}
+.st{display:inline-block;padding:3px 10px;border-radius:99px;font-weight:700;font-size:13px;margin-right:6px}.ok{background:#E7F5EE;color:#177a45}.no{background:#FFF2EA;color:#CC5314}
+table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;border-bottom:1px solid #EBE4DB;text-align:left}th{color:#6F6C66;font-weight:600;font-size:13px}td.r{text-align:right}
+.k1{color:#9A6B00;font-weight:700}.k2{color:#D64545;font-weight:700}small{color:#6F6C66}
+</style></head><body>
+<header><b>Tibbo</b> · Багажные весы, стойка <? include "global.tbh"
+web_send(CFG_COUNTER) ?></header>
+<main>
+<div class=card id=wbox><span id=w>-</span> <span id=u>кг</span><div id=cl></div><div id=s></div></div>
+<div class=card><table><tr><td>Мест за сутки</td><td class=r id=bt></td></tr><tr><td>Из них с перевесом</td><td class=r id=ov></td></tr><tr><td>Всего за сутки, кг</td><td class=r id=tk></td></tr></table></div>
+<div class=card><b>Последние взвешивания</b><table id=lg><tr><th>Время</th><th>Вес, кг</th><th></th></tr></table></div>
+<div class=card><small>Программа регистрации: виртуальный COM-порт на TCP <? web_send(str(CFG_RAW_PORT)) ?>, данные весов не меняются.<br>
+Для систем: <code>state.txt</code> (состояние) и <code>weighings.csv</code> (журнал).</small></div>
+</main>
+<script>
+var L1='',L2='';
+function cls(c){return c==='2'?'больше '+L2+' кг':c==='1'?'больше '+L1+' кг':''}
+function st(){fetch('state.txt?'+Date.now()).then(r=>r.text()).then(t=>{var v={};t.split('\n').forEach(l=>{var i=l.indexOf('=');if(i>0)v[l.slice(0,i)]=l.slice(i+1)});L1=v.limit1_kg;L2=v.limit2_kg;
+w.textContent=v.weight_kg||'-';wbox.className='card c'+v.class;cl.textContent=cls(v.class);cl.className=v.class==='0'?'':'k'+v.class;
+s.innerHTML=(v.scale_online==='1'?'<span class="st ok">весы на связи</span>':'<span class="st no">весы не на связи</span>')+(v.zero_ok==='1'?'':'<span class="st no">весы не на нуле</span>')+(v.time_ok==='1'?'':'<span class="st no">время не установлено</span>');
+bt.textContent=v.bags_today;ov.textContent=v.over_today;tk.textContent=v.total_kg_today}).catch(()=>{})}
+function lg(){fetch('weighings.csv?'+Date.now()).then(r=>r.text()).then(t=>{var rows=t.trim().split('\n').slice(1),h='<tr><th>Время</th><th>Вес, кг</th><th></th></tr>';
+rows.forEach(r=>{var p=r.trim().split(';');if(p.length<4)return;h+='<tr><td>'+(p[1]||'-')+'</td><td>'+p[2]+'</td><td class="k'+p[3]+'">'+cls(p[3])+'</td></tr>'});document.getElementById('lg').innerHTML=h}).catch(()=>{})}
+st();lg();setInterval(st,700);setInterval(lg,3000);
+</script>
+</body></html>

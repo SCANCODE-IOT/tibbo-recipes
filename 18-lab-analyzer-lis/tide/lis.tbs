@@ -1,0 +1,187 @@
+'=====================================================================
+' Отправка в ЛИС: ASTM E1381 по TCP, DS1101 - отправитель
+' Целое сообщение из буфера: ENQ -> ACK, кадры с новой нумерацией -> ACK,
+' EOT. После EOT в буфер пишется отметка «принято ЛИС».
+' NAK на кадр - повтор до 6 раз, нет ответа 15 с - EOT и повтор позже.
+'=====================================================================
+include "global.tbh"
+
+dim lis_sock as byte
+dim lis_state as lis_states = LIS_IDLE
+dim lis_msgs as dword = 0
+dim lis_err as string(40) = ""
+dim lis_msg as dword = 0                    'какое сообщение отправляем
+dim lis_cur as word = 0                     'сектор текущего кадра
+dim lis_fn as byte = 1                      'номер кадра 0-7
+dim lis_try as byte = 0
+dim lis_tmo as word = 0
+dim lis_out as string(250) = ""
+
+declare sub lis_send_next()
+declare sub lis_abort(byref why as string)
+declare sub lis_tx(byref s as string)
+
+sub lis_init()
+	lis_sock = sock_get("LIS")
+	sock.num = lis_sock
+	sock.protocol = PL_SOCK_PROTOCOL_TCP
+	sock.inconmode = PL_SOCK_INCONMODE_NONE
+	sock.targetip = CFG_LIS_IP
+	sock.targetport = CFG_LIS_PORT
+	sock.connectiontout = 0
+	sock.rxbuffrq(1)
+	sock.txbuffrq(1)
+end sub
+
+sub lis_tx(byref s as string)
+	sock.num = lis_sock
+	if sock.txfree < len(s) then exit sub
+	sock.setdata(s)
+	sock.send()
+end sub
+
+sub lis_tick()
+	if lis_state = LIS_PAUSE then
+		lis_tmo = lis_tmo + 1
+		if lis_tmo >= CFG_LIS_RETRY_HALFSEC then lis_state = LIS_IDLE
+		exit sub
+	end if
+	if lis_state <> LIS_IDLE then
+		lis_tmo = lis_tmo + 1
+		if lis_tmo > 30 then lis_abort("ЛИС не ответила за 15 с")
+		exit sub
+	end if
+
+	'найти первое неотправленное сообщение
+	while log_start <> log_wr
+		if log_read(log_start) = OK then
+			if r_typ = REC_DATA and r_msg > msg_sent then goto have_msg
+		end if
+		log_start = log_next(log_start)
+	wend
+	exit sub
+have_msg:
+	dim m as dword = r_msg
+	if rx_busy = YES and m = rx_msg then exit sub     'анализатор ещё передаёт это сообщение
+	'целое (E) или оборванное (X)?
+	dim i as word = log_start
+	dim closed as string(1) = ""
+	while i <> log_wr
+		if log_read(i) = OK then
+			if r_msg = m and (r_typ = REC_END or r_typ = REC_DROP) then
+				closed = r_typ
+				goto scanned
+			end if
+		end if
+		i = log_next(i)
+	wend
+scanned:
+	if closed = "" then exit sub
+	if closed = REC_DROP then
+		'оборванную передачу не пересылаем - отмечаем как обработанную
+		if log_write(REC_SENT, m, NO, "") = OK then msg_sent = m
+		exit sub
+	end if
+	sock.num = lis_sock
+	if sock.statesimple = PL_SSTS_CLOSED then
+		lis_err = "нет соединения с ЛИС"
+		sock.connect()
+		lis_state = LIS_PAUSE                   'подождём соединения, повторим через паузу
+		lis_tmo = CFG_LIS_RETRY_HALFSEC - 4
+		exit sub
+	end if
+	if sock.statesimple <> PL_SSTS_EST then exit sub
+	lis_msg = m
+	lis_cur = log_start
+	lis_fn = 1
+	lis_try = 0
+	lis_tmo = 0
+	lis_state = LIS_ENQ
+	lis_tx(chr(C_ENQ))
+end sub
+
+'следующий кадр сообщения lis_msg начиная с сектора lis_cur, или EOT в конце
+sub lis_send_next()
+	while lis_cur <> log_wr
+		if log_read(lis_cur) = OK and r_msg = lis_msg then
+			if r_typ = REC_DATA then
+				dim endc as byte = C_ETX
+				if r_etb = YES then endc = C_ETB
+				dim body as string(245) = chr(48 + lis_fn) + r_text + chr(endc)
+				dim sum as word = 0
+				dim i as byte
+				for i = 1 to len(body)
+					sum = sum + asc(mid(body, i, 1))
+				next i
+				lis_out = chr(C_STX) + body + hex2(sum and &hFF) + chr(C_CR) + chr(C_LF)
+				lis_try = 0
+				lis_tmo = 0
+				lis_state = LIS_FRAME
+				lis_tx(lis_out)
+				exit sub
+			end if
+			if r_typ = REC_END then
+				lis_tx(chr(C_EOT))
+				if log_write(REC_SENT, lis_msg, NO, "") = OK then msg_sent = lis_msg
+				lis_msgs = lis_msgs + 1
+				lis_err = ""
+				log_start = log_next(lis_cur)
+				lis_state = LIS_IDLE
+				dbg("Message " + lstr(lis_msg) + " sent to LIS")
+				exit sub
+			end if
+		end if
+		lis_cur = log_next(lis_cur)
+	wend
+	lis_abort("сообщение в буфере неполное")
+end sub
+
+sub lis_data()
+	sock.num = lis_sock
+	dim s as string(64) = sock.getdata(64)
+	dim i as byte
+	dim c as byte
+	for i = 1 to len(s)
+		c = asc(mid(s, i, 1))
+		if c = C_ENQ then
+			lis_tx(chr(C_NAK))                  'ЛИС хочет передать сама - этот рецепт только отправляет
+		else if lis_state = LIS_ENQ then
+			if c = C_ACK then
+				lis_send_next()
+			else if c = C_NAK then
+				lis_err = "ЛИС занята (NAK на ENQ)"
+				lis_state = LIS_PAUSE
+				lis_tmo = 0
+			end if
+		else if lis_state = LIS_FRAME then
+			if c = C_ACK or c = C_EOT then      'EOT вместо ACK - просьба ЛИС закончить, кадр принят
+				lis_fn = (lis_fn + 1) mod 8
+				lis_cur = log_next(lis_cur)
+				lis_send_next()
+			else if c = C_NAK then
+				lis_try = lis_try + 1
+				if lis_try >= 6 then
+					lis_abort("ЛИС 6 раз отклонила кадр")
+				else
+					lis_tmo = 0
+					lis_tx(lis_out)
+				end if
+			end if
+		end if
+	next i
+end sub
+
+sub lis_event(newstatesimple as pl_sock_state_simple)
+	if newstatesimple = PL_SSTS_CLOSED and (lis_state = LIS_ENQ or lis_state = LIS_FRAME) then
+		lis_abort("ЛИС закрыла соединение")
+	end if
+end sub
+
+sub lis_abort(byref why as string)
+	sock.num = lis_sock
+	if sock.statesimple = PL_SSTS_EST then lis_tx(chr(C_EOT))
+	lis_err = why
+	lis_state = LIS_PAUSE
+	lis_tmo = 0
+	dbg("LIS: " + why)
+end sub

@@ -1,0 +1,22 @@
+<?
+include "global.tbh"
+'ключ=значение, по строке: для Zabbix, Prometheus или своего скрипта
+dim s as string
+dim pend as dword = 0
+if msg_next - 1 > msg_sent then pend = msg_next - 1 - msg_sent
+sock.num = lis_sock
+dim conn as byte = 0
+if sock.statesimple = PL_SSTS_EST then conn = 1
+s = "lis_connected=" + str(conn) + chr(10)
+s = s + "queue_messages=" + lstr(pend) + chr(10)
+s = s + "buffer_free=" + str(log_free()) + chr(10)
+s = s + "buffer_total=" + str(log_n) + chr(10)
+web_send(s)
+s = "analyzer_busy=" + str(rx_busy) + chr(10)
+s = s + "frames_received=" + lstr(rx_frames) + chr(10)
+s = s + "messages_received=" + lstr(rx_msgs) + chr(10)
+s = s + "naks_to_analyzer=" + lstr(rx_naks) + chr(10)
+s = s + "messages_sent=" + lstr(lis_msgs) + chr(10)
+s = s + "lis_error=" + lis_err + chr(10)
+web_send(s)
+?>

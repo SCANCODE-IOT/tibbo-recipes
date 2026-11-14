@@ -1,0 +1,15 @@
+'=====================================================================
+' Веб: вывод страницы по частям
+'=====================================================================
+include "global.tbh"
+
+sub web_send(byref s as string)
+	dim hs as byte = sock.num
+	while sock.txfree < len(s)
+		sock.send()
+		doevents
+		sock.num = hs                       'за время doevents другой код мог выбрать другой сокет
+	wend
+	sock.setdata(s)
+	sock.send()
+end sub

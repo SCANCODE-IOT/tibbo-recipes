@@ -1,0 +1,154 @@
+'=====================================================================
+' Приём от анализатора: ASTM E1381 (CLSI LIS01), DS1101 - получатель
+' ENQ -> ACK, кадр STX FN текст ETX|ETB C1 C2 CR LF -> запись во флеш -> ACK,
+' ошибка контрольной суммы или номера -> NAK, EOT - конец передачи.
+' Кадр подтверждается только после того, как он записан во флеш-память.
+'=====================================================================
+include "global.tbh"
+
+dim rx_busy as no_yes = NO                  'идёт передача от анализатора
+dim rx_frames as dword = 0
+dim rx_naks as dword = 0
+dim rx_msgs as dword = 0
+dim rx_msg as dword = 0                     'номер текущего сообщения в буфере
+dim rx_fn as byte = 1                       'ожидаемый номер кадра 0-7
+dim rx_any as no_yes = NO                   'в этой передаче уже есть записанные кадры
+dim rx_in_frame as no_yes = NO
+dim rx_buf as string(250) = ""
+dim rx_idle as word = 0                     'полусекунд без байтов во время передачи
+
+declare sub rx_reply(c as byte)
+declare sub rx_frame()
+declare sub rx_abort()
+
+sub astm_init()
+	ser.num = 0
+	ser.enabled = NO
+	ser.interface = PL_SER_SI_FULLDUPLEX
+	ser.flowcontrol = PL_SER_FC_DISABLED
+	'делитель без промежуточного 9600*N: на 16-битных платформах он не помещается в word
+#if CFG_BAUD >= 9600
+	ser.baudrate = ser.div9600 / (CFG_BAUD / 9600)
+#else
+	ser.baudrate = ser.div9600 * (9600 / CFG_BAUD)
+#endif
+	ser.parity = CFG_PARITY
+	ser.bits = CFG_BITS
+	ser.interchardelay = 0
+	ser.esctype = PL_SER_ET_DISABLED
+	ser.rxbuffrq(2)
+	ser.txbuffrq(1)
+end sub
+
+sub rx_reply(c as byte)
+	ser.num = 0
+	ser.setdata(chr(c))
+	ser.send()
+end sub
+
+sub astm_feed(byref s as string)
+	dim i as byte
+	dim c as byte
+	rx_idle = 0
+	for i = 1 to len(s)
+		c = asc(mid(s, i, 1))
+		if rx_in_frame = YES then
+			if len(rx_buf) < 250 then rx_buf = rx_buf + chr(c)
+			if c = C_LF then
+				rx_in_frame = NO
+				rx_frame()
+			end if
+		else if c = C_ENQ then
+			if rx_busy = YES then rx_abort()        'анализатор начал заново - прошлую передачу не пересылать
+			if log_free() < CFG_MIN_FREE then
+				rx_naks = rx_naks + 1
+				rx_reply(C_NAK)                     'буфер полон: анализатор повторит позже
+				dbg("ENQ refused: buffer full")
+			else
+				rx_busy = YES
+				rx_msg = msg_next
+				msg_next = msg_next + 1
+				rx_fn = 1
+				rx_any = NO
+				rx_reply(C_ACK)
+			end if
+		else if c = C_STX and rx_busy = YES then
+			rx_in_frame = YES
+			rx_buf = ""
+		else if c = C_EOT and rx_busy = YES then
+			if rx_any = YES then
+				if log_write(REC_END, rx_msg, NO, "") = OK then
+					rx_msgs = rx_msgs + 1
+				else
+					log_write(REC_DROP, rx_msg, NO, "")
+				end if
+			end if
+			rx_busy = NO
+		end if
+	next i
+end sub
+
+'rx_buf: FN текст ETX|ETB C1 C2 CR LF
+sub rx_frame()
+	dim n as byte = len(rx_buf)
+	if n < 6 then goto bad
+	dim fn_ch as string(1) = left(rx_buf, 1)
+	if fn_ch < "0" or fn_ch > "7" then goto bad
+	dim endc as byte = asc(mid(rx_buf, n - 4, 1))
+	if endc <> C_ETX and endc <> C_ETB then goto bad
+	'контрольная сумма: сумма байтов от FN до ETX/ETB включительно, младший байт, две hex-цифры
+	dim sum as word = 0
+	dim i as byte
+	for i = 1 to n - 4
+		sum = sum + asc(mid(rx_buf, i, 1))
+	next i
+	dim cs as string(2) = mid(rx_buf, n - 3, 2)
+	dim want as string(2) = hex2(sum and &hFF)
+	'буквы контрольной суммы могут прийти строчными
+	for i = 1 to 2
+		dim cc as string(1) = mid(cs, i, 1)
+		if cc >= "a" and cc <= "f" then cc = chr(asc(cc) - 32)
+		if cc <> mid(want, i, 1) then goto bad
+	next i
+	dim fn as byte = val(fn_ch)
+	dim prev as byte = (rx_fn + 7) mod 8
+	if fn = prev and rx_any = YES then
+		rx_reply(C_ACK)                     'повтор уже записанного кадра (наш ACK потерялся)
+		exit sub
+	end if
+	if fn <> rx_fn then goto bad
+	dim etb as no_yes = NO
+	if endc = C_ETB then etb = YES
+	if log_write(REC_DATA, rx_msg, etb, mid(rx_buf, 2, n - 6)) <> OK then goto bad
+	rx_any = YES
+	rx_frames = rx_frames + 1
+	rx_fn = (rx_fn + 1) mod 8
+	rx_reply(C_ACK)
+	exit sub
+bad:
+	rx_naks = rx_naks + 1
+	rx_reply(C_NAK)
+end sub
+
+'передача оборвалась: записанные кадры не пересылать
+sub rx_abort()
+	if rx_any = YES then log_write(REC_DROP, rx_msg, NO, "")
+	rx_busy = NO
+	rx_in_frame = NO
+	rx_any = NO
+end sub
+
+'раз в 0,5 с: получатель ждёт кадр не дольше 30 с (E1381)
+sub astm_tick()
+	if rx_busy = NO then exit sub
+	rx_idle = rx_idle + 1
+	if rx_idle > 60 then
+		dbg("Analyzer timeout, transfer dropped")
+		rx_abort()
+	end if
+end sub
+
+function hex2(v as byte) as string
+	const HX = "0123456789ABCDEF"
+	hex2 = mid(HX, v / 16 + 1, 1) + mid(HX, (v mod 16) + 1, 1)
+end function

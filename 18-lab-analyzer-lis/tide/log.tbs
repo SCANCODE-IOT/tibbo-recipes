@@ -1,0 +1,162 @@
+'=====================================================================
+' Буфер во флеш-памяти: кольцевой журнал секторов
+' Сектор: "Q", тип (D/E/X/A), номер записи (4 байта), номер сообщения
+' (4 байта), 1 - кадр промежуточный (ETB), длина текста, текст до 240 байт.
+' Контрольную сумму сектора считает и проверяет fd.checksum.
+' Каждая запись - новый сектор по кругу: флеш изнашивается равномерно,
+' служебных таблиц, которые переписываются при каждой записи, нет.
+'=====================================================================
+include "global.tbh"
+
+dim log_n as word = 0
+dim log_wr as word = 0
+dim log_start as word = 0
+dim msg_next as dword = 1
+dim msg_sent as dword = 0
+dim r_typ as string(1) = ""
+dim r_msg as dword = 0
+dim r_etb as no_yes = NO
+dim r_text as string(240) = ""
+dim log_seq as dword = 1
+
+declare function d4(byref s as string, pos as byte) as dword
+declare function s4(v as dword) as string
+
+function log_next(idx as word) as word
+	log_next = idx + 1
+	if log_next >= log_n then log_next = 0
+end function
+
+'прочитать сектор idx в r_*; NG - сектор пустой или испорчен
+function log_read(idx as word) as ok_ng
+	dim cs as word
+	dim h as string(12)
+	log_read = NG
+	fd.buffernum = 0
+	if fd.getsector(idx) <> PL_FD_STATUS_OK then exit function
+	if fd.checksum(PL_FD_CSUM_MODE_VERIFY, cs) <> OK then exit function
+	h = fd.getbuffer(0, 12)
+	if left(h, 1) <> "Q" then exit function
+	r_typ = mid(h, 2, 1)
+	r_msg = d4(h, 7)
+	r_etb = NO
+	if asc(mid(h, 11, 1)) = 1 then r_etb = YES
+	dim n as byte = asc(mid(h, 12, 1))
+	if n > 240 then exit function
+	r_text = ""
+	if n > 0 then r_text = fd.getbuffer(12, n)
+	log_read = OK
+end function
+
+'записать новый сектор на место log_wr
+function log_write(byref typ as string, msg as dword, etb as no_yes, byref text as string) as ok_ng
+	dim cs as word
+	dim e as byte = 0
+	log_write = NG
+	if log_free() = 0 then exit function
+	if etb = YES then e = 1
+	fd.buffernum = 0
+	fd.setbuffer("Q" + typ + s4(log_seq) + s4(msg) + chr(e) + chr(len(text)), 0)
+	if len(text) > 0 then fd.setbuffer(text, 12)
+	fd.checksum(PL_FD_CSUM_MODE_CALCULATE, cs)
+	if fd.setsector(log_wr) <> PL_FD_STATUS_OK then exit function
+	log_seq = log_seq + 1
+	log_wr = log_next(log_wr)
+	log_write = OK
+end function
+
+'свободных секторов: от log_wr до начала самого старого неотправленного
+function log_free() as word
+	dim used as word
+	if log_wr >= log_start then
+		used = log_wr - log_start
+	else
+		used = log_n - log_start + log_wr
+	end if
+	log_free = log_n - used - 1
+end function
+
+'после включения: найти самую свежую запись, последнее принятое ЛИС сообщение
+'и начало первого неотправленного
+sub log_init()
+	dim i, newest as word
+	dim seq, best as dword
+	dim cs as word
+	dim maxmsg as dword = 0
+	dim lastd as dword = 0                  'последнее сообщение с кадрами
+	dim maxclosed as dword = 0              'последнее сообщение с записью E или X
+	dim found as no_yes = NO
+	dim h as string(12)
+
+	log_n = fd.availableflashspace
+	if log_n > CFG_LOG_SECTORS then log_n = CFG_LOG_SECTORS
+	best = 0
+	newest = 0
+	fd.buffernum = 0
+	for i = 0 to log_n - 1
+		if fd.getsector(i) = PL_FD_STATUS_OK then
+			if fd.checksum(PL_FD_CSUM_MODE_VERIFY, cs) = OK then
+				h = fd.getbuffer(0, 12)
+				if left(h, 1) = "Q" then
+					seq = d4(h, 3)
+					if found = NO or seq > best then
+						best = seq
+						newest = i
+						found = YES
+					end if
+					r_msg = d4(h, 7)
+					if r_msg > maxmsg then maxmsg = r_msg
+					r_typ = mid(h, 2, 1)
+					if r_typ = REC_SENT and r_msg > msg_sent then msg_sent = r_msg
+					if r_typ = REC_DATA and r_msg > lastd then lastd = r_msg
+					if (r_typ = REC_END or r_typ = REC_DROP) and r_msg > maxclosed then maxclosed = r_msg
+				end if
+			end if
+		end if
+		if (i and 63) = 0 then doevents
+	next i
+	if found = YES then
+		log_wr = log_next(newest)
+		log_seq = best + 1
+	else
+		log_wr = 0
+		log_seq = 1
+	end if
+	msg_next = maxmsg + 1
+	'начало первого неотправленного сообщения: от самой старой записи вперёд
+	log_start = log_wr
+	if found = YES then
+		i = log_wr
+		do
+			if log_read(i) = OK then
+				if r_typ = REC_DATA and r_msg > msg_sent then
+					log_start = i
+					goto start_found
+				end if
+			end if
+			i = log_next(i)
+		loop until i = log_wr
+		log_start = log_wr
+	end if
+start_found:
+	'передача, оборванная выключением, - пометить, чтобы не пересылать половину
+	if lastd > msg_sent and lastd > maxclosed then log_write(REC_DROP, lastd, NO, "")
+	dbg("Log: " + str(log_n) + " sectors, free " + str(log_free()) + ", next msg " + lstr(msg_next) + ", sent " + lstr(msg_sent))
+end sub
+
+function d4(byref s as string, pos as byte) as dword
+	dim v as dword = asc(mid(s, pos, 1))
+	v = v * 256 + asc(mid(s, pos + 1, 1))
+	v = v * 256 + asc(mid(s, pos + 2, 1))
+	v = v * 256 + asc(mid(s, pos + 3, 1))
+	d4 = v
+end function
+
+function s4(v as dword) as string
+	dim b0, b1, b2, b3 as byte
+	b3 = v and &hFF
+	b2 = (v shr 8) and &hFF
+	b1 = (v shr 16) and &hFF
+	b0 = (v shr 24) and &hFF
+	s4 = chr(b0) + chr(b1) + chr(b2) + chr(b3)
+end function

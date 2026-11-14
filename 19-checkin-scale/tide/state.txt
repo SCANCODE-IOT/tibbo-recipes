@@ -1,0 +1,22 @@
+<?
+include "global.tbh"
+'ключ=значение: вес сейчас, состояние весов, счётчики за сутки
+dim s as string
+dim online as byte = 1
+if scale_age > CFG_SILENT_HALFSEC then online = 0
+s = "counter=" + CFG_COUNTER + chr(10) + "scale_online=" + str(online) + chr(10)
+if online = 1 then
+	s = s + "weight_kg=" + weigh_kg(scale_milli) + chr(10) + "stable=" + str(scale_stable) + chr(10) + "class=" + str(weigh_class(scale_milli)) + chr(10)
+else
+	s = s + "weight_kg=" + chr(10) + "stable=0" + chr(10) + "class=0" + chr(10)
+end if
+if zero_bad = YES then
+	s = s + "zero_ok=0" + chr(10)
+else
+	s = s + "zero_ok=1" + chr(10)
+end if
+web_send(s)
+s = "bags_today=" + str(w_count) + chr(10) + "over_today=" + str(w_over) + chr(10) + "total_kg_today=" + lstr(w_total / 1000) + chr(10)
+s = s + "limit1_kg=" + weigh_kg(CFG_LIMIT1_G) + chr(10) + "limit2_kg=" + weigh_kg(CFG_LIMIT2_G) + chr(10) + "time_ok=" + str(time_ok) + chr(10)
+web_send(s)
+?>

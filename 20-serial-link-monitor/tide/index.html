@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Прибор на связи? · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:720px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:16px 18px;margin:12px 0}
+.big{font-size:30px;font-weight:700}.ok{color:#177a45}.no{color:#CC5314}
+table{width:100%;border-collapse:collapse;font-size:15px}td,th{padding:6px 4px;border-bottom:1px solid #EBE4DB;text-align:left}th{color:#6F6C66;font-weight:600;font-size:13px}td.r{text-align:right}small{color:#6F6C66}
+</style></head><body>
+<header><b>Tibbo</b> · Прибор <? include "global.tbh"
+web_send(CFG_NAME) ?></header>
+<main>
+<div class=card><div class=big id=sum>-</div><div id=det></div></div>
+<div class=card><table>
+<tr><td>Программа подключена</td><td class=r id=pc></td></tr>
+<tr><td>Прибор молчит</td><td class=r id=q></td></tr>
+<tr><td>Байт от прибора</td><td class=r id=bd></td></tr>
+<tr><td>Байт от программы</td><td class=r id=bp></td></tr></table></div>
+<div class=card><b>События</b><table id=ev></table></div>
+<div class=card><small>Программа: виртуальный COM-порт на TCP <? web_send(str(CFG_RAW_PORT)) ?>, данные не меняются и не сохраняются.<br>Для мониторинга: <code>state.txt</code>, журнал: <code>events.csv</code>.</small></div>
+</main>
+<script>
+function sec(s){s=+s;return s<120?s+' с':s<7200?Math.round(s/60)+' мин':Math.round(s/3600)+' ч'}
+function st(){fetch('state.txt?'+Date.now()).then(r=>r.text()).then(t=>{var v={};t.split('\n').forEach(l=>{var i=l.indexOf('=');if(i>0)v[l.slice(0,i)]=l.slice(i+1)});
+var p=[];if(v.device_silent==='1')p.push('прибор молчит');if(v.device_noreply==='1')p.push('прибор не отвечает');if(v.pc_off==='1')p.push('программа не подключена');
+sum.textContent=p.length?'Есть сбой':'Всё в порядке';sum.className='big '+(p.length?'no':'ok');det.textContent=p.join(', ');
+pc.textContent=v.pc_connected==='1'?'да':'нет';q.textContent=sec(v.device_quiet_s);bd.textContent=v.bytes_from_device;bp.textContent=v.bytes_from_pc}).catch(()=>{})}
+function evl(){fetch('events.csv?'+Date.now()).then(r=>r.text()).then(t=>{var h='<tr><th>Время</th><th>Событие</th></tr>';t.trim().split('\n').slice(1).forEach(r=>{var i=r.indexOf(';');if(i<0)return;h+='<tr><td>'+(r.slice(0,i)||'-')+'</td><td>'+r.slice(i+1)+'</td></tr>'});ev.innerHTML=h}).catch(()=>{})}
+st();evl();setInterval(st,2000);setInterval(evl,5000);
+</script>
+</body></html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Анализатор → ЛИС · Tibbo</title>
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,sans-serif;margin:0;background:#FBF8F5;color:#2C2B28}
+header{background:#2C2B28;color:#fff;padding:14px 16px}header b{color:#EC6C2E}
+main{max-width:680px;margin:0 auto;padding:12px 16px}
+.card{background:#fff;border:1px solid #EBE4DB;border-radius:10px;padding:16px 18px;margin:12px 0}
+.big{font-size:44px;font-weight:700}.lbl{color:#6F6C66;font-size:14px}
+.st{display:inline-block;padding:3px 10px;border-radius:99px;font-weight:700;font-size:13px}.ok{background:#E7F5EE;color:#177a45}.no{background:#FFF2EA;color:#CC5314}
+table{width:100%;border-collapse:collapse;font-size:15px}td{padding:6px 0;border-bottom:1px solid #EBE4DB}td:last-child{text-align:right;font-weight:600}
+small{color:#6F6C66}
+</style></head><body>
+<header><b>Tibbo</b> · Анализатор → ЛИС</header>
+<main>
+<div class=card><div class=lbl>В очереди на отправку в ЛИС</div><div class=big id=q>-</div>
+ЛИС: <span id=c class=st></span> <small id=e></small></div>
+<div class=card><table>
+<tr><td>Свободно в буфере</td><td id=f></td></tr>
+<tr><td>Анализатор сейчас передаёт</td><td id=b></td></tr>
+<tr><td>Принято сообщений от анализатора</td><td id=mr></td></tr>
+<tr><td>Принято кадров</td><td id=fr></td></tr>
+<tr><td>Отказов анализатору (NAK)</td><td id=nk></td></tr>
+<tr><td>Отправлено в ЛИС</td><td id=ms></td></tr>
+</table></div>
+<div class=card><small>Для мониторинга: <code>http://<? include "global.tbh"
+web_send(net.ip) ?>/state.txt</code> - строки «ключ=значение».<br>
+ЛИС: <? web_send(CFG_LIS_IP + ":" + str(CFG_LIS_PORT)) ?></small></div>
+</main>
+<script>
+function upd(){fetch('state.txt?'+Date.now()).then(r=>r.text()).then(t=>{var v={};t.split('\n').forEach(l=>{var i=l.indexOf('=');if(i>0)v[l.slice(0,i)]=l.slice(i+1)});
+q.textContent=v.queue_messages;var c=document.getElementById('c');if(v.lis_connected==='1'){c.textContent='на связи';c.className='st ok'}else{c.textContent='нет связи';c.className='st no'}
+e.textContent=v.lis_error||'';f.textContent=Math.round(100*v.buffer_free/v.buffer_total)+' % ('+v.buffer_free+' кадров)';
+b.textContent=v.analyzer_busy==='1'?'да':'нет';mr.textContent=v.messages_received;fr.textContent=v.frames_received;nk.textContent=v.naks_to_analyzer;ms.textContent=v.messages_sent}).catch(()=>{})}
+upd();setInterval(upd,2000);
+</script>
+</body></html>

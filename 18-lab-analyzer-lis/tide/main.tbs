@@ -1,0 +1,99 @@
+'=====================================================================
+' Рецепт 18 «Анализатор -> ЛИС с буфером» · события
+' Порт 0 (RS-232) - анализатор. TCP-клиент - ЛИС. HTTP 80 - страница
+' состояния и state.txt для мониторинга.
+'=====================================================================
+include "global.tbh"
+
+dim net_up as no_yes = NO
+
+declare sub net_started()
+
+sub on_sys_init()
+	sys.onsystimerperiod = 50           '0,5 с
+
+	dim i, s as byte
+	for i = 1 to 2
+		s = sock_get("WEB")
+		sock.num = s
+		sock.protocol = PL_SOCK_PROTOCOL_TCP
+		sock.inconmode = PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
+		sock.httpmode = YES
+		sock.httpportlist = "80"
+		sock.connectiontout = 20
+		sock.rxbuffrq(1)
+		sock.txbuffrq(2)
+		sock.varbuffrq(1)
+	next i
+	lis_init()
+	astm_init()
+	sys.buffalloc()
+	log_init()
+	ser.num = 0
+	ser.enabled = YES
+
+#if CFG_USE_DHCP
+	dhcp_start(PL_SOCK_INTERFACE_NET, "", "")
+#else
+	net.ip = CFG_IP
+	net.netmask = CFG_NETMASK
+	net.gatewayip = CFG_GATEWAY
+	net_started()
+#endif
+end sub
+
+sub net_started()
+	if net_up = YES then exit sub
+	net_up = YES
+	dbg("Analyzer -> LIS, web: http://" + net.ip + "/")
+end sub
+
+sub on_sys_timer()
+	dhcp_proc_timer()
+	astm_tick()
+	if net_up = YES then lis_tick()
+end sub
+
+sub on_ser_data_arrival()
+	dim s as string(128) = ser.getdata(128)
+	astm_feed(s)
+end sub
+
+sub on_sock_data_arrival()
+	if sock.num = lis_sock then
+		lis_data()
+		exit sub
+	end if
+	dhcp_proc_data()
+end sub
+
+sub on_sock_event(newstate as enum pl_sock_state, newstatesimple as enum pl_sock_state_simple)
+	if sock.num = lis_sock then lis_event(newstatesimple)
+end sub
+
+sub callback_dhcp_ok(renew as no_yes, interface as pl_sock_interfaces, byref ip as string, byref gateway_ip as string, byref netmask as string, lease_time as dword)
+	if renew = YES and net.ip = ip then exit sub
+	net.ip = ip
+	net.gatewayip = gateway_ip
+	net.netmask = netmask
+	net_started()
+end sub
+
+sub callback_dhcp_failure(interface as pl_sock_interfaces, failure_code as en_dhcp_status_codes)
+	dbg("DHCP failed, library will retry")
+end sub
+
+sub callback_dhcp_pre_clear_ip(interface as pl_sock_interfaces)
+end sub
+
+sub callback_dhcp_pre_buffrq(required_buff_pages as byte)
+end sub
+
+sub callback_dhcp_buff_released()
+end sub
+
+sub dbg(byref s as string)
+#if CFG_DEBUG
+	sys.debugprint(s + chr(13) + chr(10))
+#endif
+end sub

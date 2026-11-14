@@ -1,0 +1,178 @@
+'=====================================================================
+' Наблюдение за обменом: прибор молчит, прибор не отвечает на запросы,
+' программа не подключена. События - в журнал (страница) и в syslog.
+' Содержимое обмена не сохраняется и не показывается: только счётчики.
+'=====================================================================
+include "global.tbh"
+
+dim raw_sock as byte
+dim log_sock as byte
+dim time_ok as no_yes = NO
+dim dev_bytes as dword = 0
+dim pc_bytes as dword = 0
+dim dev_quiet as dword = 0
+dim pc_up as no_yes = NO
+dim st_silent as no_yes = NO
+dim st_noreply as no_yes = NO
+dim st_pcoff as no_yes = NO
+dim misses as byte = 0
+dim ev_n as byte = 0
+dim ev_day(EV_SIZE) as word
+dim ev_min(EV_SIZE) as word
+dim ev_sec(EV_SIZE) as byte
+dim ev_txt(EV_SIZE) as string(48)
+dim waiting as no_yes = NO                  'программа отправила запрос, ждём ответ прибора
+dim wait_cnt as byte = 0
+dim pc_off as dword = 0
+
+declare sub mon_event(byref txt as string, sev as byte)
+
+sub mon_init()
+	raw_sock = sock_get("RAW")
+	sock.num = raw_sock
+	sock.protocol = PL_SOCK_PROTOCOL_TCP
+	sock.inconmode = PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
+	sock.localportlist = str(CFG_RAW_PORT)
+	sock.reconmode = PL_SOCK_RECONMODE_3
+	sock.rxbuffrq(2)
+	sock.txbuffrq(2)
+	log_sock = sock_get("LOG")
+	sock.num = log_sock
+	sock.protocol = PL_SOCK_PROTOCOL_UDP
+	sock.inconmode = PL_SOCK_INCONMODE_NONE
+	sock.rxbuffrq(1)
+	sock.txbuffrq(1)
+end sub
+
+sub mon_from_device(n as word)
+	dev_bytes = dev_bytes + n
+	dev_quiet = 0
+	if waiting = YES then
+		waiting = NO
+		misses = 0
+	end if
+	if st_noreply = YES then
+		st_noreply = NO
+		mon_event("прибор снова отвечает", 5)
+	end if
+	if st_silent = YES then
+		st_silent = NO
+		mon_event("прибор снова передаёт данные", 5)
+	end if
+end sub
+
+sub mon_from_pc(n as word)
+	pc_bytes = pc_bytes + n
+	if waiting = NO then
+		waiting = YES
+		wait_cnt = 0
+	end if
+end sub
+
+sub mon_pc_event(newstatesimple as pl_sock_state_simple)
+	if newstatesimple = PL_SSTS_EST then
+		pc_up = YES
+		pc_off = 0
+		if st_pcoff = YES then
+			st_pcoff = NO
+			mon_event("программа снова подключена", 5)
+		end if
+	else if newstatesimple = PL_SSTS_CLOSED and pc_up = YES then
+		pc_up = NO
+		waiting = NO
+	end if
+end sub
+
+sub mon_tick()
+	if dev_quiet < 1000000000 then dev_quiet = dev_quiet + 1
+#if CFG_SILENT_MIN > 0
+	if st_silent = NO and dev_quiet > CFG_SILENT_MIN * 120 then
+		st_silent = YES
+		mon_event("прибор молчит больше " + str(CFG_SILENT_MIN) + " мин", 4)
+	end if
+#endif
+#if CFG_REPLY_MISSES > 0
+	if waiting = YES then
+		wait_cnt = wait_cnt + 1
+		if wait_cnt > CFG_REPLY_HALFSEC then
+			waiting = NO
+			if misses < 255 then misses = misses + 1
+			if misses >= CFG_REPLY_MISSES and st_noreply = NO then
+				st_noreply = YES
+				mon_event("прибор не ответил " + str(misses) + " раз подряд", 4)
+			end if
+		end if
+	end if
+#endif
+#if CFG_PC_OFF_MIN > 0
+	if pc_up = NO then
+		if pc_off < 1000000000 then pc_off = pc_off + 1
+		if st_pcoff = NO and pc_off > CFG_PC_OFF_MIN * 120 then
+			st_pcoff = YES
+			mon_event("программа не подключена больше " + str(CFG_PC_OFF_MIN) + " мин", 4)
+		end if
+	end if
+#endif
+end sub
+
+function two(v as word) as string
+	two = str(v)
+	if v < 10 then two = "0" + two
+end function
+
+function mon_time(d as word, m as word, s as byte) as string
+	if time_ok = NO then
+		mon_time = ""
+		exit function
+	end if
+	mon_time = str(2000 + year(d)) + "-" + two(month(d)) + "-" + two(date(d)) + " " + two(m / 60) + ":" + two(m mod 60) + ":" + two(s)
+end function
+
+'событие: в журнал (новые сверху), в отладку и в syslog
+'sev - важность syslog: 4 - предупреждение, 5 - восстановление
+sub mon_event(byref txt as string, sev as byte)
+	dim d, m as word
+	dim s as byte
+	if time_ok = YES then
+		rtc.getdata(d, m, s)
+	else
+		d = 0
+		m = 0
+		s = 0
+	end if
+	dim i as byte
+	if ev_n < EV_SIZE then ev_n = ev_n + 1
+	for i = ev_n - 1 to 1 step -1
+		ev_day(i) = ev_day(i - 1)
+		ev_min(i) = ev_min(i - 1)
+		ev_sec(i) = ev_sec(i - 1)
+		ev_txt(i) = ev_txt(i - 1)
+	next i
+	ev_day(0) = d
+	ev_min(0) = m
+	ev_sec(0) = s
+	ev_txt(0) = left(txt, 48)
+	dbg(txt)
+	if CFG_SYSLOG_IP = "" then exit sub
+	dim keep as byte = sock.num
+	sock.num = log_sock
+	if sock.statesimple = PL_SSTS_CLOSED then
+		sock.targetip = CFG_SYSLOG_IP
+		sock.targetport = CFG_SYSLOG_PORT
+		sock.connect()
+	end if
+	'syslog RFC 3164: <PRI>Mmm dd hh:mm:ss хост приложение: текст; local0 = 16
+	const MON = "JanFebMarAprMayJunJulAugSepOctNovDec"
+	dim ts as string(16) = ""
+	if time_ok = YES then
+		dim dd as string(2) = str(date(d))
+		if date(d) < 10 then dd = " " + dd
+		ts = mid(MON, (month(d) - 1) * 3 + 1, 3) + " " + dd + " " + two(m / 60) + ":" + two(m mod 60) + ":" + two(s) + " "
+	end if
+	dim msg as string(120) = "<" + str(16 * 8 + sev) + ">" + ts + CFG_NAME + " tibbo: " + txt
+	if sock.txfree >= len(msg) then
+		sock.setdata(msg)
+		sock.send()
+	end if
+	sock.num = keep
+end sub

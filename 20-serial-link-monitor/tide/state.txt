@@ -1,0 +1,10 @@
+<?
+include "global.tbh"
+'ключ=значение: 1 - сбой есть, 0 - нет
+dim s as string
+s = "name=" + CFG_NAME + chr(10) + "pc_connected=" + str(pc_up) + chr(10)
+s = s + "device_silent=" + str(st_silent) + chr(10) + "device_noreply=" + str(st_noreply) + chr(10) + "pc_off=" + str(st_pcoff) + chr(10)
+web_send(s)
+s = "device_quiet_s=" + lstr(dev_quiet / 2) + chr(10) + "bytes_from_device=" + lstr(dev_bytes) + chr(10) + "bytes_from_pc=" + lstr(pc_bytes) + chr(10) + "time_ok=" + str(time_ok) + chr(10)
+web_send(s)
+?>

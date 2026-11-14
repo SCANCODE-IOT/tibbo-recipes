@@ -1,0 +1,43 @@
+'=====================================================================
+' Рецепт 20 «Прибор на связи?» · общий заголовок
+' Устройство DS1101 (порт 0 RS-232 на DB9, Ethernet, часы). Библиотеки 2_01_05
+'=====================================================================
+include "config.tbh"
+
+#define DHCP_DEBUG_PRINT 0
+#define SNTP_DEBUG_PRINT 0
+include "sock\trunk\sock.tbh"
+include "dhcp\trunk\dhcp.tbh"
+include "sntp\trunk\sntp.tbh"
+
+#define EV_SIZE 30                          'сколько последних событий хранит журнал
+
+'--- mon.tbs ---
+declare sub mon_init()
+declare sub mon_tick()
+declare sub mon_from_device(n as word)
+declare sub mon_from_pc(n as word)
+declare sub mon_pc_event(newstatesimple as pl_sock_state_simple)
+declare function mon_time(d as word, m as word, s as byte) as string
+declare raw_sock as byte
+declare log_sock as byte
+declare time_ok as no_yes
+declare dev_bytes as dword
+declare pc_bytes as dword
+declare dev_quiet as dword                  'полусекунд без данных от прибора
+declare pc_up as no_yes
+declare st_silent as no_yes
+declare st_noreply as no_yes
+declare st_pcoff as no_yes
+declare misses as byte
+declare ev_n as byte
+declare ev_day(EV_SIZE) as word
+declare ev_min(EV_SIZE) as word
+declare ev_sec(EV_SIZE) as byte
+declare ev_txt(EV_SIZE) as string(48)
+
+'--- main.tbs ---
+declare sub dbg(byref s as string)
+
+'--- web.tbs ---
+declare sub web_send(byref s as string)

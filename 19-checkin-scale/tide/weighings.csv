@@ -1,0 +1,11 @@
+<?
+include "global.tbh"
+'журнал последних взвешиваний: стойка;время;кг;класс (0 - норма, 1 - больше первого порога, 2 - больше второго)
+dim i as byte
+web_send("counter;time;kg;class" + chr(13) + chr(10))
+if log_n > 0 then
+for i = 0 to log_n - 1
+	web_send(CFG_COUNTER + ";" + weigh_time(log_day(i), log_min(i)) + ";" + weigh_kg(log_g(i)) + ";" + str(weigh_class(log_g(i))) + chr(13) + chr(10))
+next i
+end if
+?>

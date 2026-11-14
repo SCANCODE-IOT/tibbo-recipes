@@ -1,0 +1,152 @@
+'=====================================================================
+' Взвешивания: багаж положили, вес стабилен - одна запись в журнал.
+' Следующая запись - после того, как весы опустели. Перевес по двум
+' порогам, контроль нуля пустых весов, счётчики за сутки, UDP-сообщение.
+'=====================================================================
+include "global.tbh"
+
+dim raw_sock as byte
+dim udp_sock as byte
+dim time_ok as no_yes = NO
+dim w_count as word = 0                     'взвешиваний за сутки
+dim w_over as word = 0                      'из них с перевесом (больше первого порога)
+dim w_total as dword = 0                    'суммарный вес за сутки, г
+dim zero_bad as no_yes = NO
+dim log_n as byte = 0
+dim log_day(LOG_SIZE) as word
+dim log_min(LOG_SIZE) as word
+dim log_g(LOG_SIZE) as long
+dim armed as no_yes = NO                    'ждём багаж (весы перед этим опустели)
+dim stable_cnt as byte = 0
+dim zero_cnt as word = 0
+dim cur_day as word = 0
+
+declare sub weigh_record(g as long)
+
+sub weigh_init()
+	raw_sock = sock_get("RAW")
+	sock.num = raw_sock
+	sock.protocol = PL_SOCK_PROTOCOL_TCP
+	sock.inconmode = PL_SOCK_INCONMODE_ANY_IP_ANY_PORT
+	sock.localportlist = str(CFG_RAW_PORT)
+	sock.reconmode = PL_SOCK_RECONMODE_3
+	sock.rxbuffrq(1)
+	sock.txbuffrq(2)
+	udp_sock = sock_get("UDP")
+	sock.num = udp_sock
+	sock.protocol = PL_SOCK_PROTOCOL_UDP
+	sock.inconmode = PL_SOCK_INCONMODE_NONE
+	sock.rxbuffrq(1)
+	sock.txbuffrq(1)
+end sub
+
+'класс веса: 0 - в норме, 1 - больше первого порога, 2 - больше второго
+function weigh_class(g as long) as byte
+	weigh_class = 0
+	if g > CFG_LIMIT1_G then weigh_class = 1
+	if g > CFG_LIMIT2_G then weigh_class = 2
+end function
+
+sub weigh_tick()
+	if scale_age > CFG_SILENT_HALFSEC then
+		stable_cnt = 0
+		exit sub
+	end if
+	dim g as long = scale_milli
+	if g < CFG_ZERO_G then armed = YES
+	'контроль нуля: пустые весы долго показывают не ноль
+	if g < CFG_MIN_G and scale_stable = YES then
+		dim a as long = g
+		if a < 0 then a = -a
+		if a > CFG_ZERO_WARN_G then
+			if zero_cnt < 65535 then zero_cnt = zero_cnt + 1
+			if zero_cnt >= CFG_ZERO_WARN_HALFSEC then zero_bad = YES
+		else
+			zero_cnt = 0
+			zero_bad = NO
+		end if
+	end if
+	'взвешивание
+	if armed = YES and g >= CFG_MIN_G and scale_stable = YES then
+		stable_cnt = stable_cnt + 1
+		if stable_cnt >= CFG_STABLE_HALFSEC then
+			weigh_record(g)
+			armed = NO
+			stable_cnt = 0
+		end if
+	else
+		stable_cnt = 0
+	end if
+end sub
+
+sub weigh_record(g as long)
+	dim d, m as word
+	dim s as byte
+	if time_ok = YES then
+		rtc.getdata(d, m, s)
+	else
+		d = 0
+		m = 0
+	end if
+	if d <> cur_day then
+		cur_day = d
+		w_count = 0
+		w_over = 0
+		w_total = 0
+	end if
+	'журнал: новые записи в начало
+	dim i as byte
+	if log_n < LOG_SIZE then log_n = log_n + 1
+	for i = log_n - 1 to 1 step -1
+		log_day(i) = log_day(i - 1)
+		log_min(i) = log_min(i - 1)
+		log_g(i) = log_g(i - 1)
+	next i
+	log_day(0) = d
+	log_min(0) = m
+	log_g(0) = g
+	w_count = w_count + 1
+	w_total = w_total + g
+	if weigh_class(g) > 0 then w_over = w_over + 1
+	dbg("Bag: " + weigh_kg(g) + " kg")
+	if CFG_UDP_IP = "" then exit sub
+	dim keep as byte = sock.num
+	sock.num = udp_sock
+	if sock.statesimple = PL_SSTS_CLOSED then
+		sock.targetip = CFG_UDP_IP
+		sock.targetport = CFG_UDP_PORT
+		sock.connect()
+	end if
+	dim msg as string(80) = CFG_COUNTER + ";" + weigh_time(d, m) + ";" + weigh_kg(g) + ";" + str(weigh_class(g))
+	if sock.txfree >= len(msg) then
+		sock.setdata(msg)
+		sock.send()
+	end if
+	sock.num = keep
+end sub
+
+function two(v as word) as string
+	two = str(v)
+	if v < 10 then two = "0" + two
+end function
+
+'"2026-11-14 09:05"; часы не установлены - пусто
+function weigh_time(d as word, m as word) as string
+	if d = 0 and m = 0 and time_ok = NO then
+		weigh_time = ""
+		exit function
+	end if
+	weigh_time = str(2000 + year(d)) + "-" + two(month(d)) + "-" + two(date(d)) + " " + two(m / 60) + ":" + two(m mod 60)
+end function
+
+'граммы -> "23.4" (кг, одна цифра после точки, без плавающей точки)
+function weigh_kg(g as long) as string
+	dim neg as no_yes = NO
+	if g < 0 then
+		neg = YES
+		g = -g
+	end if
+	dim r as long = (g + 50) / 100
+	weigh_kg = lstr(r / 10) + "." + lstr(r mod 10)
+	if neg = YES then weigh_kg = "-" + weigh_kg
+end function

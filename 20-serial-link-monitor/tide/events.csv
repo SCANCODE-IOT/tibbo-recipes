@@ -1,0 +1,11 @@
+<?
+include "global.tbh"
+'последние события: время;событие
+dim i as byte
+web_send("time;event" + chr(13) + chr(10))
+if ev_n > 0 then
+for i = 0 to ev_n - 1
+	web_send(mon_time(ev_day(i), ev_min(i), ev_sec(i)) + ";" + ev_txt(i) + chr(13) + chr(10))
+next i
+end if
+?>
