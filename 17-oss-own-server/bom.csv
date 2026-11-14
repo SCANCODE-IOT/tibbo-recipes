@@ -1,0 +1,5 @@
+Артикул;Наименование;Кол-во;Назначение;Страница в каталоге
+OSS1-WC-L02-00;OSS: Wi-Fi, LTE, внешнее питание, температура, влажность и CO2;1;Пример станции - любая модель OSS подходит;https://tibbo.ru/products/oss1-wc-l02-00
+-;VPS или сервер с Docker, 1 ядро, 2 ГБ памяти, белый IP или домен;1;Mosquitto, Node-RED, InfluxDB, Grafana;
+-;Смартфон с NFC и Bluetooth и приложением OSS Companion;1;Прошивка и настройка OSS;
+-;Компьютер с Windows и TIDE;1;Сборка прошивки OSS;

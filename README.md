@@ -1,6 +1,6 @@
 # Рецепты Tibbo: готовые решения автоматизации
 
-Шестнадцать задач, решённых от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC или проект [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
+Семнадцать задач, решённых от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC или проект [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
 
 Описания и страницы со спецификацией и ценами - на [tibbo.ru/recipes](https://tibbo.ru/recipes).
 
@@ -22,6 +22,7 @@
 | 14 | [Сварочный пост: учёт времени работы сварщика](14-welding-post/) - По току аппарата считает время дуги, время в работе, зажигания и киловатт-часы за сутки; журнал, CSV и MQTT. | TPP2(G2) | да |
 | 15 | [Этикетка по весу на принтер Godex](15-weight-label/) - Весы на RS-232, печать этикетки по стабильному весу на сетевой Godex: масса, даты, весовой EAN-13 и QR. | DS1101 | - |
 | 16 | [Подбор по свету с ТСД](16-pick-to-light/) - ТСД сканирует товар, у ячейки загорается лампа, работник подтверждает кнопкой; задание из учётной системы по HTTP. | TPP2(G2) | - |
+| 17 | [OSS со своим сервером: MQTT вместо Azure](17-oss-own-server/) - Уличная станция Tibbo OSS отправляет данные на ваш брокер MQTT: графики Grafana, оповещения в Telegram, имитатор станции для проверки. | OSS | - |
 
 ## Принципы
 
@@ -30,6 +31,7 @@
 - **Все настройки объекта в одном файле** `tide/config.tbh`: сеть, MQTT, адреса приборов, пороги.
 - **Проверка.** Каждый проект собирается компилятором TIDE без ошибок; варианты AppBlocks собираются компилятором Tibbo, логика изменённых в версии 1.3.0 проектов (04, 08, 10) прогнана на модели по сценариям. Что и как проверено - в строке «Проверка» каждого рецепта. На реальном оборудовании рецепты не проверялись - перед установкой на объект проверьте комплект на стенде.
 - **Два варианта - не всегда одно и то же.** Вариант AppBlocks проще варианта TIDE. В каждом рецепте есть список «Чем отличается от варианта TIDE»: прочитайте его до выбора.
+- **Рецепт 17 - для станции OSS, а не для платы TPS.** В нём нет проекта TIDE: это сервер в Docker и правка официальной прошивки Tibbo для своего сертификата. Сервер проверен имитатором OSS, изменённая прошивка собирается компилятором Tibbo, на живой OSS рецепт не проверялся.
 - **Рецепты 11-13 проверены иначе.** 12 - проект AppBlocks, собран компилятором Tibbo через сборщик AppBlocks; 13 - Tibbo BASIC, собран тем же компилятором, библиотеки лежат в папке проекта; 11 - программа на Python для Linux-платы, 27 автотестов на эмуляторе. Как и остальные, на настоящем железе они не запускались.
 
 ## Как начать
@@ -44,7 +46,7 @@
 
 # Tibbo recipes: ready-made automation solutions
 
-Sixteen automation tasks solved end to end on Tibbo hardware: a TIDE project (Tibbo BASIC), an AppBlocks variant where it fits, a bill of materials, a Tibbit socket layout with power budget and assembly notes. Documentation inside each recipe is in Russian.
+Seventeen automation tasks solved end to end on Tibbo hardware: a TIDE project (Tibbo BASIC), an AppBlocks variant where it fits, a bill of materials, a Tibbit socket layout with power budget and assembly notes. Documentation inside each recipe is in Russian.
 
 | # | Recipe | Board | AppBlocks |
 |---|---|---|---|
@@ -64,11 +66,13 @@ Sixteen automation tasks solved end to end on Tibbo hardware: a TIDE project (Ti
 | 14 | [Welding post: welder work time tracking](14-welding-post/) | TPP2(G2) | yes |
 | 15 | [Weight label on a Godex printer](15-weight-label/) | DS1101 | - |
 | 16 | [Pick-to-light with a mobile computer](16-pick-to-light/) | TPP2(G2) | - |
+| 17 | [Tibbo OSS with your own server: MQTT instead of Azure](17-oss-own-server/) | OSS | - |
 
-Every project builds with the TIDE compiler with no errors, and AppBlocks variants build with the Tibbo cloud compiler. An AppBlocks variant is simpler than the TIDE one: each recipe lists the differences. Connectors are chosen so that the AppBlocks editor does not flag any socket (power Tibbits #09/#10 use #18, the #29 sensor sits next to #00-3). **Not tested on real hardware** - verify on a bench before deployment.
+Every project builds with the TIDE compiler with no errors, and AppBlocks variants build with the Tibbo cloud compiler. An AppBlocks variant is simpler than the TIDE one: each recipe lists the differences. Connectors are chosen so that the AppBlocks editor does not flag any socket (power Tibbits #09/#10 use #18, the #29 sensor sits next to #00-3). **Not tested on real hardware** - verify on a bench before deployment. Recipe 17 is for the Tibbo OSS station rather than a TPS board: a Docker server plus a patch to the official Tibbo firmware.
 
 ## Versions
 
+- **1.6.0** (2026-11-14): recipe 17 - Tibbo OSS (Outdoor Sensor System) with your own server instead of Azure. The Tibbo Alibaba Cloud firmware gets your CA certificate and port 8883 (patch script and a `.tcu` packer that reproduces official Tibbo releases byte for byte); the server is Docker Compose with Mosquitto (TLS, per-device logins and ACL), Node-RED (time reply, parsing, thresholds, no-data watchdog, Telegram), InfluxDB 2 and Grafana. Server checked with an OSS simulator; the patched firmware builds with the Tibbo compiler; not tested on a real OSS.
 - **1.5.1** (2026-11-13): fixes after an independent code review. Web pages of recipes 02, 03, 04, 05, 08, 09, 10, 13, 14, 15, 16: the first query parameter was not found because the TiOS request string has no leading "?" - buttons, settings and the clock set from the page could fail. Recipe 06: values on the page are sent as TiOS documentation requires. Recipe 15: the print button got no reply (it went to the printer socket), QR in alphanumeric mode, weight without float rounding, stuck printer connection reset, EZPL control characters removed from the product name. Recipe 16: no lost first parameter, longer request buffer, full journal events, CSV-safe codes and names.
 - **1.5.0** (2026-11-13): recipes 15 and 16 for warehouses and labelling. 15 - a scale on RS-232 and a network Godex printer (EZPL over TCP 9100): the label is printed when the weight is stable, with net weight, packing and best-before dates, a weight EAN-13 and a QR code; printer status is checked with ~S,CHECK. 16 - pick-to-light: a CipherLab, Point Mobile or other Android mobile computer scans in keyboard mode on the controller's web page, the cell lamp lights (#11), the worker confirms with the cell button (#04-8); tasks come from the accounting system over HTTP. Both built with the Tibbo compiler, logic checked on a model.
 - **1.4.0** (2026-11-13): recipe 14 - welding post time tracking. A current switch on the welder supply cable and an isolated 24 V input (#04-5) detect the arc; the controller counts arc time, work time, arc starts and energy per day (Modbus meter), keeps a 62-day journal, CSV and MQTT. TIDE and AppBlocks variants, built with the Tibbo compiler, logic checked on a model.

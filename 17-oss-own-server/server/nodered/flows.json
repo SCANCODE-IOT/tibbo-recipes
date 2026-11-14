@@ -1,0 +1,358 @@
+[
+ {
+  "id": "oss_tab",
+  "type": "tab",
+  "label": "OSS",
+  "info": "Рецепт 17: приём данных OSS (прошивка с MQTT), время, InfluxDB, оповещения."
+ },
+ {
+  "id": "brk",
+  "type": "mqtt-broker",
+  "name": "mosquitto (внутренний 1883)",
+  "broker": "${MQTT_HOST}",
+  "port": "1883",
+  "clientid": "nodered-oss",
+  "autoConnect": true,
+  "usetls": false,
+  "protocolVersion": "4",
+  "keepalive": "60",
+  "cleansession": true,
+  "autoUnsubscribe": true,
+  "birthTopic": "",
+  "closeTopic": "",
+  "willTopic": ""
+ },
+ {
+  "id": "c1",
+  "type": "comment",
+  "name": "1. Время: OSS спрашивает время при каждом подключении - отвечаем часами сервера",
+  "info": "",
+  "x": 260,
+  "y": 40,
+  "z": "oss_tab"
+ },
+ {
+  "id": "ntp_in",
+  "type": "mqtt in",
+  "name": "запрос времени",
+  "topic": "/ext/ntp/+/+/request",
+  "qos": "1",
+  "datatype": "utf8",
+  "broker": "brk",
+  "nl": false,
+  "rap": true,
+  "rh": 0,
+  "inputs": 0,
+  "wires": [
+   [
+    "ntp_fn"
+   ]
+  ],
+  "x": 150,
+  "y": 80,
+  "z": "oss_tab"
+ },
+ {
+  "id": "ntp_fn",
+  "type": "function",
+  "name": "ответ со временем",
+  "func": "// OSS ждёт ответ в формате Alibaba Cloud: serverRecvTime - время сервера в миллисекундах (UTC)\nlet req = {};\ntry { req = JSON.parse(msg.payload); } catch (e) {}\nconst now = String(Date.now());\nmsg.topic = msg.topic.replace(/\\/request$/, '/response');\nmsg.payload = JSON.stringify({ deviceSendTime: String(req.deviceSendTime || ''), serverRecvTime: now, serverSendTime: now });\nreturn msg;",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "wires": [
+   [
+    "ntp_out"
+   ]
+  ],
+  "x": 380,
+  "y": 80,
+  "z": "oss_tab"
+ },
+ {
+  "id": "ntp_out",
+  "type": "mqtt out",
+  "name": "",
+  "topic": "",
+  "qos": "1",
+  "retain": "false",
+  "broker": "brk",
+  "wires": [],
+  "x": 590,
+  "y": 80,
+  "z": "oss_tab"
+ },
+ {
+  "id": "c2",
+  "type": "comment",
+  "name": "2. Данные: разбор сообщений OSS и запись в InfluxDB",
+  "info": "",
+  "x": 220,
+  "y": 140,
+  "z": "oss_tab"
+ },
+ {
+  "id": "tele_in",
+  "type": "mqtt in",
+  "name": "данные и события OSS",
+  "topic": "/sys/+/+/thing/event/+/post",
+  "qos": "1",
+  "datatype": "utf8",
+  "broker": "brk",
+  "nl": false,
+  "rap": true,
+  "rh": 0,
+  "inputs": 0,
+  "wires": [
+   [
+    "parse"
+   ]
+  ],
+  "x": 160,
+  "y": 180,
+  "z": "oss_tab"
+ },
+ {
+  "id": "parse",
+  "type": "function",
+  "name": "разбор",
+  "func": "// топик: /sys/<продукт>/<устройство>/thing/event/<property | events:events>/post\nconst p = msg.topic.split('/');\nconst pk = p[2], dn = p[3], ident = p[6];\nlet j;\ntry { j = JSON.parse(msg.payload); } catch (e) { node.warn('не JSON от ' + dn + ': ' + msg.payload); return null; }\n// id - метка времени устройства: секунды и три цифры («1734657290001»)\nconst now = Math.floor(Date.now() / 1000);\nlet ts = Math.floor(Number(j.id) / 1000);\nif (!ts || ts < 1577836800 || ts > now + 3600) ts = now;   // часы устройства ещё не сверены\nconst seen = flow.get('seen') || {}; seen[dn] = now; flow.set('seen', seen);\nif (ident === 'property') {\n    const fields = {};\n    for (const [k, v] of Object.entries(j.params || {})) {\n        const i = k.indexOf(':');\n        const mod = k.slice(0, i), name = k.slice(i + 1);\n        if (mod === 'telemetry' && typeof v === 'number' && isFinite(v)) fields[name] = v;\n        else if (mod === 'settings') { const info = flow.get('info') || {}; (info[dn] = info[dn] || {})[name] = String(v); flow.set('info', info); }\n    }\n    if (!Object.keys(fields).length) return null;\n    msg.oss = { kind: 'data', pk, dn, ts, fields };\n} else {\n    msg.oss = { kind: 'event', pk, dn, ts, text: String((j.params || {}).message || '') };\n}\nreturn msg;",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "wires": [
+   [
+    "influx",
+    "thr",
+    "evt"
+   ]
+  ],
+  "x": 380,
+  "y": 180,
+  "z": "oss_tab"
+ },
+ {
+  "id": "influx",
+  "type": "function",
+  "name": "в формат InfluxDB",
+  "func": "const o = msg.oss;\nconst esc = s => String(s).replace(/[ ,=]/g, '\\\\$&');\nlet line;\nif (o.kind === 'data') {\n    const f = Object.entries(o.fields).map(([k, v]) => esc(k) + '=' + v).join(',');\n    line = `oss,product=${esc(o.pk)},device=${esc(o.dn)} ${f} ${o.ts}`;\n} else {\n    const t = o.text.replace(/\\\\/g, '\\\\\\\\').replace(/\"/g, '\\\\\"');\n    line = `oss_event,product=${esc(o.pk)},device=${esc(o.dn)} message=\"${t}\" ${o.ts}`;\n}\nconst base = env.get('INFLUX_URL') || 'http://influxdb:8086';\nmsg.url = base + '/api/v2/write?org=' + encodeURIComponent(env.get('INFLUX_ORG')) + '&bucket=' + encodeURIComponent(env.get('INFLUX_BUCKET')) + '&precision=s';\nmsg.method = 'POST';\nmsg.headers = { 'Authorization': 'Token ' + env.get('INFLUX_TOKEN'), 'Content-Type': 'text/plain; charset=utf-8' };\nmsg.payload = line;\nreturn msg;",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "wires": [
+   [
+    "influx_http"
+   ]
+  ],
+  "x": 610,
+  "y": 160,
+  "z": "oss_tab"
+ },
+ {
+  "id": "influx_http",
+  "type": "http request",
+  "name": "запись в InfluxDB",
+  "method": "use",
+  "ret": "txt",
+  "paytoqs": "ignore",
+  "url": "",
+  "tls": "",
+  "persist": false,
+  "proxy": "",
+  "insecureHTTPParser": false,
+  "authType": "",
+  "senderr": false,
+  "headers": [],
+  "wires": [
+   [
+    "http_chk"
+   ]
+  ],
+  "x": 830,
+  "y": 160,
+  "z": "oss_tab"
+ },
+ {
+  "id": "http_chk",
+  "type": "function",
+  "name": "ошибка записи?",
+  "func": "if (msg.statusCode >= 300) node.warn('InfluxDB ответил ' + msg.statusCode + ': ' + msg.payload);\nreturn null;",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "wires": [
+   []
+  ],
+  "x": 1030,
+  "y": 160,
+  "z": "oss_tab"
+ },
+ {
+  "id": "c3",
+  "type": "comment",
+  "name": "3. Оповещения: пороги из THRESHOLDS, ошибки датчика, «нет данных» (NODATA_MIN)",
+  "info": "",
+  "x": 290,
+  "y": 260,
+  "z": "oss_tab"
+ },
+ {
+  "id": "thr",
+  "type": "function",
+  "name": "пороги",
+  "func": "if (msg.oss.kind !== 'data') return null;\nlet cfg = {};\ntry { cfg = JSON.parse(env.get('THRESHOLDS') || '{}'); } catch (e) { node.warn('THRESHOLDS - не JSON'); return null; }\nconst st = flow.get('alarm') || {};\nconst out = [];\nfor (const [name, v] of Object.entries(msg.oss.fields)) {\n    const c = cfg[name];\n    if (!c) continue;\n    const h = Number(c.hyst || 0), key = msg.oss.dn + '/' + name;\n    const hi = c.max !== undefined && v > c.max, lo = c.min !== undefined && v < c.min;\n    if (!st[key] && (hi || lo)) {\n        st[key] = true;\n        out.push({ payload: `⚠️ ${msg.oss.dn}: ${name} = ${v} (${hi ? 'выше ' + c.max : 'ниже ' + c.min})` });\n    } else if (st[key]) {\n        const okHi = c.max === undefined || v <= c.max - h, okLo = c.min === undefined || v >= c.min + h;\n        if (okHi && okLo) { st[key] = false; out.push({ payload: `✅ ${msg.oss.dn}: ${name} = ${v}, снова в норме` }); }\n    }\n}\nflow.set('alarm', st);\nreturn [out];",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "wires": [
+   [
+    "tg"
+   ]
+  ],
+  "x": 590,
+  "y": 300,
+  "z": "oss_tab"
+ },
+ {
+  "id": "evt",
+  "type": "function",
+  "name": "ошибки устройства",
+  "func": "// события OSS, о которых стоит сообщить сразу; остальные (обновление прошивки и т.п.) только в журнал\nif (msg.oss.kind !== 'event') return null;\nif (!/unable|fail|out of range|invalid/i.test(msg.oss.text)) return null;\nmsg.payload = `❗ ${msg.oss.dn}: ${msg.oss.text}`;\nreturn msg;",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "wires": [
+   [
+    "tg"
+   ]
+  ],
+  "x": 610,
+  "y": 340,
+  "z": "oss_tab"
+ },
+ {
+  "id": "tick",
+  "type": "inject",
+  "name": "каждые 5 минут",
+  "props": [
+   {
+    "p": "payload"
+   }
+  ],
+  "repeat": "300",
+  "crontab": "",
+  "once": true,
+  "onceDelay": "60",
+  "topic": "",
+  "payload": "",
+  "payloadType": "date",
+  "wires": [
+   [
+    "nodata"
+   ]
+  ],
+  "x": 160,
+  "y": 400,
+  "z": "oss_tab"
+ },
+ {
+  "id": "nodata",
+  "type": "function",
+  "name": "нет данных?",
+  "func": "const lim = (Number(env.get('NODATA_MIN')) || 90) * 60;\nconst now = Date.now() / 1000;\nconst seen = flow.get('seen') || {}, lost = flow.get('lost') || {};\nconst out = [];\nfor (const [dn, t] of Object.entries(seen)) {\n    const late = now - t > lim;\n    if (late && !lost[dn]) { lost[dn] = true; out.push({ payload: `📵 ${dn}: нет данных ${Math.round((now - t) / 60)} мин` }); }\n    if (!late && lost[dn]) { lost[dn] = false; out.push({ payload: `📶 ${dn}: снова на связи` }); }\n}\nflow.set('lost', lost);\nreturn [out];",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "wires": [
+   [
+    "tg"
+   ]
+  ],
+  "x": 380,
+  "y": 400,
+  "z": "oss_tab"
+ },
+ {
+  "id": "tg",
+  "type": "function",
+  "name": "в Telegram",
+  "func": "const tok = env.get('TELEGRAM_TOKEN'), chat = env.get('TELEGRAM_CHAT');\nnode.log(msg.payload);\nif (!tok || !chat) { node.status({ fill: 'grey', shape: 'ring', text: 'Telegram не настроен' }); return null; }\nconst base = env.get('TELEGRAM_API') || 'https://api.telegram.org';\nmsg.url = base + '/bot' + tok + '/sendMessage';\nmsg.method = 'POST';\nmsg.headers = { 'Content-Type': 'application/json' };\nmsg.payload = JSON.stringify({ chat_id: chat, text: msg.payload });\nreturn msg;",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "wires": [
+   [
+    "tg_http"
+   ]
+  ],
+  "x": 830,
+  "y": 340,
+  "z": "oss_tab"
+ },
+ {
+  "id": "tg_http",
+  "type": "http request",
+  "name": "отправка",
+  "method": "use",
+  "ret": "txt",
+  "paytoqs": "ignore",
+  "url": "",
+  "tls": "",
+  "persist": false,
+  "proxy": "",
+  "insecureHTTPParser": false,
+  "authType": "",
+  "senderr": false,
+  "headers": [],
+  "wires": [
+   [
+    "tg_chk"
+   ]
+  ],
+  "x": 1010,
+  "y": 340,
+  "z": "oss_tab"
+ },
+ {
+  "id": "tg_chk",
+  "type": "function",
+  "name": "ошибка Telegram?",
+  "func": "if (msg.statusCode >= 300) node.warn('Telegram ответил ' + msg.statusCode + ': ' + msg.payload);\nreturn null;",
+  "outputs": 1,
+  "timeout": 0,
+  "noerr": 0,
+  "initialize": "",
+  "finalize": "",
+  "libs": [],
+  "wires": [
+   []
+  ],
+  "x": 1190,
+  "y": 340,
+  "z": "oss_tab"
+ }
+]

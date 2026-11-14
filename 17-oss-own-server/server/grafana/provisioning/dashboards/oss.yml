@@ -1,0 +1,7 @@
+apiVersion: 1
+providers:
+  - name: OSS
+    folder: OSS
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards
