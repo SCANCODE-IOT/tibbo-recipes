@@ -82,6 +82,7 @@ Every project builds with the TIDE compiler with no errors, and AppBlocks varian
 
 ## Versions
 
+- **1.9.3** (2026-11-16): recipe 03 - a note on meter verification (the meters are the measuring instruments, the controller only reads them). Firmware unchanged.
 - **1.9.2** (2026-11-16): recipes 06 and 15 - solution diagrams (scheme.png) added to the README and the archive. Firmware unchanged.
 - **1.9.1** (2026-11-14): recipe 22 - a prominent note that the #17 outputs switch the +12 V side, so only single-colour 12 V strips and garlands fit; a common-anode RGB strip will not work. Same note on the controller web page and in config.tbh.
 - **1.9.0** (2026-11-14): recipe 22 - festive and facade lighting by sunset on TPP2(G2). Sunrise and sunset are computed on the controller from latitude, longitude and date (NOAA formulas with own sin/cos/acos, checked against the astral library: within 5 minutes for six cities over 2026-2027); evening on at sunset with an offset, off at a set time, optional morning window, New Year's night until sunrise, white nights and polar day/night handled. Two relays (#03-1) drive 12 V coils of installation relays for 230 V groups; three 12 V PWM channels (#17, 2 kHz) run steady, breathing, chase, flow and twinkle effects with soft start and gamma. #17 is driven by unchanged Tibbo files from CA-Test-Tibbits-16-17-31. Builds with the Tibbo compiler; not tested on hardware.
