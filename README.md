@@ -3,6 +3,7 @@
 Двадцать две задачи, решённые от начала до конца на оборудовании [Tibbo Technology](https://tibbo.com): проект TIDE на Tibbo BASIC или проект [AppBlocks](https://appblocks.io), спецификация (`bom.csv`), раскладка Tibbit по сокетам с бюджетом питания и инструкция по сборке и настройке.
 
 Описания и страницы со спецификацией и ценами - на [tibbo.ru/recipes](https://tibbo.ru/recipes).
+Новые рецепты и новости Tibbo - в нашем [Telegram-канале](https://t.me/tibbotechnologyru): подпишитесь, чтобы узнавать о них первыми.
 
 | № | Рецепт | Плата | AppBlocks |
 |---|---|---|---|
